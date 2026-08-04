@@ -1,0 +1,61 @@
+<!-- 
+<link href="index.css" rel="stylesheet" />
+<script src="alpine.js" defer></script>
+$ tailwindcss -o index.css --watch --minify
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scoped CSS Variables and JS</title>
+  <link href="index.css" rel="stylesheet" />
+  <script src="alpine.js" defer></script>
+  <link rel="icon" href="https://fav.farm/🔥" />
+</head>
+<body 
+  x-data="{
+    spacing: 10, blur: 10, color: '#ffc600',  
+  }"
+  class="bg-[#193549] text-white p-5"
+>
+  <h2 class="text-7xl text-center font-bold m-10">
+    Update CSS Variables with 
+    <span :style="{ color: color }">JS</span>
+  </h2>
+
+  <div class="flex justify-center controls gap-2 m-15 items-baseline">
+    <label for="spacing" class="text-5xl">Spacing:</label>
+    <input 
+        id="spacing" type="range" min="10" max="200" value="10" 
+        data-sizing="px" class="w-25" x-model="spacing"
+    >
+
+    <label for="blur" class="text-5xl">Blur:</label>
+    <input id="blur" type="range" min="0" max="25" value="10" 
+        data-sizing="px" class="w-25" x-model="blur"
+    >
+
+    <label for="base" class="text-5xl">Base Color:</label>
+    <input id="base" type="color" value="#ffc600"
+        class="border-5 rounded-md w-25" x-model="color"
+    >
+  </div>
+
+  <img src="https://unsplash.it/800/500?image" 
+    class="mx-auto border-12 rounded-xs"
+    :style="{
+      'border-color': color,
+      'filter': 'blur(' + blur + 'px)',
+      'border-width': spacing + 'px',
+    }"
+  >
+
+  <style>
+  </style>
+
+  <script>
+  </script>
+
+</body>
+</html>

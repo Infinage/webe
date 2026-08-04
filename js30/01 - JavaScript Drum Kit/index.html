@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS Drum Kit</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="//unpkg.com/alpinejs" defer></script>
+  <link rel="icon" href="https://fav.farm/🔥" />
+</head>
+<body
+  class="bg-position-[bottom_center] bg-cover bg-[url(./background.jpg)]"
+>
+  <div 
+      class="flex items-center justify-center h-screen"
+      x-data="{
+        activeKeys: {},
+        
+        keys: [
+          {key: 'A', desc:    'clap', audio: new Audio('sounds/clap.wav')},
+          {key: 'S', desc:   'hihat', audio: new Audio('sounds/hihat.wav')},
+          {key: 'D', desc:    'kick', audio: new Audio('sounds/kick.wav')},
+          {key: 'F', desc: 'openhat', audio: new Audio('sounds/openhat.wav')},
+          {key: 'G', desc:    'boom', audio: new Audio('sounds/boom.wav')},
+          {key: 'H', desc:    'ride', audio: new Audio('sounds/ride.wav')},
+          {key: 'J', desc:   'snare', audio: new Audio('sounds/snare.wav')},
+          {key: 'K', desc:     'tom', audio: new Audio('sounds/tom.wav')},
+          {key: 'L', desc:    'tink', audio: new Audio('sounds/tink.wav')},
+        ],
+
+        playSound(e) {
+          const drum = this.keys.find(k => k.key === e.key.toUpperCase());
+          if (!drum) return;
+          drum.audio.currentTime = 0;
+          drum.audio.play();
+          this.activeKeys[drum.key] = true;
+        },
+
+        removeTransition(e, key) {
+          if (e.propertyName !== 'scale') return; 
+          delete this.activeKeys[key];
+        },
+      }"
+      @keydown.window="playSound"
+  >
+      <template x-for="k in keys" :key="k.key">
+        <div 
+          class="w-[10rem] bg-black/40 flex flex-col text-center px-[1rem] py-[.5rem] m-[1rem] transition-transform ease-in 
+            duration-[0.07s] border-4 rounded-[.5rem] cursor-pointer select-none"
+          :class="activeKeys[k.key]? 'scale-110 border-yellow-400 shadow-yellow-400 shadow-[0_0_15px]': 'border-black'"
+          @click="playSound({key: k.key})"
+          @transitionend="removeTransition($event, k.key)"
+        >
+          <kbd x-text="k.key" class="text-white text-4xl"></kbd>
+          <span x-text="k.desc" class="text-xs tracking-[.1rem] text-yellow-400 uppercase"></span>
+        </div>
+      </template>
+
+</body>
+</html>

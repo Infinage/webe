@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS + CSS Clock</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="alpine.js" defer></script>
+  <link rel="icon" href="https://fav.farm/🔥" />
+</head>
+<body
+  x-data="{
+    // Time in degrees
+    hourDeg: 0, minDeg: 0, secDeg: 0,
+    tickEffect: false,
+
+    tick() {
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const s = now.getSeconds();
+
+      // keep track of old values to check for wrap
+      old = [this.secDeg, this.minDeg, this.hourDeg]
+
+      // Update current state
+      this.secDeg  = ((s / 60) * 360);
+      this.minDeg  = ((m / 60) * 360) + (s / 60) * 6;
+      this.hourDeg = ((h / 12) * 360) + (m / 60) * 30;
+
+      // Disable tick effect if we just wrapped
+      this.tickEffect = old[0] <= this.secDeg && old[1] <= this.minDeg && old[2] <= this.hourDeg;
+    },
+
+    init() {
+      this.tick();
+      setInterval(() => this.tick(), 1000);
+    },
+  }"
+  x-init=""
+  class="
+    bg-[#018DED] bg-cover bg-[url(https://unsplash.it/1500/1000?image=881&blur=5)] 
+    text-center font-[2rem] flex flex-1 min-h-screen items-center
+  "
+>
+    <div class="w-[30rem] h-[30rem] border-[20px] border-white rounded-[50%] m-[50px] relative m-auto p-[2rem]">
+
+      <div class="absolute top-1/2 left-1/2 w-4 h-4 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 z-40 shadow-md"></div>
+
+      <div class="relative w-full h-full -translate-y-[3px] rotate-90">
+        <div 
+          class="w-2/5 h-[6px] bg-white absolute top-[50%] left-[10%] origin-[100%] z-10"
+          :class="tickEffect? 'ease-in transition duration-50': ''"
+          :style="`transform: rotate(${hourDeg}deg);`"
+        ></div>
+
+        <div 
+          class="w-1/2 h-[6px] bg-gray-200 absolute top-[50%] origin-[100%] z-20"
+          :class="tickEffect? 'ease-in transition duration-50': ''"
+          :style="`transform: rotate(${minDeg}deg);`"
+        ></div>
+
+        <div 
+          class="w-1/2 h-[3px] bg-red-400 absolute top-[50%] origin-[100%] z-30"
+          :class="tickEffect? 'transition duration-50 ease-[cubic-bezier(0.1,3.13,.77,1.51)]': ''"
+          :style="`transform: rotate(${secDeg}deg);`"
+        ></div>
+      </div>
+
+    </div>
+
+  <script>
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flex Panels 💪</title>
+  <link rel="icon" href="https://fav.farm/🔥" />
+  <link href='https://fonts.googleapis.com/css?family=Amatic+SC' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="index.css">
+<script src="alpine.js" defer></script>
+</head>
+<body>
+  <div 
+    x-data="{
+      panels: [
+        ['Hey', 'Let\'s', 'Dance'],
+        ['Give', 'Take', 'Receive'],
+        ['Experience', 'It', 'Today'],
+        ['Give', 'All', 'You can'],
+        ['Life', 'In', 'Motion'],
+      ],
+
+      images: [
+        'https://images.unsplash.com/photo-1443891238287-325a8fddd0f7?w=1500&h=1500',
+        'https://cdn.pixabay.com/photo/2017/08/07/16/48/green-2605621_1280.jpg',
+        'https://images.unsplash.com/photo-1465188162913-8fb5709d6d57?w=1500&h=1500',
+        'https://images.unsplash.com/photo-1442522772768-9032b6d10e3e?w=1500&h=1500',
+        'https://images.unsplash.com/photo-1465156799763-2c087c332922?w=1500&h=1500',
+      ],
+    }"
+    class="
+      flex flex-row h-screen font-['Amatic_SC',_cursive] 
+      text-center text-white text-[4em] uppercase
+      text-shadow-[0_0_4px_rgba(0,0,0,0.72),0_0_14px_rgba(0,0,0,0.45)]
+      text-shadow-black/75 text-shadow-xs
+    "
+  >
+    <template x-for="(panel, index) in panels" :key="index">
+      <div 
+        :style="`background-image: url(${images[index]});`"
+        class="
+          flex flex-col bg-cover bg-center transition-[flex]
+          duration-700 ease-[cubic-bezier(0.61,-0.19,0.7,-0.11)]
+          cursor-pointer select-none
+        "
+        x-data="{ selected: false, openActive: false }" 
+        @click="selected = !selected"
+        :class="selected? 'flex-5': 'flex-1'"
+        @transitionend="if($event.propertyName.includes('flex')) openActive = selected"
+      >
+        <p
+          x-text="panel[0]" 
+          :class="openActive? 'translate-y-0': '-translate-y-[100%]'"
+          class="
+            flex flex-1 items-center justify-center overflow-hidden
+            transition-[translate] duration-700 mx-5
+          "
+        ></p>
+
+        <p 
+          :class="{'text-[2em]': selected}" x-text="panel[1]"
+          class="
+            flex flex-1 items-center justify-center 
+            transition-[font-size] duration-700 mx-5
+            ease-[cubic-bezier(0.61,-0.19,0.7,-0.11)]
+          "
+        ></p>
+
+        <p 
+          x-text="panel[2]" 
+          :class="openActive? 'translate-y-0': 'translate-y-[100%]'"
+          class="
+            flex flex-1 items-center justify-center overflow-hidden
+            transition-[translate] duration-700 mx-5
+          "
+        ></p>
+      </div>
+    </template>
+  </div>
+</body>
+</html>
