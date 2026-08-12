@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <script src="alpine.js" defer></script>
+</head>
+<body 
+  class="bg-[#FFC600] flex justify-center"
+  x-init="cities = await (await fetch('./cities.json')).json()"
+  x-data="{
+    cities: [],
+    text: '',
+
+    highlight(raw) {
+      const escapedText = this.text.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const regex = new RegExp(`(${escapedText})`, 'gi');
+      return raw.replace(regex, `<span class='bg-yellow-400'>$1</span>`);  
+    },
+
+    get filteredCities() {
+      return this.cities.filter(({city, state}) => {
+        const cityLower = city.toLowerCase();
+        const stateLower = state.toLowerCase();
+        return cityLower.includes(this.text) || stateLower.includes(this.text);
+      })
+    }
+  }"
+>
+  <div class="mt-16 w-[30rem] flex flex-col place-items-center text-center">
+    <input
+      x-model="text"
+      placeholder="City or State" 
+      class="py-4 w-full text-black text-center text-4xl rounded-md
+        bg-white border-[#F7F7F7] border-8 focus:outline-none"
+    />
+
+    <template x-if="text === ''">
+      <ul class="text-left text-lg w-10/12 [perspective:100px]">
+        <li class="
+          p-4 shadow-sm bg-[#f7f7f7] shadow-gray-500
+          odd:[transform:rotateX(-3deg)]
+          even:[transform:rotateX(3deg)] 
+          "
+        >Filter For A City</li>
+        <li class="
+          p-4 shadow-sm bg-[#f7f7f7] shadow-gray-500
+          odd:[transform:rotateX(-3deg)]
+          even:[transform:rotateX(3deg)] 
+          overflow-hidden
+          "
+        >or A State</li>
+      </ul>
+    </template>
+
+    <template x-if="text !== ''">
+      <ul class="text-left text-lg w-10/12">
+        <template x-for="entry in filteredCities">
+        <li 
+          class="
+            p-4 shadow-sm bg-[#f7f7f7] shadow-gray-500
+            odd:[transform:perspective(100px)_rotateX(3deg)]
+            even:[transform:perspective(100px)_rotateX(-3deg)] 
+          "
+        >
+          <div class="flex justify-between gap-4">
+            <span class="flex flex-wrap w-3/5 break-words">
+              <span x-html="highlight(entry.city)"></span>
+              <span>,&nbsp;</span>
+              <span x-html="highlight(entry.state)"></span>
+            </span>
+            <span 
+              class="font-mono w-2/5 text-right" 
+              x-text="Number(entry.population).toLocaleString('en-US')"
+            ></span>
+          </div>
+        </li>
+      </ul>
+    </template>
+  </div>
+
+</body>
+</html>
