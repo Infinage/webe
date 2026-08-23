@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <script src="alpine.js" defer></script>
+</head>
+<body>
+  <p class="m-2.5"
+    x-data="{
+      isActive: false,
+      dogs: [{ name: 'Snickers', age: 2 }, { name: 'hugo', age: 8 }],
+      cats: [{ name: 'Luna', age: 3 }, { name: 'Oliver', age: 1 }],
+    }"
+    @click="isActive = !isActive;"
+    :class="isActive? 'text-lime-400 text-5xl mt-12': ''"
+    x-init="
+      // Clearing the console
+      console.clear();
+
+      // Regular
+      console.log('Hello');
+
+      // Styled
+      console.log('%c Styled text', 'background-color: red; color: white;');
+
+      // Warnings
+      console.warn('Ooops');
+
+      // Error
+      console.error('Shit');
+
+      // Info
+      console.info('Good to know!');
+      
+      // Assertions (doesn't stop execution)
+      console.assert(1 === 2, 'That is wrong!');
+
+      // Grouping logs (open by default)
+      console.group('dog');
+      dogs.forEach(d => { console.log(`This is ${d.name}, ${d.age} years old.`) });
+      console.groupEnd('dog');
+
+      // Grouping logs (collapsed by default)
+      console.groupCollapsed('cat');
+      cats.forEach(d => { console.log(`This is ${d.name}, ${d.age} years old.`) });
+      console.groupEnd('cat');
+
+      // Counting things (dom, variable, strings, any)
+      console.count('abc');
+      console.count('abc');
+
+      // Timing
+      console.time('sleep-check')
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      console.timeEnd('sleep-check')
+
+      // Table printing
+      console.table(Alpine.raw(dogs));
+
+      // Viewing a DOM element
+      console.dir($el);
+    "
+  >×BREAK×DOWN×</p>
+</body>
+</html>

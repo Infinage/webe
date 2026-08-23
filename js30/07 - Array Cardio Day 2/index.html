@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="alpine.js" defer></script>
+</head>
+<body
+  x-data="{
+    people: [
+      { name: 'Wes', year: 1988 },
+      { name: 'Kait', year: 1986 },
+      { name: 'Irv', year: 1970 },
+      { name: 'Lux', year: 2015 }
+    ],
+
+    comments: [
+      { text: 'Love this!', id: 523423 },
+      { text: 'Super good', id: 823423 },
+      { text: 'You are the best', id: 2039842 },
+      { text: 'Ramen is my fav food ever', id: 123523 },
+      { text: 'Nice Nice Nice!', id: 542328 }
+    ],
+
+    init() {
+      const year = new Date().getFullYear();
+
+      // Atleast one person 19 or older?
+      console.log(this.people.some(p => year - p.year >= 19));
+
+      // Everyone 19 or older?
+      console.log(this.people.every(p => year - p.year >= 19));
+
+      // Find comment with id = 823423
+      console.log(Alpine.raw(this.comments.find(c => c.id === 823423)));
+
+      // Find the index of comment with id 823423
+      const idx = this.comments.findIndex(c => c.id === 823423);
+      if (idx != -1) {
+        this.comments.splice(idx, 1);
+        console.log('Comment deleted');
+        console.log(Alpine.raw(this.comments));
+      }
+    }
+  }"
+>
+  <p><em>Psst: have a look at the JavaScript Console</em> 💁</p>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <script src="alpine.js" defer></script>
+</head>
+<body class="grid justify-center place-items-center h-screen">
+<canvas 
+  x-init="() => {
+    $el.width = window.innerWidth * 0.75;
+    $el.height = window.innerHeight * 0.75;
+
+    const ctx = $el.getContext('2d');
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 10;
+  }"
+
+  x-data="{
+    x: 0, y: 0, hue: 0, 
+    direction: true,
+    isDrawing: false,
+
+    startDrawing(e) {
+      [this.x, this.y] = [e.offsetX, e.offsetY];
+      this.isDrawing = true;
+    },
+
+    stopDrawing(e) { this.isDrawing = false; },
+
+    draw(e) {
+      if (!this.isDrawing) return;
+      const ctx = $el.getContext('2d');
+      ctx.strokeStyle = `hsl(${this.hue}, 100%, 50%)`;
+
+      // Draw a line
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+
+      // Update paint brush
+      [this.x, this.y, this.hue] = [e.offsetX, e.offsetY, this.hue + 1];
+      this.direction? ctx.lineWidth++: ctx.lineWidth--;
+      if (ctx.lineWidth >= 50 || ctx.lineWidth <= 1) {
+        this.direction = !this.direction;
+      }
+    },
+  }"
+
+  @mousemove="draw" @mousedown="startDrawing" 
+  @mouseup="stopDrawing" @mouseleave="stopDrawing"
+  class="border-gray-600 border-2 border-dashed" 
+>
+</canvas>
+</body>
+</html>
