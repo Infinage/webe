@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <script src="alpine.js" defer></script>
+</head>
+<body class="bg-[#FFC600]">
+  <div 
+    x-data="{
+      items: [
+        {text: 'This is an inbox layout.', checked: false}, 
+        {text: 'Check one item', checked: false},
+        {text: 'Hold down your Shift key', checked: false},
+        {text: 'Check a lower item', checked: false},
+        {text: 'Everything in between should also be set to checked', checked: false},
+        {text: 'Try do it without any libraries', checked: false},
+        {text: 'Just regular JavaScript', checked: false},
+        {text: 'Good Luck!', checked: false},
+        {text: 'Don\'t forget to tweet your result!', checked: false},
+      ],
+
+      multiselect(idx) {
+        // Always toggle current item
+        checked = this.items[idx].checked = !this.items[idx].checked;
+
+        // Prev item that had already been checked
+        const prevIdx = this.items.slice(0, idx)
+          .findLastIndex(item => item.checked === true);   
+
+        // If unchecked or nothing exists before it
+        if (!checked || prevIdx === -1) return;
+
+        // Check every item before it
+        for (let i = prevIdx; i <= idx; i++) this.items[i].checked = true;
+      },
+    }"
+    class="
+      bg-white flex flex-col justify-center mx-auto w-[25rem] rounded-md 
+      m-12 shadow-[8px_8px_0_0_rgba(0,0,0,0.2)] font-['helvetica_neue'] 
+      text-gray-700 text-xl
+    "
+  >
+    <ul class="divide-y border-gray-200">
+      <template x-for="({text}, index) in items" :key="index">
+        <li class="flex items-stretch" @click.shift="multiselect(index)" >
+          <div class="border-r-gray-200 border-r p-5 flex place-items-center">
+            <input x-model="items[index].checked" :id="index" type="checkbox" />
+          </div>
+          <label :for="index" x-text="text" class="p-5 flex-1 select-none"
+            :class="items[index].checked && 'line-through'"></label>
+        </li>
+      </template>
+    </ul>
+  </div>
+</body>
+</html>
