@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <script src="alpine.js" defer></script>
+</head>
+<body 
+  x-init="console.log(
+    '%c⬆️⬆️⬇️⬇️⬅️⬅️➡️➡️', 
+    'color: transparent; background: transparent; font-size: 16px;'
+  );"
+  x-data="{
+    rickRoll: false, sequence: [], timeout: null,
+    secret: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 
+      'ArrowLeft', 'ArrowLeft', 'ArrowRight', 'ArrowRight'],
+
+    listenForSecret(key) {
+      if (this.rickRoll || !key.startsWith('Arrow')) return;
+      clearTimeout(this.timeout);
+      this.sequence.push(key);
+      this.sequence.length > this.secret.length && this.sequence.shift();
+      if (this.sequence.join(',') === this.secret.join(',')) {
+        this.rickRoll = true;
+        this.sequence = [];
+      }
+      this.timeout = setTimeout(() => this.sequence = [], 800)
+    }
+  }"
+  @keyup.window="listenForSecret($event.key)"
+  class="flex place-items-center justify-center h-screen 
+    text-3xl font-mono"
+>
+  <div x-show="!rickRoll">
+    Wow, such empty! Am I really though?
+  </div>
+  <div x-show="rickRoll" class="h-3/4">
+    <img src="52s0fq8fu46h1.gif" alt="Rick Rolled" class="h-full w-auto" />
+  </div>
+</body>
+</html>
