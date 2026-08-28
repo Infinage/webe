@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <script src="datastar.js" type="module" defer></script>
+</head>
+<body 
+  style="--dot: 15vmin; --gap: 2vmin;"
+  class="bg-[#2D3464] h-screen w-screen flex flex-col p-10"
+>
+  <div class="flex flex-1 gap-[var(--gap)] place-self-start place-items-start">
+    <div class="bg-[#F7EC7D] rounded-full h-[var(--dot)] aspect-square"></div>
+    <div class="bg-[#F7EC7D] rounded-t-full h-full w-[var(--dot)]"></div>
+    <div class="bg-[#F7EC7D] rounded-full h-[var(--dot)] aspect-square"></div>
+  </div>
+
+  <div class="
+    bg-[#F7EC7D] place-self-center
+    w-[calc(100%-(var(--dot)+var(--gap))*2)] h-[calc(var(--dot)*0.75)] 
+  "></div>
+
+  <div class="flex flex-1 gap-[var(--gap)] place-self-end place-items-end">
+    <div class="bg-[#F7EC7D] rounded-full h-[var(--dot)] aspect-square"></div>
+    <div class="bg-[#F7EC7D] rounded-b-full h-full w-[var(--dot)]"></div>
+    <div class="bg-[#F7EC7D] rounded-full h-[var(--dot)] aspect-square"></div>
+  </div>
+</body>
+</html>
