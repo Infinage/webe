@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="static/index.css">
+  <script src="static/datastar.js" type="module" defer></script>
+</head>
+<body 
+  class="bg-black flex flex-col items-center gap-4 p-8"
+  data-init="{
+    $id = '{{.id}}', $x = 0, $y = 0, 
+    $cssSize = Math.min(window.innerWidth, window.innerHeight) - 64;
+  }"
+>
+  <canvas
+    id="board" class="border border-gray-700"
+    style="image-rendering: pixelated;"
+    width="300" height="300"
+    data-style="{ width: $cssSize + 'px', height: $cssSize + 'px' }"
+    data-on:resize__window__debounce.200ms="
+      $cssSize = Math.min(window.innerWidth, window.innerHeight) - 64;
+    "
+    data-on:mousemove="
+      const rect = evt.target.getBoundingClientRect();
+      $x = Math.floor(((evt.clientY - rect.top) / rect.height) * 300);
+      $y = Math.floor(((evt.clientX - rect.left) / rect.width) * 300);
+    "
+    data-on:mousedown="@post('/click', {contentType: 'form', selector: '#meta'})"
+  ></canvas>
+
+   <form id="meta" hidden>
+    <input name="id" data-bind="id" />
+    <input name="x" data-bind="x" />
+    <input name="y" data-bind="y" />
+  </form> 
+
+  <script>
+    const id = "{{.id}}";
+    const canvas = document.getElementById("board");
+    const ctx = canvas.getContext("2d");
+
+    const imgData = ctx.createImageData(300, 300);
+    const url = `/loop?id=${id}&height=300&width=300`;
+    const source = new EventSource(url);
+
+    source.onmessage = (e) => {
+      const binStr = atob(e.data);
+      if (binStr.length === imgData.data.length) {
+        for (let i = 0; i < binStr.length; i++) {
+          imgData.data[i] = binStr.charCodeAt(i);
+        }
+        ctx.putImageData(imgData, 0, 0);
+      }
+    };
+
+    source.onerror = () => { console.error("SSE connection lost"); source.close(); };
+  </script>
+</body>
+</html>
