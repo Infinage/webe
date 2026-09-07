@@ -99,6 +99,8 @@ func (b Board) merge(d Direction) Board {
 	return rotateCW(b, 4-rotCW)
 }
 
+// mergeLine merges a single line of a 2048 board.
+// It behaves as if there had been a left swipe.
 func mergeLine(line [4]uint16) [4]uint16 {
 	for p1, p2 := 0, 1; p2 < 4; {
 		switch {

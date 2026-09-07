@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <script src="datastar.js" type="module" defer></script>
+</head>
+<body class="bg-[#181A1B] flex flex-col items-center h-screen gap-16 m-8">
+  <!-- Score box -->
+  <div class="flex gap-4" data-signals="{score: 0, hscore: 0}">
+    <div class="
+      flex flex-col text-[#9C9487] bg-[#2A2617]
+      uppercase rounded-lg py-1 px-6 font-bold text-xs text-center
+    ">
+      Score <span class="text-2xl font-bold leading-none" data-text="$score"></span>
+    </div>
+    <div class="
+      flex flex-col text-[#9C9487] border-[#9C9487] border
+      uppercase rounded-lg py-1 px-6 font-bold text-xs text-center
+    ">
+      Best <span class="text-2xl font-bold leading-none" data-text="$hscore"></span>
+    </div>
+  </div>
+
+  <!-- Puzzle board -->
+  <div id="board" class="grid grid-cols-4 grid-rows-4 gap-3 p-3 
+    bg-[#9C8B7C] h-1/2 aspect-square rounded-xl">
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+    <div class="bg-[#BDAC97] rounded-xl"></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="flex bg-[#2A2617] p-3 gap-3 rounded-xl">
+    <button title="Undo" class="text-white bg-[#383223] p-2 rounded-lg cursor-pointer">
+    <svg class="size-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 14 4 9l5-5"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 9h10a6 6 0 0 1 6 6v1"/>
+    </svg>
+    </button>
+
+    <button title="Restart" class="text-white bg-[#383223] p-2 rounded-lg cursor-pointer">
+      <svg class="size-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"/>
+      </svg>
+    </button>
+  </div>
+  
+</body>
+</html>

@@ -157,6 +157,7 @@ func Test_MergeLine(t *testing.T) {
 		{input: [4]uint16{8, 0, 2, 4}, output: [4]uint16{8, 2, 4, 0}},
 		{input: [4]uint16{2, 4, 2, 4}, output: [4]uint16{2, 4, 2, 4}},
 		{input: [4]uint16{2, 4, 4, 2}, output: [4]uint16{2, 8, 2, 0}},
+		{input: [4]uint16{2, 2, 2, 2}, output: [4]uint16{4, 4, 0, 0}},
 	}
 
 	for _, tt := range tests {
