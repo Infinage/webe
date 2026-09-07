@@ -4,21 +4,16 @@ import (
 	"math/rand/v2"
 )
 
-type Direction int
+type Direction string
 
 const (
-	L Direction = iota // Swipe Left
-	R                  // Swipe Right
-	U                  // Swipe Up
-	D                  // Swipe Down
+	L Direction = "L" // Swipe Left
+	R           = "R" // Swipe Right
+	U           = "U" // Swipe Up
+	D           = "D" // Swipe Down
 )
 
 type Board [16]uint16
-
-// ij2i is a helper func to return 1D indexing from 2D based indexing.
-func ij2i(i, j int) int {
-	return i*4 + j
-}
 
 // Spawn randomly fills a random empty spot (denoted by '0').
 // Probability: 2 (90% chance), 4 (10% chance).
@@ -94,26 +89,52 @@ func (b Board) merge(d Direction) Board {
 
 	// Solve one line at a time
 	for i := range 4 {
-		for p1, p2 := 0, 1; p2 < 4; p2++ {
-			p1_1d, p2_1d := ij2i(i, p1), ij2i(i, p2)
-			if b[p1_1d] == b[p2_1d] {
-				// If both match, merge them
-				b[p1_1d], b[p2_1d] = b[p1_1d]*2, 0
-				p1_1d++
-			} else if b[p1_1d] == 0 && b[p2_1d] != 0 {
-				// If left side has a hole, fill it
-				b[p1_1d], b[p2_1d] = b[p2_1d], 0
-				p1_1d++
-			}
-		}
+		var line [4]uint16
+		copy(line[:], b[i*4:(i+1)*4])
+		mergedLine := mergeLine(line)
+		copy(b[i*4:], mergedLine[:])
 	}
 
 	// Rotate back to how things were initially
 	return rotateCW(b, 4-rotCW)
 }
 
+func mergeLine(line [4]uint16) [4]uint16 {
+	for p1, p2 := 0, 1; p2 < 4; {
+		switch {
+		// If both are caught up, incr p2
+		case p1 == p2:
+			p2++
+
+		// [0, 0, _, _], [2, 0, _, _] => incr right only
+		case line[p2] == 0:
+			p2++
+
+		// [0, 2, _, _] => fill the hole, incr right only
+		case line[p1] == 0:
+			line[p1], line[p2] = line[p2], line[p1]
+			p2++
+
+		// [2, 2, _, _] => merge into left, incr both ptrs
+		case line[p1] == line[p2]:
+			line[p1], line[p2] = line[p1]*2, 0
+			p1++
+			p2++
+
+		// [2, 4, _, _], [2, 0, _, _] => incr left until right
+		default:
+			p1++
+		}
+	}
+
+	return line
+}
+
 // Rotate the given board clockwise for specified no of times.
 func rotateCW(b Board, count int) Board {
+	// helper to return 1D indexing from 2D based indexing.
+	ij2i := func(i, j int) int { return i*4 + j }
+
 	// Rotating beyond 3 times we get back to where we started
 	count %= 4
 	if count == 0 {
@@ -124,7 +145,7 @@ func rotateCW(b Board, count int) Board {
 	for range count {
 		// Transpose
 		for i := range 4 {
-			for j := range 4 {
+			for j := i; j < 4; j++ {
 				p1, p2 := ij2i(i, j), ij2i(j, i)
 				b[p1], b[p2] = b[p2], b[p1]
 			}
