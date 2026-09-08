@@ -15,6 +15,13 @@ const (
 
 type Board [16]uint16
 
+// NewBoard returns a 2048 puzzle with 2 filled cells
+func NewBoard() Board {
+	var b Board
+	b = b.Spawn()
+	return b.Spawn()
+}
+
 // Spawn randomly fills a random empty spot (denoted by '0').
 // Probability: 2 (90% chance), 4 (10% chance).
 // This is a no-op when there are no empty cells to fill.

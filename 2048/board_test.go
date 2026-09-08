@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+// counter returns the frequency of numbers on the input board
 func counter(t *testing.T, b Board) map[uint16]int {
 	t.Helper()
 	freq := make(map[uint16]int, 16)
@@ -11,6 +12,13 @@ func counter(t *testing.T, b Board) map[uint16]int {
 		freq[v]++
 	}
 	return freq
+}
+
+func Test_NewBoard(t *testing.T) {
+	b := NewBoard()
+	if freq := counter(t, b); freq[0] != 14 || freq[2]+freq[4] != 2 {
+		t.Errorf("Expected 2 cells to be filled: %v", freq)
+	}
 }
 
 func Test_Spawn(t *testing.T) {

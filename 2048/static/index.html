@@ -1,10 +1,11 @@
+{{define "Home"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="index.css">
-  <script src="datastar.js" type="module" defer></script>
+  <link rel="stylesheet" href="/static/index.css">
+  <script src="/static/datastar.js" type="module" defer></script>
 </head>
 <body class="bg-[#181A1B] flex flex-col items-center h-screen gap-16 m-8">
   <!-- Score box -->
@@ -24,8 +25,11 @@
   </div>
 
   <!-- Puzzle board -->
-  <div id="board" class="grid grid-cols-4 grid-rows-4 gap-3 p-3 
-    bg-[#9C8B7C] h-1/2 aspect-square rounded-xl">
+  <div id="board" 
+    data-init="@get('/api/new')" 
+    class="grid grid-cols-4 grid-rows-4 gap-3 p-3 
+    bg-[#9C8B7C] h-1/2 aspect-square rounded-xl"
+  >
     <div class="bg-[#BDAC97] rounded-xl"></div>
     <div class="bg-[#BDAC97] rounded-xl"></div>
     <div class="bg-[#BDAC97] rounded-xl"></div>
@@ -55,15 +59,14 @@
     </svg>
     </button>
 
-    <button title="Restart" class="text-white bg-[#383223] p-2 rounded-lg cursor-pointer">
+    <button title="New Game" class="text-white bg-[#383223] p-2 rounded-lg cursor-pointer">
       <svg class="size-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"/>
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 5v14M5 12h14"/>
       </svg>
     </button>
   </div>
   
 </body>
 </html>
+{{end}}
