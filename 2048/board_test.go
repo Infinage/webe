@@ -52,22 +52,22 @@ func Test_Slide(t *testing.T) {
 			{
 				before: Board{0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
 				after:  Board{0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0},
-				dir:    L,
+				dir:    DirectionLeft,
 			},
 			{
 				before: Board{0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
 				after:  Board{0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				dir:    U,
+				dir:    DirectionUp,
 			},
 			{
 				before: Board{0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
 				after:  Board{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2},
-				dir:    D,
+				dir:    DirectionDown,
 			},
 			{
 				before: Board{0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
 				after:  Board{0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2},
-				dir:    R,
+				dir:    DirectionRight,
 			},
 		}
 
@@ -85,22 +85,22 @@ func Test_Slide(t *testing.T) {
 			{
 				before: Board{2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2},
 				after:  Board{4, 2, 0, 0, 4, 2, 0, 0, 4, 2, 0, 0, 4, 2, 0, 0},
-				dir:    L, score: 16,
+				dir:    DirectionLeft, score: 16,
 			},
 			{
 				before: Board{2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2},
 				after:  Board{0, 0, 2, 4, 0, 0, 2, 4, 0, 0, 2, 4, 0, 0, 2, 4},
-				dir:    R, score: 16,
+				dir:    DirectionRight, score: 16,
 			},
 			{
 				before: Board{2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2},
 				after:  Board{4, 4, 4, 4, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				dir:    U, score: 24,
+				dir:    DirectionUp, score: 24,
 			},
 			{
 				before: Board{2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2},
 				after:  Board{0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 4, 4, 4, 4},
-				dir:    D, score: 24,
+				dir:    DirectionDown, score: 24,
 			},
 		}
 
@@ -118,12 +118,12 @@ func Test_Slide(t *testing.T) {
 			{
 				before: Board{4, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				after:  Board{4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				dir:    L, score: 4,
+				dir:    DirectionLeft, score: 4,
 			},
 			{
 				before: Board{4, 0, 0, 0, 4, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0},
 				after:  Board{0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0},
-				dir:    D, score: 8,
+				dir:    DirectionDown, score: 8,
 			},
 		}
 
@@ -143,7 +143,7 @@ func Test_Slide(t *testing.T) {
 			{2, 4, 8, 4, 4, 2, 4, 16, 8, 4, 8, 64, 2, 16, 32, 8},
 			{4, 8, 2, 4, 2, 4, 8, 16, 4, 8, 4, 2, 8, 2, 8, 4},
 		} {
-			for _, dir := range []Direction{U, D, L, R} {
+			for _, dir := range Directions {
 				merged, score, ok := b.Slide(dir)
 				if score != 0 || ok {
 					t.Errorf("Expected slide [%v] to fail, got %v", dir, merged)
@@ -208,5 +208,12 @@ func Test_RotateCW(t *testing.T) {
 					tt.before, tt.after, got)
 			}
 		}
+	}
+}
+
+func Test_Status(t *testing.T) {
+	type TC struct {
+		input Board
+		status GameStatus
 	}
 }

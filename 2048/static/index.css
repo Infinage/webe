@@ -7,17 +7,29 @@
     'Noto Color Emoji';
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
+    --color-sky-400: oklch(74.6% 0.16 232.661);
+    --color-sky-500: oklch(68.5% 0.169 237.323);
     --color-white: #fff;
     --spacing: 0.25rem;
     --text-xs: 0.75rem;
     --text-xs--line-height: calc(1 / 0.75);
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
+    --text-xl: 1.25rem;
+    --text-xl--line-height: calc(1.75 / 1.25);
     --text-2xl: 1.5rem;
     --text-2xl--line-height: calc(2 / 1.5);
+    --text-3xl: 1.875rem;
+    --text-3xl--line-height: calc(2.25 / 1.875);
+    --text-4xl: 2.25rem;
+    --text-4xl--line-height: calc(2.5 / 2.25);
     --font-weight-bold: 700;
     --radius-lg: 0.5rem;
     --radius-xl: 0.75rem;
+    --animate-ping: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
+    --animate-shake-once: shake 200ms ease-in-out;
   }
 }
 @layer base {
@@ -175,11 +187,20 @@
   .absolute {
     position: absolute;
   }
+  .relative {
+    position: relative;
+  }
   .static {
     position: static;
   }
   .end-1 {
     inset-inline-end: calc(var(--spacing) * 1);
+  }
+  .top-0 {
+    top: calc(var(--spacing) * 0);
+  }
+  .right-0 {
+    right: calc(var(--spacing) * 0);
   }
   .m-8 {
     margin: calc(var(--spacing) * 8);
@@ -199,11 +220,18 @@
   .inline {
     display: inline;
   }
+  .inline-flex {
+    display: inline-flex;
+  }
   .table {
     display: table;
   }
   .aspect-square {
     aspect-ratio: 1 / 1;
+  }
+  .size-3 {
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
   }
   .size-7 {
     width: calc(var(--spacing) * 7);
@@ -212,14 +240,38 @@
   .h-1\/2 {
     height: calc(1 / 2 * 100%);
   }
+  .h-2 {
+    height: calc(var(--spacing) * 2);
+  }
+  .h-6 {
+    height: calc(var(--spacing) * 6);
+  }
+  .h-full {
+    height: 100%;
+  }
   .h-screen {
     height: 100vh;
+  }
+  .w-2 {
+    width: calc(var(--spacing) * 2);
+  }
+  .w-full {
+    width: 100%;
   }
   .grow {
     flex-grow: 1;
   }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
+  }
+  .animate-ping {
+    animation: var(--animate-ping);
+  }
+  .animate-shake-once {
+    animation: var(--animate-shake-once);
+  }
+  .cursor-not-allowed {
+    cursor: not-allowed;
   }
   .cursor-pointer {
     cursor: pointer;
@@ -239,6 +291,9 @@
   .items-center {
     align-items: center;
   }
+  .justify-center {
+    justify-content: center;
+  }
   .gap-3 {
     gap: calc(var(--spacing) * 3);
   }
@@ -252,6 +307,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .rounded-full {
+    border-radius: calc(infinity * 1px);
   }
   .rounded-lg {
     border-radius: var(--radius-lg);
@@ -269,6 +327,12 @@
   .bg-\[\#2A2617\] {
     background-color: #2A2617;
   }
+  .bg-\[\#3C3A32\] {
+    background-color: #3C3A32;
+  }
+  .bg-\[\#3e3727\] {
+    background-color: #3e3727;
+  }
   .bg-\[\#9C8B7C\] {
     background-color: #9C8B7C;
   }
@@ -280,6 +344,45 @@
   }
   .bg-\[\#BDAC97\] {
     background-color: #BDAC97;
+  }
+  .bg-\[\#EDC22E\] {
+    background-color: #EDC22E;
+  }
+  .bg-\[\#EDC53F\] {
+    background-color: #EDC53F;
+  }
+  .bg-\[\#EDC850\] {
+    background-color: #EDC850;
+  }
+  .bg-\[\#EDCC61\] {
+    background-color: #EDCC61;
+  }
+  .bg-\[\#EDCF72\] {
+    background-color: #EDCF72;
+  }
+  .bg-\[\#EDE0C8\] {
+    background-color: #EDE0C8;
+  }
+  .bg-\[\#EEE4DA\] {
+    background-color: #EEE4DA;
+  }
+  .bg-\[\#F2B179\] {
+    background-color: #F2B179;
+  }
+  .bg-\[\#F65E3B\] {
+    background-color: #F65E3B;
+  }
+  .bg-\[\#F67C5F\] {
+    background-color: #F67C5F;
+  }
+  .bg-\[\#F59563\] {
+    background-color: #F59563;
+  }
+  .bg-sky-400 {
+    background-color: var(--color-sky-400);
+  }
+  .bg-sky-500 {
+    background-color: var(--color-sky-500);
   }
   .p-2 {
     padding: calc(var(--spacing) * 2);
@@ -300,6 +403,22 @@
     font-size: var(--text-2xl);
     line-height: var(--tw-leading, var(--text-2xl--line-height));
   }
+  .text-3xl {
+    font-size: var(--text-3xl);
+    line-height: var(--tw-leading, var(--text-3xl--line-height));
+  }
+  .text-4xl {
+    font-size: var(--text-4xl);
+    line-height: var(--tw-leading, var(--text-4xl--line-height));
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: var(--tw-leading, var(--text-lg--line-height));
+  }
+  .text-xl {
+    font-size: var(--text-xl);
+    line-height: var(--tw-leading, var(--text-xl--line-height));
+  }
   .text-xs {
     font-size: var(--text-xs);
     line-height: var(--tw-leading, var(--text-xs--line-height));
@@ -315,14 +434,35 @@
   .text-\[\#9C9487\] {
     color: #9C9487;
   }
+  .text-\[\#776E65\] {
+    color: #776E65;
+  }
+  .text-transparent {
+    color: transparent;
+  }
   .text-white {
     color: var(--color-white);
   }
   .uppercase {
     text-transform: uppercase;
   }
+  .opacity-50 {
+    opacity: 50%;
+  }
+  .opacity-75 {
+    opacity: 75%;
+  }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .select-none {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .data-class\:animate-shake-once {
+    &[data-class] {
+      animation: var(--animate-shake-once);
+    }
   }
 }
 @property --tw-rotate-x {
@@ -410,6 +550,23 @@
 @property --tw-drop-shadow-size {
   syntax: "*";
   inherits: false;
+}
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
 }
 @layer properties {
   @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {

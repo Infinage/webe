@@ -6,11 +6,21 @@ import (
 
 type Direction string
 
+var Directions = []Direction{DirectionUp, DirectionDown, DirectionLeft, DirectionRight}
+
 const (
-	L Direction = "L" // Swipe Left
-	R           = "R" // Swipe Right
-	U           = "U" // Swipe Up
-	D           = "D" // Swipe Down
+	DirectionLeft Direction = "L" // Swipe Left
+	DirectionRight           = "R" // Swipe Right
+	DirectionUp           = "U" // Swipe Up
+	DirectionDown           = "D" // Swipe Down
+)
+
+type GameStatus int
+
+const (
+	StatusInProgress GameStatus = iota
+	StatusWin
+	StatusLose
 )
 
 type Board [16]uint16
@@ -77,6 +87,29 @@ func (b Board) Slide(d Direction) (merged Board, score int, ok bool) {
 	return merged, score, true
 }
 
+// Status returns the current game state: StatusInProgress, StatusWin, StatusLose
+func (b Board) Status() GameStatus {
+	gameOver := true
+	for _, dir := range Directions {
+		if _, _, ok := b.Slide(dir); ok {
+			gameOver = false
+			break
+		}
+	}
+
+	if gameOver {
+		return StatusLose
+	}
+
+	for _, cell := range b {
+		if cell >= 2048 {
+			return StatusWin
+		}
+	}
+
+	return StatusInProgress
+}
+
 // merge returns the board config after swiping in the given direction.
 // To simplify things, we rotate the board based on input direction and
 // always solve for swipe RTL (right to left).
@@ -84,11 +117,11 @@ func (b Board) merge(d Direction) Board {
 	// Determine clockwise rotation count
 	rotCW := 0
 	switch d {
-	case R:
+	case DirectionRight:
 		rotCW = 2
-	case U:
+	case DirectionUp:
 		rotCW = 3
-	case D:
+	case DirectionDown:
 		rotCW = 1
 	}
 
