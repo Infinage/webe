@@ -1,13 +1,55 @@
 @import "tailwindcss";
 @source "../**/*.go";
+
 @source inline("animate-shake-once");
+@source inline("animate-pop-in-once");
+@source inline("{,-}animate-slide-from-x-{0,1,2,3}");
+@source inline("{,-}animate-slide-from-y-{0,1,2,3}");
 
 @theme {
+  --slide-duration: 200ms;
   --animate-shake-once: shake 200ms ease-in-out;
+  --animate-pop-in-once: pop-in var(--slide-duration) ease-out var(--slide-duration) backwards;
 
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
     20%, 40%, 60%, 80% { transform: translateX(5px); }
   }
+
+  @keyframes pop-in {
+    0%   { transform: scale(0); opacity: 0; }
+    70%  { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes slide-x {
+    from { transform: translateX(calc(var(--slide-x, 0) * (100% + 0.75rem))); }
+    to   { transform: translateX(0); }
+  }
+
+  @keyframes slide-y {
+    from { transform: translateY(calc(var(--slide-y, 0) * (100% + 0.75rem))); }
+    to   { transform: translateY(0); }
+  }
+}
+
+@utility animate-slide-from-x-* {
+  --slide-x: --value(integer, [integer]);
+  animation: slide-x var(--slide-duration) ease-out;
+}
+
+@utility -animate-slide-from-x-* {
+  --slide-x: calc(--value(integer, [integer]) * -1);
+  animation: slide-x var(--slide-duration) ease-out;
+}
+
+@utility animate-slide-from-y-* {
+  --slide-y: --value(integer, [integer]);
+  animation: slide-y var(--slide-duration) ease-out;
+}
+
+@utility -animate-slide-from-y-* {
+  --slide-y: calc(--value(integer, [integer]) * -1);
+  animation: slide-y var(--slide-duration) ease-out;
 }

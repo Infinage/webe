@@ -9,18 +9,18 @@ type Direction string
 var Directions = []Direction{DirectionUp, DirectionDown, DirectionLeft, DirectionRight}
 
 const (
-	DirectionLeft Direction = "L" // Swipe Left
+	DirectionLeft  Direction = "L" // Swipe Left
 	DirectionRight           = "R" // Swipe Right
-	DirectionUp           = "U" // Swipe Up
-	DirectionDown           = "D" // Swipe Down
+	DirectionUp              = "U" // Swipe Up
+	DirectionDown            = "D" // Swipe Down
 )
 
-type GameStatus int
+type GameStatus string
 
 const (
-	StatusInProgress GameStatus = iota
-	StatusWin
-	StatusLose
+	StatusInProgress GameStatus = "InProgress"
+	StatusWin                   = "Win"
+	StatusLoss                  = "Loss"
 )
 
 type Board [16]uint16
@@ -30,6 +30,29 @@ func NewBoard() Board {
 	var b Board
 	b = b.Spawn()
 	return b.Spawn()
+}
+
+// Status returns the current game state: StatusInProgress, StatusWin, StatusLose
+func (b Board) Status() GameStatus {
+	gameOver := true
+	for _, dir := range Directions {
+		if _, _, _, ok := b.Slide(dir); ok {
+			gameOver = false
+			break
+		}
+	}
+
+	if gameOver {
+		return StatusLoss
+	}
+
+	for _, cell := range b {
+		if cell >= 2048 {
+			return StatusWin
+		}
+	}
+
+	return StatusInProgress
 }
 
 // Spawn randomly fills a random empty spot (denoted by '0').
@@ -60,16 +83,16 @@ func (b Board) Spawn() Board {
 	return b
 }
 
-// Slide performs a swipe in the provided direction and returns
-// the final board post merge.
-//
-// It also computes the score delta and returns a boolean if a
-// swipe in the provided direction is not possible.
-func (b Board) Slide(d Direction) (merged Board, score int, ok bool) {
+// Slide performs a swipe in the provided direction and returns:
+//  1. Final board post merge.
+//  2. Cell movement deltas in the inverse direction to obtain pre slide config.
+//  3. Score increment resulting from the move.
+//  4. Boolean value false if move is invalid.
+func (b Board) Slide(d Direction) (merged, deltas Board, score int, ok bool) {
 	// If nothing has moved, it is an invalid move
-	merged = b.merge(d)
+	merged, deltas = b.merge(d)
 	if merged == b {
-		return merged, 0, false
+		return merged, deltas, 0, false
 	}
 
 	// Score is the sum total of newly created cells
@@ -84,36 +107,13 @@ func (b Board) Slide(d Direction) (merged Board, score int, ok bool) {
 		}
 	}
 
-	return merged, score, true
+	return merged, deltas, score, true
 }
 
-// Status returns the current game state: StatusInProgress, StatusWin, StatusLose
-func (b Board) Status() GameStatus {
-	gameOver := true
-	for _, dir := range Directions {
-		if _, _, ok := b.Slide(dir); ok {
-			gameOver = false
-			break
-		}
-	}
-
-	if gameOver {
-		return StatusLose
-	}
-
-	for _, cell := range b {
-		if cell >= 2048 {
-			return StatusWin
-		}
-	}
-
-	return StatusInProgress
-}
-
-// merge returns the board config after swiping in the given direction.
-// To simplify things, we rotate the board based on input direction and
-// always solve for swipe RTL (right to left).
-func (b Board) merge(d Direction) Board {
+// merge returns the board config and delta points for each cell after swiping
+// in the given direction. To simplify things, we rotate the board based on
+// input direction and always solve for swipe RTL (right to left).
+func (b Board) merge(d Direction) (merged, deltas Board) {
 	// Determine clockwise rotation count
 	rotCW := 0
 	switch d {
@@ -130,18 +130,20 @@ func (b Board) merge(d Direction) Board {
 	// Solve one line at a time
 	for i := range 4 {
 		var line [4]uint16
-		copy(line[:], b[i*4:(i+1)*4])
-		mergedLine := mergeLine(line)
-		copy(b[i*4:], mergedLine[:])
+		copy(line[:], b[i*4:(i+1)*4])            // Copy to temp buffer
+		mergedLine, deltaLine := mergeLine(line) // Merge along given direction
+		copy(b[i*4:], mergedLine[:])             // Copy from temp buffer back to board
+		copy(deltas[i*4:(i+1)*4], deltaLine[:])  // Copy deltas of single row
 	}
 
 	// Rotate back to how things were initially
-	return rotateCW(b, 4-rotCW)
+	return rotateCW(b, 4-rotCW), rotateCW(deltas, 4-rotCW)
 }
 
-// mergeLine merges a single line of a 2048 board.
-// It behaves as if there had been a left swipe.
-func mergeLine(line [4]uint16) [4]uint16 {
+// mergeLine merges a single row as a left swipe. It returns the merged
+// row and cell deltas that reconstruct the input row when applied in
+// the opposite direction.
+func mergeLine(line [4]uint16) (mergedLine, deltaLine [4]uint16) {
 	for p1, p2 := 0, 1; p2 < 4; {
 		switch {
 		// If both are caught up, incr p2
@@ -155,11 +157,13 @@ func mergeLine(line [4]uint16) [4]uint16 {
 		// [0, 2, _, _] => fill the hole, incr right only
 		case line[p1] == 0:
 			line[p1], line[p2] = line[p2], line[p1]
+			deltaLine[p1] = uint16(p2 - p1)
 			p2++
 
 		// [2, 2, _, _] => merge into left, incr both ptrs
 		case line[p1] == line[p2]:
 			line[p1], line[p2] = line[p1]*2, 0
+			deltaLine[p1] = uint16(p2 - p1)
 			p1++
 			p2++
 
@@ -169,7 +173,7 @@ func mergeLine(line [4]uint16) [4]uint16 {
 		}
 	}
 
-	return line
+	return line, deltaLine
 }
 
 // Rotate the given board clockwise for specified no of times.

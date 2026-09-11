@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/starfederation/datastar-go/datastar"
 )
@@ -25,9 +26,17 @@ func handleNew(w http.ResponseWriter, r *http.Request) {
 	sse := datastar.NewSSE(w, r)
 
 	b := NewBoard()
-	sse.PatchElements(renderBoard(b))
 
-	signals := map[string]any{"scores": []int{0}, "boards": []Board{b}}
+	// pop in effect for new spawn
+	var animations [16]string
+	for idx := range 16 {
+		if b[idx] != 0 {
+			animations[idx] = "animate-pop-in-once"
+		}
+	}
+
+	sse.PatchElements(renderBoard(b, animations))
+	signals := map[string]any{"scores": []int{0}, "boards": []Board{b}, "_gameOver": false}
 	sse.MarshalAndPatchSignals(signals)
 }
 
@@ -51,20 +60,36 @@ func handleSlide(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var dir Direction
+	var slideAnimation string
 	switch req.Key {
 	case "k", "ArrowUp":
 		dir = DirectionUp
+		slideAnimation = "animate-slide-from-y-"
 	case "j", "ArrowDown":
 		dir = DirectionDown
+		slideAnimation = "-animate-slide-from-y-"
 	case "h", "ArrowLeft":
 		dir = DirectionLeft
+		slideAnimation = "animate-slide-from-x-"
 	case "l", "ArrowRight":
 		dir = DirectionRight
+		slideAnimation = "-animate-slide-from-x-"
 	}
 
-	currB := req.Boards[len(req.Boards)-1]
-	b, score, ok := currB.Slide(dir)
-	b = b.Spawn()
+	prevB := req.Boards[len(req.Boards)-1]
+	currB, deltas, score, ok := prevB.Slide(dir)
+	currB = currB.Spawn()
+
+	// Create animation effects
+	var animations [16]string
+	for idx := range 16 {
+		switch {
+		case deltas[idx] != 0:
+			animations[idx] = slideAnimation + strconv.Itoa(int(deltas[idx]))
+		case prevB[idx] != currB[idx] && currB[idx] != 0:
+			animations[idx] = "animate-pop-in-once"
+		}
+	}
 
 	sse := datastar.NewSSE(w, r)
 	if !ok {
@@ -72,10 +97,10 @@ func handleSlide(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sse.PatchElements(renderBoard(b))
+	sse.PatchElements(renderBoard(currB, animations))
 
 	// Retain just the last 10 entries
-	boards := append(req.Boards, b)
+	boards := append(req.Boards, currB)
 	scores := append(req.Scores, req.Scores[N-1]+score)
 	if N > 10 {
 		boards = boards[N-9:]
@@ -83,9 +108,9 @@ func handleSlide(w http.ResponseWriter, r *http.Request) {
 	}
 
 	hscore := max(req.HScore, scores[len(scores)-1])
-	gameOver := b.Status() == StatusLose
+	gameOver := currB.Status() == StatusLoss
 	signals := map[string]any{
-		"scores": scores, "boards": boards, 
+		"scores": scores, "boards": boards,
 		"_hscore": hscore, "_gameOver": gameOver,
 	}
 
@@ -120,5 +145,5 @@ func handleUndo(w http.ResponseWriter, r *http.Request) {
 
 	sse := datastar.NewSSE(w, r)
 	sse.MarshalAndPatchSignals(signals)
-	sse.PatchElements(renderBoard(req.Boards[N-2]))
+	sse.PatchElements(renderBoard(req.Boards[N-2], [16]string{}))
 }

@@ -42,7 +42,8 @@ func Test_Slide(t *testing.T) {
 	type TC struct {
 		before Board
 		dir    Direction
-		after  Board
+		merged Board
+		deltas Board
 		score  int
 		ok     bool
 	}
@@ -51,31 +52,36 @@ func Test_Slide(t *testing.T) {
 		tests := []TC{
 			{
 				before: Board{0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
-				after:  Board{0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0},
+				merged: Board{0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0},
+				deltas: Board{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0},
 				dir:    DirectionLeft,
 			},
 			{
 				before: Board{0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
-				after:  Board{0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				merged: Board{0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				deltas: Board{0, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				dir:    DirectionUp,
 			},
 			{
 				before: Board{0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
-				after:  Board{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2},
+				merged: Board{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2},
+				deltas: Board{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0},
 				dir:    DirectionDown,
 			},
 			{
 				before: Board{0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
-				after:  Board{0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2},
+				merged: Board{0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2},
+				deltas: Board{0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0},
 				dir:    DirectionRight,
 			},
 		}
 
 		for _, tt := range tests {
-			merged, score, ok := tt.before.Slide(tt.dir)
-			if !ok || score != 0 || tt.after != merged {
-				t.Errorf("\nInit: (%v, Dir: %v)\nWant: (%v, 0, true)\nGot : (%v, %d, %t)",
-					tt.before, tt.dir, tt.after, merged, score, ok)
+			merged, deltas, score, ok := tt.before.Slide(tt.dir)
+			if !ok || score != 0 || tt.merged != merged || tt.deltas != deltas {
+				t.Errorf("\nInit: (%v, Dir: %v)\nWant: (%v, %v, 0, true)\n"+
+					"Got : (%v, %v, %d, %t)", tt.before, tt.dir, tt.merged,
+					tt.deltas, merged, deltas, score, ok)
 			}
 		}
 	})
@@ -84,31 +90,36 @@ func Test_Slide(t *testing.T) {
 		tests := []TC{
 			{
 				before: Board{2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2},
-				after:  Board{4, 2, 0, 0, 4, 2, 0, 0, 4, 2, 0, 0, 4, 2, 0, 0},
+				merged: Board{4, 2, 0, 0, 4, 2, 0, 0, 4, 2, 0, 0, 4, 2, 0, 0},
+				deltas: Board{1, 1, 0, 0, 2, 2, 0, 0, 1, 1, 0, 0, 2, 2, 0, 0},
 				dir:    DirectionLeft, score: 16,
 			},
 			{
 				before: Board{2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2},
-				after:  Board{0, 0, 2, 4, 0, 0, 2, 4, 0, 0, 2, 4, 0, 0, 2, 4},
+				merged: Board{0, 0, 2, 4, 0, 0, 2, 4, 0, 0, 2, 4, 0, 0, 2, 4},
+				deltas: Board{0, 0, 2, 2, 0, 0, 1, 1, 0, 0, 2, 2, 0, 0, 1, 1},
 				dir:    DirectionRight, score: 16,
 			},
 			{
 				before: Board{2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2},
-				after:  Board{4, 4, 4, 4, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				merged: Board{4, 4, 4, 4, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				deltas: Board{2, 1, 1, 3, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				dir:    DirectionUp, score: 24,
 			},
 			{
 				before: Board{2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2},
-				after:  Board{0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 4, 4, 4, 4},
+				merged: Board{0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 4, 4, 4, 4},
+				deltas: Board{0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 3, 1, 1, 2},
 				dir:    DirectionDown, score: 24,
 			},
 		}
 
 		for _, tt := range tests {
-			merged, score, ok := tt.before.Slide(tt.dir)
-			if !ok || score != tt.score || merged != tt.after {
-				t.Errorf("\nInit: (%v, dir: %v)\nwant: (%v, %d)\ngot : (%v, %d)",
-					tt.before, tt.dir, tt.after, tt.score, merged, score)
+			merged, deltas, score, ok := tt.before.Slide(tt.dir)
+			if !ok || score != tt.score || merged != tt.merged || deltas != tt.deltas {
+				t.Errorf("\nInit: (%v, Dir: %v)\nWant: (%v, %v, 0, true)\n"+
+					"Got : (%v, %v, %d, %t)", tt.before, tt.dir, tt.merged,
+					tt.deltas, merged, deltas, score, ok)
 			}
 		}
 	})
@@ -117,21 +128,24 @@ func Test_Slide(t *testing.T) {
 		tests := []TC{
 			{
 				before: Board{4, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				after:  Board{4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				merged: Board{4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				deltas: Board{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				dir:    DirectionLeft, score: 4,
 			},
 			{
 				before: Board{4, 0, 0, 0, 4, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0},
-				after:  Board{0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0},
+				merged: Board{0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0},
+				deltas: Board{0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0},
 				dir:    DirectionDown, score: 8,
 			},
 		}
 
 		for _, tt := range tests {
-			merged, score, ok := tt.before.Slide(tt.dir)
-			if !ok || score != tt.score || merged != tt.after {
-				t.Errorf("\nInit: (%v, dir: %v)\nwant: (%v, %d)\ngot : (%v, %d)",
-					tt.before, tt.dir, tt.after, tt.score, merged, score)
+			merged, deltas, score, ok := tt.before.Slide(tt.dir)
+			if !ok || score != tt.score || merged != tt.merged || deltas != tt.deltas {
+				t.Errorf("\nInit: (%v, Dir: %v)\nWant: (%v, %v, 0, true)\n"+
+					"Got : (%v, %v, %d, %t)", tt.before, tt.dir, tt.merged,
+					tt.deltas, merged, deltas, score, ok)
 			}
 		}
 	})
@@ -144,7 +158,7 @@ func Test_Slide(t *testing.T) {
 			{4, 8, 2, 4, 2, 4, 8, 16, 4, 8, 4, 2, 8, 2, 8, 4},
 		} {
 			for _, dir := range Directions {
-				merged, score, ok := b.Slide(dir)
+				merged, _, score, ok := b.Slide(dir)
 				if score != 0 || ok {
 					t.Errorf("Expected slide [%v] to fail, got %v", dir, merged)
 				}
@@ -155,22 +169,59 @@ func Test_Slide(t *testing.T) {
 
 func Test_MergeLine(t *testing.T) {
 	tests := []struct {
-		input, output [4]uint16
+		input, mergedLine, deltaLine [4]uint16
 	}{
-		{input: [4]uint16{0, 2, 0, 2}, output: [4]uint16{4, 0, 0, 0}},
-		{input: [4]uint16{0, 0, 0, 2}, output: [4]uint16{2, 0, 0, 0}},
-		{input: [4]uint16{0, 2, 0, 2}, output: [4]uint16{4, 0, 0, 0}},
-		{input: [4]uint16{2, 0, 0, 2}, output: [4]uint16{4, 0, 0, 0}},
-		{input: [4]uint16{2, 2, 2, 0}, output: [4]uint16{4, 2, 0, 0}},
-		{input: [4]uint16{8, 0, 2, 4}, output: [4]uint16{8, 2, 4, 0}},
-		{input: [4]uint16{2, 4, 2, 4}, output: [4]uint16{2, 4, 2, 4}},
-		{input: [4]uint16{2, 4, 4, 2}, output: [4]uint16{2, 8, 2, 0}},
-		{input: [4]uint16{2, 2, 2, 2}, output: [4]uint16{4, 4, 0, 0}},
+		{
+			input:      [4]uint16{0, 2, 0, 2},
+			mergedLine: [4]uint16{4, 0, 0, 0},
+			deltaLine:  [4]uint16{3, 0, 0, 0},
+		},
+		{
+			input:      [4]uint16{0, 0, 0, 2},
+			mergedLine: [4]uint16{2, 0, 0, 0},
+			deltaLine:  [4]uint16{3, 0, 0, 0},
+		},
+		{
+			input:      [4]uint16{0, 2, 2, 2},
+			mergedLine: [4]uint16{4, 2, 0, 0},
+			deltaLine:  [4]uint16{2, 2, 0, 0},
+		},
+		{
+			input:      [4]uint16{2, 0, 0, 2},
+			mergedLine: [4]uint16{4, 0, 0, 0},
+			deltaLine:  [4]uint16{3, 0, 0, 0},
+		},
+		{
+			input:      [4]uint16{2, 2, 2, 0},
+			mergedLine: [4]uint16{4, 2, 0, 0},
+			deltaLine:  [4]uint16{1, 1, 0, 0},
+		},
+		{
+			input:      [4]uint16{8, 0, 2, 4},
+			mergedLine: [4]uint16{8, 2, 4, 0},
+			deltaLine:  [4]uint16{0, 1, 1, 0},
+		},
+		{
+			input:      [4]uint16{2, 4, 2, 4},
+			mergedLine: [4]uint16{2, 4, 2, 4},
+			deltaLine:  [4]uint16{0, 0, 0, 0},
+		},
+		{
+			input:      [4]uint16{2, 4, 4, 2},
+			mergedLine: [4]uint16{2, 8, 2, 0},
+			deltaLine:  [4]uint16{0, 1, 1, 0},
+		},
+		{
+			input:      [4]uint16{2, 2, 2, 2},
+			mergedLine: [4]uint16{4, 4, 0, 0},
+			deltaLine:  [4]uint16{1, 2, 0, 0},
+		},
 	}
 
 	for _, tt := range tests {
-		if got := mergeLine(tt.input); got != tt.output {
-			t.Errorf("mergeLine(%v) => want %v, got %v", tt.input, tt.output, got)
+		if mLine, dLine := mergeLine(tt.input); mLine != tt.mergedLine {
+			t.Errorf("mergeLine(%v) => want (%v, %v), got (%v, %v)",
+				tt.input, tt.mergedLine, tt.deltaLine, mLine, dLine)
 		}
 	}
 }
@@ -213,7 +264,24 @@ func Test_RotateCW(t *testing.T) {
 
 func Test_Status(t *testing.T) {
 	type TC struct {
-		input Board
+		input  Board
 		status GameStatus
+	}
+
+	tests := []TC{
+		{input: Board{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, status: StatusLoss},
+		{input: Board{2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2}, status: StatusLoss},
+		{input: Board{4, 8, 2, 4, 2, 4, 8, 16, 4, 8, 4, 2, 8, 2, 8, 4}, status: StatusLoss},
+		{input: Board{0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0}, status: StatusInProgress},
+		{input: Board{0, 0, 2, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0}, status: StatusInProgress},
+		{input: Board{0, 0, 512, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 512, 0}, status: StatusInProgress},
+		{input: Board{0, 512, 512, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2048, 0}, status: StatusWin},
+		{input: Board{0, 2048, 512, 2, 0, 0, 2, 0, 2048, 0, 0, 0, 0, 0, 2048, 0}, status: StatusWin},
+	}
+
+	for _, tt := range tests {
+		if st := tt.input.Status(); st != tt.status {
+			t.Errorf("%v: want %q, got %q", tt.input, tt.status, st)
+		}
 	}
 }

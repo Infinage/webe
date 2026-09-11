@@ -1,8 +1,8 @@
 {{define "EmptyBoard"}}
 <div id="board" 
+  class="grid grid-cols-4 grid-rows-4 gap-3 p-3 bg-[#9C8B7C]
+    w-full max-w-md aspect-square rounded-xl select-none"
   data-init="@get('/api/new', {filterSignals: {exclude: /.*/}})"
-  class="grid grid-cols-4 grid-rows-4 gap-3 p-3 bg-[#9C8B7C] h-1/2 
-    aspect-square rounded-xl select-none"
 >
   <div class="bg-[#BDAC97] rounded-xl"></div>
   <div class="bg-[#BDAC97] rounded-xl"></div>
@@ -105,7 +105,7 @@
   <script src="/static/datastar.js" type="module" defer></script>
 </head>
 <body
-  class="bg-[#181A1B] flex flex-col items-center h-screen gap-16 m-8"
+  class="bg-[#181A1B] flex flex-col items-center h-dvh gap-16 py-8 px-4"
   data-signals="{
     boards: [], _isShaking: false, scores: [], _gameOver: false,
     _hscore: Number(localStorage.getItem('hscore')) || 0

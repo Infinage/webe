@@ -6,11 +6,51 @@ import (
 	"strconv"
 )
 
-func renderBoard(b Board) string {
+// renderBoard returns a html markup of the board with the provided animations.
+func renderBoard(b Board, animations [16]string) string {
 	var buf bytes.Buffer
-	buf.WriteString(`<div id="board" class="grid grid-cols-4 grid-rows-4 gap-3 p-3 
-		bg-[#9C8B7C] h-1/2 aspect-square rounded-xl"
-	>`)
+	buf.WriteString(`
+		<div id="board" 
+			class="grid grid-cols-4 grid-rows-4 gap-3 p-3 bg-[#9C8B7C] w-full 
+				max-w-md aspect-square rounded-xl select-none touch-none"
+			data-on:touchstart="$_tCoords = [evt.changedTouches[0].clientX, evt.changedTouches[0].clientY]"
+			data-on:touchmove__window="$_touching = true"
+			data-on:touchend__window="
+			  if (!$_touching) return;
+
+			  const minSwipeDistance = 10;
+			  const deltaX = evt.changedTouches[0].clientX - $_tCoords[0]; 
+			  const deltaY = evt.changedTouches[0].clientY - $_tCoords[1];
+
+			  // Horizontal swipe
+			  let direction = '';
+			  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+			    if (Math.abs(deltaX) > minSwipeDistance) {
+				  direction = deltaX > 0 ? 'ArrowRight': 'ArrowLeft';
+				}
+			  } 
+
+			  // Vertical swipe
+			  else {
+			    if (Math.abs(deltaY) > minSwipeDistance) {
+				  direction = deltaY > 0 ? 'ArrowDown': 'ArrowUp';
+				}
+			  }
+
+			  // Send the slide request
+			  if (direction) {
+				  @post('/api/slide', { payload: {
+					 key: direction, 
+					 boards: $boards, 
+					 scores: $scores, 
+					 hscore: $_hscore
+				  }});
+			  }
+
+			  $_touching = false;
+  			"
+		>
+	`)
 
 	colors := map[uint16]string{
 		0:    "bg-[#BDAC97] text-transparent",
@@ -27,7 +67,7 @@ func renderBoard(b Board) string {
 		2048: "bg-[#EDC22E] text-white",
 	}
 
-	for _, cell := range b {
+	for idx, cell := range b {
 		color, ok := colors[cell]
 		if !ok {
 			color = "text-white bg-[#3C3A32]"
@@ -36,18 +76,17 @@ func renderBoard(b Board) string {
 		text := strconv.FormatUint(uint64(cell), 10)
 
 		// Make larger numbers slightly smaller
-		fontSize := "text-4xl"
-		if cell >= 1000 {
-			fontSize = "text-3xl"
-		}
+		fontSize := "text-4xl sm:text-5xl"
 		if cell >= 10000 {
-			fontSize = "text-2xl"
+			fontSize = "text-2xl sm:text-3xl"
+		} else if cell >= 1000 {
+			fontSize = "text-3xl sm:text-4xl"
 		}
 
 		cellHtml := fmt.Sprintf(`
 			<div class="rounded-xl flex items-center justify-center 
-				font-bold select-none %s %s">%s</div>
-		`, fontSize, color, text)
+				font-bold select-none %s %s %s">%s</div>
+		`, fontSize, color, animations[idx], text)
 
 		buf.WriteString(cellHtml)
 	}
