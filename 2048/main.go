@@ -1,22 +1,25 @@
 package main
 
 import (
+	"embed"
 	"html/template"
 	"log"
 	"net/http"
 )
 
+//go:embed static
+var FS embed.FS
+
 func main() {
 	// Parse html templates
-	templ, err := template.ParseFiles("static/index.html")
+	templ, err := template.ParseFS(FS, "static/index.html")
 	if err != nil {
 		log.Fatalf("Template parse fail: %v", err)
 	}
 
 	// Initialize the router
 	mux := http.NewServeMux()
-	handleStatic := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
-	mux.Handle("GET /static/", handleStatic)
+	mux.Handle("GET /static/", http.FileServerFS(FS))
 	mux.HandleFunc("GET /api/new", handleNew)
 	mux.HandleFunc("POST /api/slide", handleSlide)
 	mux.HandleFunc("POST /api/undo", handleUndo)
