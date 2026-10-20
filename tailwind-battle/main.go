@@ -8,13 +8,16 @@ import (
 )
 
 func main() {
-	templ, err := template.ParseFiles("assets/index.html")
+	templ, err := template.ParseFiles("assets/html/index.html")
 	if err != nil {
 		log.Fatal("template parse: ", err)
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets/"))))
+
+	assetsServer := http.FileServer(http.Dir("assets/"))
+	mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetsServer))
+
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		err = templ.Execute(w, nil)
 		if err != nil {

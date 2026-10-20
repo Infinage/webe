@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/assets/css/index.css">
+  <script src="/assets/js/datastar.js" type="module" defer></script>
+  <script>
+    function containsScript(html) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      return doc.getElementsByTagName('script').length > 0;
+    }
+  </script>
+</head>
+<body class="bg-gray-800 text-gray-200 min-h-dvh flex flex-col">
+  <header class="flex flex-wrap bg-gray-800 py-4 px-6 gap-4 items-center 
+    border-b border-b-white/10"
+  >
+    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-green-400">
+      Tailwind <span class="text-gray-100">Battle</span>
+    </h1>
+    <input data-bind="url" type="url" placeholder="Target image URL" 
+      data-on:change__debounce.250ms="
+        if (el.value) $_image.src=el.value
+        else $_image.src='/assets/images/default.png'
+      "
+      class="bg-gray-500 text-gray-200 border border-white/10 focus:outline-none 
+        p-2 flex-1 md:max-w-1/2 rounded-md max-w-full"
+    />
+    <span class="text-yellow-300 md:ml-auto text-xl">
+      <span class="font-medium uppercase tracking-wider text-gray-400">Score</span>
+      <span class="ml-2 font-mono font-semibold text-green-400">—%</span>
+    </span>
+  </header>
+
+  <div class="grid flex-1 grid-cols-1 gap-4 p-4 md:grid-cols-[1fr_auto]"
+    data-signals:html='
+      "<div class=\"p-2\">" + "\n\t" +
+      "<div class=\"h-25 w-25 bg-[#dd6b4d]\"></div>" + "\n" +
+      "</div>"
+    '
+  >
+    <!-- Editor panel -->
+    <section class="flex min-h-87.5 flex-col overflow-hidden rounded-xl border 
+      border-white/10 bg-gray-900"
+    >
+      <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
+        <h2 class="text-sm font-semibold text-gray-200">Your code</h2>
+        <span class="text-xs text-gray-500">HTML + Tailwind CSS</span>
+      </div>
+
+      <textarea spellcheck="false" data-bind:html
+        class="min-h-75 w-full flex-1 resize-y bg-gray-950 p-4 font-mono text-sm 
+          leading-6 text-gray-200 focus:outline-none"
+        data-on:keyup__debounce.500ms="
+          if (containsScript($html)) return;
+          $preview.contentWindow.postMessage({html: $html}, '*');
+        "
+      ></textarea>
+
+      <div class="border-t border-white/10 px-4 py-2 text-xs text-gray-500">
+        Edit your markup to match the reference.
+      </div>
+    </section>
+
+    <section class="flex min-w-0 flex-col gap-4">
+      <div class="overflow-hidden rounded-xl border border-white/10 bg-gray-900">
+        <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
+          <h2 class="text-sm font-semibold text-gray-200">Reference</h2>
+          <span class="text-xs text-gray-500">Target image</span>
+        </div>
+
+        <div class="flex justify-center">
+          <img data-ref:_image src="/assets/images/default.png" alt="Reference design"
+            class="block w-100 aspect-4/3 rounded-md"
+          />
+        </div>
+      </div>
+
+      <!-- Live preview -->
+      <div class="overflow-hidden rounded-xl border border-white/10 bg-gray-900">
+        <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
+          <h2 class="text-sm font-semibold text-gray-200">Live preview</h2>
+          <span class="flex items-center gap-2 text-xs text-green-400">
+            <span class="h-2 w-2 rounded-full bg-green-400"></span>
+            Live
+          </span>
+        </div>
+
+        <div class="flex justify-center">
+          <iframe data-ref:preview src="/assets/html/sandbox.html"
+            data-on:load="el.contentWindow.postMessage({html: $html}, '*')"
+            sandbox="allow-scripts allow-same-origin"
+            class="aspect-4/3 w-full max-w-100 rounded-md border border-white/10"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
