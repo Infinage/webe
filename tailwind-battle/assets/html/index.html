@@ -4,12 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/assets/css/index.css">
+  <script src="/assets/js/snapdom.js"></script>
   <script src="/assets/js/datastar.js" type="module" defer></script>
   <script>
     function containsScript(html) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
       return doc.getElementsByTagName('script').length > 0;
+    }
+
+    async function captureScreenshot(event, iframe) {
+      const doc = iframe.contentDocument;
+      if (!doc?.body) return;
+
+      try {
+        const result = await snapdom(doc.body);
+        const image = await result.toPng();
+        return image.src;
+      } catch (err) {
+        console.error('Capture failed:', err);
+        return null;
+      }
     }
   </script>
 </head>
@@ -91,6 +106,14 @@
         <div class="flex justify-center">
           <iframe data-ref:preview src="/assets/html/sandbox.html"
             data-on:load="el.contentWindow.postMessage({html: $html}, '*')"
+            data-on:message__window="
+              if (event.origin !== window.location.origin) return;
+              if (event.data?.type !== 'preview-updated') return;
+              captureScreenshot(evt, el).then(image => {
+                if (!image) return;
+                @post('/api/diff', {payload: {image: image}});
+              })
+            "
             sandbox="allow-scripts allow-same-origin"
             class="aspect-4/3 w-full max-w-100 rounded-md border border-white/10"
           ></iframe>

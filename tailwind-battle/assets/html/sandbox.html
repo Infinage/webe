@@ -8,8 +8,14 @@
 <body class="bg-white h-screen">
   <div 
     data-on:message__window="
+      // Read inbound change and render
       if (event.origin != window.location.origin) return;
       el.innerHTML = event.data.html;
+
+      // Signal completion
+      new Promise(requestAnimationFrame).then(() => {
+        window.parent.postMessage({ type: 'preview-updated' }, window.location.origin);
+      });
     "
   ></div>
 </body>

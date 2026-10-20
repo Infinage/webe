@@ -2,9 +2,12 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/starfederation/datastar-go/datastar"
 )
 
 func main() {
@@ -18,12 +21,23 @@ func main() {
 	assetsServer := http.FileServer(http.Dir("assets/"))
 	mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetsServer))
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		err = templ.Execute(w, nil)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+	})
+
+	mux.HandleFunc("POST /api/diff", func(w http.ResponseWriter, r *http.Request) {
+		var data struct { Image string `json:"image"` }
+		err = datastar.ReadSignals(r, &data)
+		if err != nil {
+			http.Error(w, "read signals", http.StatusBadRequest)
+			return
+		}
+
+		fmt.Println(data.Image)
 	})
 
 	err = http.ListenAndServe(":8080", mux)
