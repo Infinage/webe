@@ -6,6 +6,9 @@
   <link rel="stylesheet" href="/assets/css/index.css">
   <script src="/assets/js/snapdom.js"></script>
   <script src="/assets/js/datastar.js" type="module" defer></script>
+  <link href="/assets/css/prism-tomorrow.min.css" rel="stylesheet" />
+  <script src="/assets/js/prism.min.js"></script>
+
   <script>
     function containsScript(html) {
       const parser = new DOMParser();
@@ -31,6 +34,18 @@
       }
     }
   </script>
+  
+  <style>
+    code[class*="language-"], pre[class*="language-"] {
+      background: transparent !important;
+      text-shadow: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .token.attr-value { color: #a78bfa !important; }
+    .token.attr-name { color: #60a5fa !important; }
+    .token.tag { color: #f472b6 !important; }
+  </style>
 </head>
 <body class="bg-gray-800 text-gray-200 min-h-dvh flex flex-col">
   <header class="flex flex-wrap bg-gray-800 py-4 px-6 gap-4 items-center 
@@ -76,14 +91,24 @@
         <span class="text-xs text-gray-500">HTML + Tailwind CSS</span>
       </div>
 
-      <textarea spellcheck="false" data-bind:html
-        class="min-h-75 w-full flex-1 resize-y bg-gray-950 p-4 font-mono text-sm 
-          leading-6 text-gray-200 focus:outline-none"
-        data-on:keyup__debounce.500ms="
-          if (containsScript($html)) return;
-          $preview.contentWindow.postMessage({html: $html}, '*');
+      <div class="language-html min-h-75 w-full flex-1 resize-y overflow-auto 
+        bg-gray-950 p-4 font-mono text-sm leading-6 text-gray-200 focus:outline-none"
+        data-init="
+          import('/assets/js/codejar.min.js').then(({CodeJar}) => {
+            const jar = CodeJar(el, block => Prism.highlightElement(block));
+            jar.updateCode($html);
+            let timeout;
+            jar.onUpdate(code => {
+              $html = code;
+              clearTimeout(timeout);
+              timeout = setTimeout(() => {
+                if (containsScript(code)) return;
+                $preview.contentWindow.postMessage({html: code}, '*');
+              }, 500);
+            });
+          })
         "
-      ></textarea>
+      ></div>
 
       <div class="border-t border-white/10 px-4 py-2 text-xs text-gray-500">
         Edit your markup to match the reference.
@@ -122,7 +147,8 @@
               <span class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full 
                 bg-gray-600 transition-colors has-[:checked]:bg-gray-500"
               >
-                <input type="checkbox" id="diffCheckBox" class="peer sr-only"/>
+                <input data-bind="diffMode" type="checkbox" id="diffCheckBox" 
+                  class="peer sr-only"/>
                 <span class="absolute left-0.5 h-4 w-4 rounded-full bg-white
                    shadow-sm transition-transform peer-checked:translate-x-4"
                  ></span>
@@ -130,7 +156,7 @@
             </label>
 
             <!-- Live indicator -->
-            <span class="flex items-center gap-2 text-xs text-green-400">
+            <span class="flex items-center gap-2 text-xs text-green-400 select-none">
               <span class="h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
               Live
             </span>
@@ -142,18 +168,21 @@
           border-white/10 mx-auto" data-signals:pos="100"
         >
           <!-- Target image -->
-          <img class="absolute inset-0 h-full w-full object-cover" alt="Target"
+          <img class="absolute inset-0 h-full w-full object-cover" 
+            alt="Target" data-class="{'opacity-75': $diffMode}"
             data-attr:src="$url || '/assets/images/default.png'" />
 
           <!-- Source image -->
           <img class="absolute inset-0 h-full w-full object-cover"
+            data-class="{'mix-blend-difference': $diffMode}"
             data-attr:src="$sourceImgString" alt="Your preview" 
             data-style="{'clip-path': 'inset(0 ' + (100 - $pos) + '% 0 0)'}"
           />
 
           <!-- Slider divider -->
-          <div data-style="{'left': $pos + '%'}" class="pointer-events-none absolute 
-            bottom-0 top-0 z-10 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_5px_rgba(0,0,0,0.8)]"
+          <div data-style="{'left': $pos + '%'}" class="pointer-events-none 
+            absolute bottom-0 top-0 z-10 w-0.5 -translate-x-1/2 bg-white 
+            shadow-[0_0_5px_rgba(0,0,0,0.8)]"
           >
             <div class="absolute left-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 
               -translate-y-1/2 items-center justify-center rounded-full bg-white 
