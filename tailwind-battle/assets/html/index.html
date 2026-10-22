@@ -13,17 +13,21 @@
       return doc.getElementsByTagName('script').length > 0;
     }
 
-    async function captureScreenshot(event, iframe) {
+    async function captureScreenshot(iframe, targetImg) {
       const doc = iframe.contentDocument;
-      if (!doc?.body) return;
+      if (!doc?.body || !targetImg.complete || !targetImg.naturalWidth) {
+        return null;
+      }
 
       try {
-        const result = await snapdom(doc.body);
-        const image = await result.toPng();
+        const imageResult = await snapdom(doc.body);
+        const image = await imageResult.toPng();
         return image.src;
-      } catch (err) {
-        console.error('Capture failed:', err);
-        return null;
+      } 
+
+      catch (err) {
+       console.error("Screenshot capture failed:", err);
+       return null;
       }
     }
   </script>
@@ -36,16 +40,23 @@
       Tailwind <span class="text-gray-100">Battle</span>
     </h1>
     <input data-bind="url" type="url" placeholder="Target image URL" 
-      data-on:change__debounce.250ms="
-        if (el.value) $_image.src=el.value
-        else $_image.src='/assets/images/default.png'
+      data-on:input__debounce.250ms="
+        if (el.value) {
+          @post('/api/target', {payload: el.value});
+          $preview.contentWindow.postMessage({html: $html}, '*');
+        }
+        else {
+          $targetImgString='';
+        }
       "
       class="bg-gray-500 text-gray-200 border border-white/10 focus:outline-none 
         p-2 flex-1 md:max-w-1/2 rounded-md max-w-full"
     />
     <span class="text-yellow-300 md:ml-auto text-xl">
       <span class="font-medium uppercase tracking-wider text-gray-400">Score</span>
-      <span class="ml-2 font-mono font-semibold text-green-400">—%</span>
+      <span data-signals:score="0" data-text="$score + '%'"
+        class="ml-2 font-mono font-semibold text-green-400"
+        >—%</span>
     </span>
   </header>
 
@@ -87,8 +98,11 @@
         </div>
 
         <div class="flex justify-center">
-          <img data-ref:_image src="/assets/images/default.png" alt="Reference design"
-            class="block w-100 aspect-4/3 rounded-md"
+          <img alt="Reference design" data-ref="targetImg"
+            data-signals:targetImgString="''"
+            data-attr:src="$url || '/assets/images/default.png'"
+            src="/assets/images/default.png" class="block w-100 aspect-4/3 
+              rounded-md"
           />
         </div>
       </div>
@@ -97,25 +111,89 @@
       <div class="overflow-hidden rounded-xl border border-white/10 bg-gray-900">
         <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <h2 class="text-sm font-semibold text-gray-200">Live preview</h2>
-          <span class="flex items-center gap-2 text-xs text-green-400">
-            <span class="h-2 w-2 rounded-full bg-green-400"></span>
-            Live
-          </span>
+
+          <div class="flex items-center gap-4">
+            <!-- Diff toggle -->
+            <label for="diffCheckBox" class="inline-flex items-center gap-2.5 
+              cursor-pointer select-none rounded-full bg-gray-900 px-3 py-1.5 
+              text-xs font-medium text-gray-300"
+            >
+              <span>Diff</span>
+              <span class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full 
+                bg-gray-600 transition-colors has-[:checked]:bg-gray-500"
+              >
+                <input type="checkbox" id="diffCheckBox" class="peer sr-only"/>
+                <span class="absolute left-0.5 h-4 w-4 rounded-full bg-white
+                   shadow-sm transition-transform peer-checked:translate-x-4"
+                 ></span>
+              </span>
+            </label>
+
+            <!-- Live indicator -->
+            <span class="flex items-center gap-2 text-xs text-green-400">
+              <span class="h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+              Live
+            </span>
+          </div>
         </div>
 
-        <div class="flex justify-center">
-          <iframe data-ref:preview src="/assets/html/sandbox.html"
+        <!-- Comparison viewport -->
+        <div class="relative aspect-4/3 max-w-100 overflow-hidden rounded-md border 
+          border-white/10 mx-auto" data-signals:pos="100"
+        >
+          <!-- Target image -->
+          <img class="absolute inset-0 h-full w-full object-cover" alt="Target"
+            data-attr:src="$url || '/assets/images/default.png'" />
+
+          <!-- Source image -->
+          <img class="absolute inset-0 h-full w-full object-cover"
+            data-attr:src="$sourceImgString" alt="Your preview" 
+            data-style="{'clip-path': 'inset(0 ' + (100 - $pos) + '% 0 0)'}"
+          />
+
+          <!-- Slider divider -->
+          <div data-style="{'left': $pos + '%'}" class="pointer-events-none absolute 
+            bottom-0 top-0 z-10 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_5px_rgba(0,0,0,0.8)]"
+          >
+            <div class="absolute left-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 
+              -translate-y-1/2 items-center justify-center rounded-full bg-white 
+              shadow-md"
+            >
+              <svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24" >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 9l-4 4 4 4m8-8l4 4-4 4"></path>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Slider interaction -->
+          <input type="range" min="0" max="100" step="0.1" data-bind="pos"
+            aria-label="Compare target and preview" class="absolute inset-0 z-20 
+              m-0 h-full w-full cursor-ew-resize opacity-0"
+          />
+
+          <!-- Hidden rendering iframe -->
+          <iframe src="/assets/html/sandbox.html"
+            sandbox="allow-scripts allow-same-origin"
+            class="absolute right-full aspect-4/3 max-w-100 overflow-hidden"
+            data-ref:preview
             data-on:load="el.contentWindow.postMessage({html: $html}, '*')"
             data-on:message__window="
               if (event.origin !== window.location.origin) return;
               if (event.data?.type !== 'preview-updated') return;
-              captureScreenshot(evt, el).then(image => {
+              captureScreenshot(el, $targetImg).then(image => {
                 if (!image) return;
-                @post('/api/diff', {payload: {image: image}});
-              })
+                $sourceImgString=image;
+                @post('/api/diff', {
+                  payload: { source: $sourceImgString, targetString: $targetImgString }
+                });
+              });
             "
-            sandbox="allow-scripts allow-same-origin"
-            class="aspect-4/3 w-full max-w-100 rounded-md border border-white/10"
+            data-attr="{
+              height: $targetImg.naturalHeight,
+              width: $targetImg.naturalWidth
+            }"
           ></iframe>
         </div>
       </div>

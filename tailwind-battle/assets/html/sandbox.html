@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html class="w-full h-full">
 <head>
   <meta charset="UTF-8">
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
   <script src="/assets/js/datastar.js" type="module" defer></script>
 </head>
-<body class="bg-white h-screen">
+<body class="w-full h-full bg-white">
   <div 
+    class="overflow-hidden"
     data-on:message__window="
       // Read inbound change and render
       if (event.origin != window.location.origin) return;
