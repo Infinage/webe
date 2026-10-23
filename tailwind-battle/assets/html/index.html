@@ -145,7 +145,7 @@
             >
               <span>Diff</span>
               <span class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full 
-                bg-gray-600 transition-colors has-[:checked]:bg-gray-500"
+                bg-gray-600 transition-colors has-[:checked]:bg-green-500"
               >
                 <input data-bind="diffMode" type="checkbox" id="diffCheckBox" 
                   class="peer sr-only"/>
@@ -174,15 +174,22 @@
 
           <!-- Source image -->
           <img class="absolute inset-0 h-full w-full object-cover"
-            data-class="{'mix-blend-difference': $diffMode}"
             data-attr:src="$sourceImgString" alt="Your preview" 
-            data-style="{'clip-path': 'inset(0 ' + (100 - $pos) + '% 0 0)'}"
+            data-class="{
+              'mix-blend-difference': $diffMode, 
+              'opacity-85': !$diffMode && $_sliderMouseIn,
+            }"
+            data-style="{
+              'clip-path': $diffMode
+                ? 'none'
+                : 'inset(0 ' + (100 - $pos) + '% 0 0)'
+            }"
           />
 
           <!-- Slider divider -->
-          <div data-style="{'left': $pos + '%'}" class="pointer-events-none 
-            absolute bottom-0 top-0 z-10 w-0.5 -translate-x-1/2 bg-white 
-            shadow-[0_0_5px_rgba(0,0,0,0.8)]"
+          <div data-show="$_sliderMouseIn" data-style="{'left': $pos + '%'}" 
+            class="pointer-events-none absolute bottom-0 top-0 z-10 w-0.5 
+            -translate-x-1/2 bg-white shadow-[0_0_5px_rgba(0,0,0,0.8)]"
           >
             <div class="absolute left-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 
               -translate-y-1/2 items-center justify-center rounded-full bg-white 
@@ -194,12 +201,23 @@
                   d="M8 9l-4 4 4 4m8-8l4 4-4 4"></path>
               </svg>
             </div>
+            <span class="absolute bottom-0 p-1 opacity-85 bg-red-400 text-white" 
+              data-class="{'-translate-x-full': $pos > 90}"
+              data-text="Math.round($pos * 400 / 100)"></span>
           </div>
 
           <!-- Slider interaction -->
-          <input type="range" min="0" max="100" step="0.1" data-bind="pos"
-            aria-label="Compare target and preview" class="absolute inset-0 z-20 
-              m-0 h-full w-full cursor-ew-resize opacity-0"
+          <input data-show="!$diffMode" type="range" min="0" max="100" 
+            step="0.1" data-bind="pos" aria-label="Compare target and preview" 
+            class="absolute inset-0 z-20 m-0 h-full w-full cursor-ew-resize opacity-0"
+            data-on:mousemove="
+              $_sliderMouseIn = true;
+              const rect = el.getBoundingClientRect();
+              $pos = Math.max(0, Math.min(100, 
+                ((event.clientX - rect.left) / rect.width) * 100
+              ));
+            "
+            data-on:mouseleave="$pos = 100; $_sliderMouseIn = false;"
           />
 
           <!-- Hidden rendering iframe -->
@@ -227,6 +245,57 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- Error toast -->
+  <div data-signals:errorTimer="0" data-show="$showError" 
+    data-on-signal-patch-filter="{include: '/^showError$/'}"
+    data-on-signal-patch="$showError? 
+      (clearTimeout($errorTimer), $errorTimer = setTimeout(() => $showError = false, 3000))
+      : clearTimeout($errorTimer)"
+    class="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 
+       md:bottom-6 md:right-6 md:left-auto md:translate-x-0"
+  >
+    <div role="alert" class="overflow-hidden rounded-xl border border-red-400/20 
+      bg-gray-900 shadow-2xl ring-1 ring-black/5"
+    >
+      <div class="p-4">
+        <div class="flex items-start gap-3">
+          <!-- Icon -->
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full 
+            bg-red-500/15 text-red-400"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 9v4m0 4h.01M10.3 3.9 1.8 18.6A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.4L13.7 
+                  3.9a2 2 0 0 0-3.4 0Z"/>
+            </svg>
+          </div>
+
+          <!-- Content -->
+          <div class="min-w-0 flex-1 pt-1">
+            <h2 id="errorTitle" class="font-medium text-sm text-gray-100">
+              Something went wrong
+            </h2>
+            <p data-text="$errorMessage" class="mt-1 break-words text-sm text-gray-400"></p>
+          </div>
+
+          <!-- Close Button -->
+          <div class="ml-4 flex shrink-0">
+            <button type="button" aria-label="Close error dialog" 
+              data-on:click="$showError = false" class="inline-flex rounded-md 
+                text-gray-500 transition hover:text-white cursor-pointer"
+            >
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M6 18 18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 </html>

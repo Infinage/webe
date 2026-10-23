@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"embed"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -13,7 +14,6 @@ import (
 	"log"
 	"math"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -21,6 +21,11 @@ import (
 	"golang.org/x/image/draw"
 )
 
+//go:embed assets/*
+var assets embed.FS
+
+// loadImageFromBase64Blob takes in a raw base64 encoded blob strips the
+// prefix, base64 decodes it and parses it to png image.
 func loadImageFromBase64Blob(raw string) (image.Image, error) {
 	header, imgEncoded, ok := strings.Cut(raw, ",")
 	if !ok || header != "data:image/png;base64" {
@@ -62,16 +67,23 @@ func diffImages(source, target image.Image) (float64, error) {
 	return scoreF, nil
 }
 
+// datastarShowErrPopup is a helper utility to send error popup to the frontend
+func datastarShowErrPopup(w http.ResponseWriter, r *http.Request, errMessage string) {
+	sse := datastar.NewSSE(w, r)
+	signals := map[string]any{"showError": true, "errorMessage": errMessage}
+	sse.MarshalAndPatchSignals(signals)
+}
+
 func main() {
-	templ, err := template.ParseFiles("assets/html/index.html")
+	templ, err := template.ParseFS(assets, "assets/html/index.html")
 	if err != nil {
 		log.Fatal("template parse: ", err)
 	}
 
 	mux := http.NewServeMux()
 
-	assetsServer := http.FileServer(http.Dir("assets/"))
-	mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetsServer))
+	assetsServer := http.FileServerFS(assets)
+	mux.Handle("GET /assets/", assetsServer)
 
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		err = templ.Execute(w, nil)
@@ -85,26 +97,26 @@ func main() {
 		var targetURL string
 		err := datastar.ReadSignals(r, &targetURL)
 		if err != nil || targetURL == "" {
-			http.Error(w, "read target URL", http.StatusBadRequest)
+			datastarShowErrPopup(w, r, "Read target URL")
 			return
 		}
 
 		client := http.Client{Timeout: 5 * time.Second}
 		resp, err := client.Get(targetURL)
 		if err != nil {
-			http.Error(w, "Read target URL", http.StatusBadRequest)
+			datastarShowErrPopup(w, r, "Read target URL")
 			return
 		}
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
-			http.Error(w, "Get target NOT OK", http.StatusBadRequest)
+			datastarShowErrPopup(w, r, "Get target NOT OK")
 			return
 		}
 
 		target, _, err := image.Decode(io.LimitReader(resp.Body, 2<<20))
 		if err != nil {
-			http.Error(w, "Decode target image", http.StatusBadRequest)
+			datastarShowErrPopup(w, r, "Decode target image")
 			return
 		}
 
@@ -114,13 +126,12 @@ func main() {
 		var buf bytes.Buffer
 		err = png.Encode(&buf, dstImg)
 		if err != nil {
-			http.Error(w, "Re-encode target image", http.StatusInternalServerError)
+			datastarShowErrPopup(w, r, "Re-encode target image")
 			return
 		}
-	
-		signals := map[string]any {
-			"targetImgString": base64.StdEncoding.EncodeToString(buf.Bytes()),
-		}
+
+		targetEncoded := base64.StdEncoding.EncodeToString(buf.Bytes())
+		signals := map[string]any{"targetImgString": targetEncoded}
 
 		sse := datastar.NewSSE(w, r)
 		sse.MarshalAndPatchSignals(signals)
@@ -134,28 +145,28 @@ func main() {
 
 		err = datastar.ReadSignals(r, &data)
 		if err != nil {
-			http.Error(w, "read signals", http.StatusBadRequest)
+			datastarShowErrPopup(w, r, "read signals")
 			return
 		}
 
 		source, err := loadImageFromBase64Blob(data.Source)
 		if err != nil {
 			log.Println("Source image load: ", err)
-			http.Error(w, "load source image from blob", http.StatusBadRequest)
+			datastarShowErrPopup(w, r, "load source image from blob")
 			return
 		}
 
 		var targetRaw []byte
 		if data.TargetString == "" {
-			targetRaw, err = os.ReadFile("assets/images/default.png")
+			targetRaw, err = assets.ReadFile("assets/images/default.png")
 			if err != nil {
-				http.Error(w, "read default source", http.StatusBadRequest)
+				datastarShowErrPopup(w, r, "read default source")
 				return
 			}
 		} else {
 			targetRaw, err = base64.StdEncoding.DecodeString(data.TargetString)
 			if err != nil {
-				http.Error(w, "read target string", http.StatusBadRequest)
+				datastarShowErrPopup(w, r, "read target string")
 				return
 			}
 		}
@@ -163,14 +174,14 @@ func main() {
 		target, _, err := image.Decode(bytes.NewReader(targetRaw))
 		if err != nil {
 			log.Println("Target image decode: ", err)
-			http.Error(w, "load target image from string", http.StatusBadRequest)
+			datastarShowErrPopup(w, r, "load target image from string")
 			return
 		}
 
 		score, err := diffImages(source, target)
 		if err != nil {
 			log.Println("diff image:", err)
-			http.Error(w, "diff image", http.StatusInternalServerError)
+			datastarShowErrPopup(w, r, "diff image")
 			return
 		}
 
