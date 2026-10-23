@@ -23,7 +23,7 @@
       }
 
       try {
-        const imageResult = await snapdom(doc.body);
+        const imageResult = await snapdom(doc.body, {width: 400, dpr: 1});
         const image = await imageResult.toPng();
         return image.src;
       } 
@@ -55,7 +55,7 @@
       Tailwind <span class="text-gray-100">Battle</span>
     </h1>
     <input data-bind="url" type="url" placeholder="Target image URL" 
-      data-on:input__debounce.250ms="
+      data-on:input__debounce.500ms="
         if (el.value) {
           @post('/api/target', {payload: el.value});
           $preview.contentWindow.postMessage({html: $html}, '*');

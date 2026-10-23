@@ -97,6 +97,7 @@ func main() {
 		var targetURL string
 		err := datastar.ReadSignals(r, &targetURL)
 		if err != nil || targetURL == "" {
+			log.Println("Read target URL: ", err)
 			datastarShowErrPopup(w, r, "Read target URL")
 			return
 		}
@@ -104,18 +105,21 @@ func main() {
 		client := http.Client{Timeout: 5 * time.Second}
 		resp, err := client.Get(targetURL)
 		if err != nil {
+			log.Println("Read target URL: ", err)
 			datastarShowErrPopup(w, r, "Read target URL")
 			return
 		}
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
+			log.Println("Get target NOT OK")
 			datastarShowErrPopup(w, r, "Get target NOT OK")
 			return
 		}
 
 		target, _, err := image.Decode(io.LimitReader(resp.Body, 2<<20))
 		if err != nil {
+			log.Println("Decode target image: ", err)
 			datastarShowErrPopup(w, r, "Decode target image")
 			return
 		}
@@ -126,6 +130,7 @@ func main() {
 		var buf bytes.Buffer
 		err = png.Encode(&buf, dstImg)
 		if err != nil {
+			log.Println("Re-encode target image: ", err)
 			datastarShowErrPopup(w, r, "Re-encode target image")
 			return
 		}
@@ -135,6 +140,15 @@ func main() {
 
 		sse := datastar.NewSSE(w, r)
 		sse.MarshalAndPatchSignals(signals)
+
+		// Truncate the url for logging
+		truncatedURL := targetURL
+		if maxLen := 30; len(targetURL) > maxLen {
+			half := (maxLen - 2) / 2
+			truncatedURL = targetURL[:half] + "..." + targetURL[len(targetURL)-half:]
+		}
+
+		log.Printf("Target image [%s] encoded successfully", truncatedURL)
 	})
 
 	mux.HandleFunc("POST /api/diff", func(w http.ResponseWriter, r *http.Request) {
@@ -145,6 +159,7 @@ func main() {
 
 		err = datastar.ReadSignals(r, &data)
 		if err != nil {
+			log.Println("Read signals: ", err)
 			datastarShowErrPopup(w, r, "read signals")
 			return
 		}
@@ -160,12 +175,14 @@ func main() {
 		if data.TargetString == "" {
 			targetRaw, err = assets.ReadFile("assets/images/default.png")
 			if err != nil {
+				log.Println("Read default source: ", err)
 				datastarShowErrPopup(w, r, "read default source")
 				return
 			}
 		} else {
 			targetRaw, err = base64.StdEncoding.DecodeString(data.TargetString)
 			if err != nil {
+				log.Println("Read target string: ", err)
 				datastarShowErrPopup(w, r, "read target string")
 				return
 			}
