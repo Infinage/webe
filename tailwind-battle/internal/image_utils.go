@@ -33,13 +33,13 @@ func getWeights(img image.Image) (map[uint16]float64, float64) {
 
 	// Total pixel count to filter out noise
 	totalPixels := bounds.Dx() * bounds.Dy()
-	noiseThreshold := 1/1000.
+	noiseThreshold := 1 / 1000.
 
 	// Weight of a color = 1 / sqrt(freq)
 	var totalWeight float64
 	weights := make(map[uint16]float64)
 	for color, count := range pixelCounts {
-		if float64(count) / float64(totalPixels) < noiseThreshold {
+		if float64(count)/float64(totalPixels) < noiseThreshold {
 			continue
 		}
 		weight := 1 / math.Sqrt(float64(count))
@@ -68,10 +68,10 @@ func diffImages(source, target image.Image, targetWeights map[uint16]float64,
 	}
 
 	pixelAlmostEq := func(x, y int, tolerance uint32) bool {
-		r1, g1, b1, _ := source.At(x, y).RGBA()	
-		r2, g2, b2, _ := target.At(x, y).RGBA()	
-		return abs(r1, r2) <= tolerance && 
-			abs(g1, g2) <= tolerance && 
+		r1, g1, b1, _ := source.At(x, y).RGBA()
+		r2, g2, b2, _ := target.At(x, y).RGBA()
+		return abs(r1, r2) <= tolerance &&
+			abs(g1, g2) <= tolerance &&
 			abs(b1, b2) <= tolerance
 	}
 
@@ -113,6 +113,6 @@ func loadImageFromBase64Blob(raw string) (image.Image, error) {
 // rescaleImage redraws the input image into the required shape.
 func rescaleImage(img image.Image, width, height int) image.Image {
 	dstImg := image.NewRGBA(image.Rect(0, 0, width, height))
-    draw.NearestNeighbor.Scale(dstImg, dstImg.Bounds(), img, img.Bounds(), draw.Src, nil)
+	draw.NearestNeighbor.Scale(dstImg, dstImg.Bounds(), img, img.Bounds(), draw.Src, nil)
 	return dstImg
 }
