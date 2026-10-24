@@ -16,14 +16,12 @@
       return doc.getElementsByTagName('script').length > 0;
     }
 
-    async function captureScreenshot(iframe, targetImg) {
+    async function captureScreenshot(iframe) {
       const doc = iframe.contentDocument;
-      if (!doc?.body || !targetImg.complete || !targetImg.naturalWidth) {
-        return null;
-      }
+      if (!doc?.body) return null;
 
       try {
-        const imageResult = await snapdom(doc.body, {width: 400, dpr: 1});
+        const imageResult = await snapdom(doc.body, {width: 400, height: 300, dpr: 1});
         const image = await imageResult.toPng();
         return image.src;
       } 
@@ -59,11 +57,6 @@
         if (el.value) {
           @post('/api/target', {payload: el.value});
           $preview.contentWindow.postMessage({html: $html}, '*');
-        }
-        else {
-          $targetImgString='';
-          $targetImgWeights={};
-          $targetTotalWeight=0.;
         }
       "
       class="bg-gray-500 text-gray-200 border border-white/10 focus:outline-none 
@@ -134,11 +127,6 @@
           <img alt="Reference design" src="/assets/images/default.png" 
             class="block w-100 aspect-4/3 rounded-md"
             data-ref="targetImg"
-            data-signals="{
-              targetImgString: '', 
-              targetImgWeights: {}, 
-              targetImgTotalWeight: 0.
-            }"
             data-attr:src="$url || '/assets/images/default.png'"
           />
         </div>
@@ -177,7 +165,9 @@
 
         <!-- Comparison viewport -->
         <div class="relative aspect-4/3 max-w-100 overflow-hidden rounded-md border 
-          border-white/10 mx-auto" data-signals:pos="100"
+          border-white/10 mx-auto" data-signals="{pos: 100, shifted: false}"
+          data-on:keydown__window="if (evt.key === 'Shift') $shifted = true;"
+          data-on:keyup__window="if (evt.key === 'Shift') $shifted = false;"
         >
           <!-- Target image -->
           <img class="absolute inset-0 h-full w-full object-cover" 
@@ -194,14 +184,25 @@
             data-style="{
               'clip-path': $diffMode
                 ? 'none'
-                : 'inset(0 ' + (100 - $pos) + '% 0 0)'
+                : $shifted 
+                  ? 'inset(0 0 ' + (100 - $pos) + '% 0)' 
+                  : 'inset(0 ' + (100 - $pos) + '% 0 0)'
             }"
           />
 
           <!-- Slider divider -->
-          <div data-show="$_sliderMouseIn" data-style="{'left': $pos + '%'}" 
-            class="pointer-events-none absolute bottom-0 top-0 z-10 w-0.5 
-            -translate-x-1/2 bg-white shadow-[0_0_5px_rgba(0,0,0,0.8)]"
+          <div 
+            data-show="$_sliderMouseIn && !$diffMode" 
+            data-style="$shifted ? 
+              {'top': $pos + '%', 'left': '0'} : 
+              {'left': $pos + '%', 'top': '0'}
+            "
+            class="pointer-events-none absolute z-10 bg-white 
+              shadow-[0_0_5px_rgba(0,0,0,0.8)]"
+            data-class="{
+              'bottom-0 w-0.5 -translate-x-1/2': !$shifted,
+              'right-0 h-0.5 -translate-y-1/2': $shifted
+            }"
           >
             <div class="absolute left-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 
               -translate-y-1/2 items-center justify-center rounded-full bg-white 
@@ -213,21 +214,27 @@
                   d="M8 9l-4 4 4 4m8-8l4 4-4 4"></path>
               </svg>
             </div>
-            <span class="absolute bottom-0 p-1 opacity-85 bg-red-400 text-white" 
-              data-class="{'-translate-x-full': $pos > 90}"
-              data-text="Math.round($pos * 400 / 100)"></span>
+            <span class="absolute p-1 opacity-85 bg-red-400 text-white" 
+              data-class="{
+                'bottom-0': !$shifted, 'right-0': $shifted,
+                '-translate-x-full': !$shifted && $pos > 90,
+                '-translate-y-full':  $shifted && $pos > 90,
+              }"
+              data-text="Math.round($pos * ($shifted? 3: 4))"></span>
           </div>
 
           <!-- Slider interaction -->
           <input data-show="!$diffMode" type="range" min="0" max="100" 
             step="0.1" data-bind="pos" aria-label="Compare target and preview" 
             class="absolute inset-0 z-20 m-0 h-full w-full cursor-ew-resize opacity-0"
+            data-class="{'cursor-ew-resize': !$shifted, 'cursor-ns-resize': $shifted}"
             data-on:mousemove="
               $_sliderMouseIn = true;
               const rect = el.getBoundingClientRect();
-              $pos = Math.max(0, Math.min(100, 
-                ((event.clientX - rect.left) / rect.width) * 100
-              ));
+              const magX = (event.clientX - rect.left) / rect.width;
+              const magY = (event.clientY - rect.top) / rect.height;
+              const mag = $shifted? magY: magX;
+              $pos = Math.max(0, Math.min(100, mag * 100));
             "
             data-on:mouseleave="$pos = 100; $_sliderMouseIn = false;"
           />
@@ -241,15 +248,13 @@
             data-on:message__window="
               if (event.origin !== window.location.origin) return;
               if (event.data?.type !== 'preview-updated') return;
-              captureScreenshot(el, $targetImg).then(image => {
+              captureScreenshot(el).then(image => {
                 if (!image) return;
                 $sourceImgString=image;
                 @post('/api/diff', {
                   payload: { 
                     source: $sourceImgString, 
-                    targetString: $targetImgString,
-                    targetWeights: $targetImgWeights,
-                    targetTotalWeight: $targetImgTotalWeight,
+                    targetURL: $url,
                   }
                 });
               });

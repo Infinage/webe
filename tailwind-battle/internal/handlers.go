@@ -2,13 +2,14 @@ package internal
 
 import (
 	"bytes"
-	"encoding/base64"
+	"fmt"
 	"image"
 	_ "image/jpeg"
-	"image/png"
+	_ "image/png"
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/starfederation/datastar-go/datastar"
@@ -17,8 +18,42 @@ import (
 // datastarShowErrPopup is a helper utility to send error popup to the frontend
 func datastarShowErrPopup(w http.ResponseWriter, r *http.Request, errMessage string) {
 	sse := datastar.NewSSE(w, r)
-	signals := map[string]any{"showError": true, "errorMessage": errMessage}
+	signals := map[string]any{"showError": true, "errorMessage": errMessage, "score": 0.}
 	sse.MarshalAndPatchSignals(signals)
+}
+
+func truncateURL(u string, maxLen int) string {
+	truncated := u
+	if len(u) > maxLen {
+		half := (maxLen - 2) / 2
+		truncated = u[:half] + "..." + u[len(u)-half:]
+	}
+	return truncated
+}
+
+func processTargetImageURL(ustr string, width, height int) (image.Image, error) {
+	client := http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Get(ustr)
+	if err != nil {
+		return nil, fmt.Errorf("read target URL: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("get target NOT OK")
+	}
+
+	if !strings.HasPrefix(resp.Header.Get("content-type"), "image/") {
+		return nil, fmt.Errorf("target url returned non image")	
+	}
+	
+	target, _, err := image.Decode(io.LimitReader(resp.Body, 2<<20))
+	if err != nil {
+		return nil, fmt.Errorf("decode target image: %w", err)
+	}
+
+	dstImg := rescaleImage(target, width, height)
+	return dstImg, nil
 }
 
 // handleAPIHome returns the homepage for tailwind-battle playground
@@ -36,72 +71,32 @@ func (app *App) handleAPIEncodeTargetImage(w http.ResponseWriter, r *http.Reques
 	err := datastar.ReadSignals(r, &targetURL)
 	if err != nil || targetURL == "" {
 		log.Println("Read target URL:", err)
-		datastarShowErrPopup(w, r, "Read target URL")
+		datastarShowErrPopup(w, r, "Read signals")
 		return
 	}
 
-	client := http.Client{Timeout: 5 * time.Second}
-	resp, err := client.Get(targetURL)
+	if _, ok := app.cache.Get(targetURL); ok {
+		log.Printf("Target image [%s] already cached", truncateURL(targetURL, 30))
+		return
+	}
+
+	dstImg, err := processTargetImageURL(targetURL, 400, 300)
 	if err != nil {
-		log.Println("Read target URL:", err)
-		datastarShowErrPopup(w, r, "Read target URL")
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		log.Println("Get target NOT OK")
-		datastarShowErrPopup(w, r, "Get target NOT OK")
+		log.Println("Process target image URL:", err)
+		datastarShowErrPopup(w, r, "Process target image URL")
 		return
 	}
 
-	target, _, err := image.Decode(io.LimitReader(resp.Body, 2<<20))
-	if err != nil {
-		log.Println("Decode target image:", err)
-		datastarShowErrPopup(w, r, "Decode target image")
-		return
-	}
-
-	dstImg := rescaleImage(target, 400, 300)
-
-	// Write into temporary memory buffer to encode it
-	var buf bytes.Buffer
-	if err := png.Encode(&buf, dstImg); err != nil {
-		log.Println("Re-encode target image: ", err)
-		datastarShowErrPopup(w, r, "Re-encode target image: ")
-		return
-	}
-
-	targetEncoded := base64.StdEncoding.EncodeToString(buf.Bytes())
-	targetWeights, targetTotalWeight := getWeights(dstImg)
-
-	signals := map[string]any{
-		"targetImgString":      targetEncoded,
-		"targetImgWeights":     targetWeights,
-		"targetImgTotalWeight": targetTotalWeight,
-	}
-
-	sse := datastar.NewSSE(w, r)
-	sse.MarshalAndPatchSignals(signals)
-
-	// Truncate the url for logging
-	truncatedURL := targetURL
-	if maxLen := 30; len(targetURL) > maxLen {
-		half := (maxLen - 2) / 2
-		truncatedURL = targetURL[:half] + "..." + targetURL[len(targetURL)-half:]
-	}
-
-	log.Printf("Target image [%s] encoded successfully", truncatedURL)
+	app.cache.Set(targetURL, dstImg)
+	log.Printf("Target image [%s] encoded successfully", truncateURL(targetURL, 30))
 }
 
 // handleAPIDiffImages compares the inbound input and target image and
 // scores based on an inverse weighted frequency.
 func (app *App) handleAPIDiffImages(w http.ResponseWriter, r *http.Request) {
 	var data struct {
-		Source            string             `json:"source"`
-		TargetString      string             `json:"targetString"`
-		TargetWeights     map[uint16]float64 `json:"targetWeights"`
-		TargetTotalWeight float64            `json:"targetTotalWeight"`
+		Source    string `json:"source"`
+		TargetURL string `json:"targetURL"`
 	}
 
 	err := datastar.ReadSignals(r, &data)
@@ -118,37 +113,44 @@ func (app *App) handleAPIDiffImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var targetRaw []byte
-	if data.TargetString == "" {
-		targetRaw, err = app.assets.ReadFile("assets/images/default.png")
-		if err != nil {
-			log.Println("Read default source:", err)
-			datastarShowErrPopup(w, r, "Read default source")
-			return
+	if _, ok := app.cache.Get(data.TargetURL); !ok {
+		var target image.Image
+		if data.TargetURL == "" {
+			targetRaw, err := app.assets.ReadFile("assets/images/default.png")
+			if err != nil {
+				log.Println("Read default source:", err)
+				datastarShowErrPopup(w, r, "Read default source")
+				return
+			}
+
+			target, _, err = image.Decode(bytes.NewReader(targetRaw))
+			if err != nil {
+				log.Println("Decode default source:", err)
+				datastarShowErrPopup(w, r, "Decode default source")
+				return
+			}
+
+		} else {
+			target, err = processTargetImageURL(data.TargetURL, 400, 300)
+			if err != nil {
+				log.Println("Process target image:", err)
+				datastarShowErrPopup(w, r, "Process target image")
+				return
+			}
 		}
-	} else {
-		targetRaw, err = base64.StdEncoding.DecodeString(data.TargetString)
-		if err != nil {
-			log.Println("Read target string:", err)
-			datastarShowErrPopup(w, r, "Read target string")
-			return
-		}
+
+		log.Printf("Cache updated for: %q", truncateURL(data.TargetURL, 30))
+		app.cache.Set(data.TargetURL, target)
 	}
 
-	target, _, err := image.Decode(bytes.NewReader(targetRaw))
-	if err != nil {
-		log.Println("Target image decode:", err)
-		datastarShowErrPopup(w, r, "Load target image from string")
+	timg, ok := app.cache.Get(data.TargetURL)
+	if !ok {
+		log.Println("Target image missing from cache after set")
+		datastarShowErrPopup(w, r, "Internal cache error")
 		return
 	}
 
-	// If not set recalculate it
-	targetWeights, targetTotalWeight := data.TargetWeights, data.TargetTotalWeight
-	if len(data.TargetWeights) == 0 || data.TargetTotalWeight <= 0. {
-		targetWeights, targetTotalWeight = getWeights(target)
-	}
-
-	score, err := diffImages(source, target, targetWeights, targetTotalWeight)
+	score, err := diffImages(source, timg.Image, timg.pixelWeights, timg.totalWeight)
 	if err != nil {
 		log.Println("Diff image:", err)
 		datastarShowErrPopup(w, r, "Diff image")
@@ -156,9 +158,5 @@ func (app *App) handleAPIDiffImages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sse := datastar.NewSSE(w, r)
-	sse.MarshalAndPatchSignals(map[string]any{
-		"score":                score,
-		"targetImgWeights":     targetWeights,
-		"targetImgTotalWeight": targetTotalWeight,
-	})
+	sse.MarshalAndPatchSignals(map[string]any{"score": score })
 }
