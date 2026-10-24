@@ -62,6 +62,8 @@
         }
         else {
           $targetImgString='';
+          $targetImgWeights={};
+          $targetTotalWeight=0.;
         }
       "
       class="bg-gray-500 text-gray-200 border border-white/10 focus:outline-none 
@@ -69,8 +71,14 @@
     />
     <span class="text-yellow-300 md:ml-auto text-xl">
       <span class="font-medium uppercase tracking-wider text-gray-400">Score</span>
-      <span data-signals:score="0" data-text="$score + '%'"
-        class="ml-2 font-mono font-semibold text-green-400"
+      <span class="ml-2 font-mono font-semibold"
+        data-signals:score="0" data-text="$score + '%'"
+        data-class="{
+          'text-green-400': $score >= 80,
+          'text-yellow-400': $score >= 41 && $score < 80,
+          'text-orange-400': $score >= 21 && $score < 41,
+          'text-red-400': $score < 21,
+        }"
         >—%</span>
     </span>
   </header>
@@ -123,11 +131,15 @@
         </div>
 
         <div class="flex justify-center">
-          <img alt="Reference design" data-ref="targetImg"
-            data-signals:targetImgString="''"
+          <img alt="Reference design" src="/assets/images/default.png" 
+            class="block w-100 aspect-4/3 rounded-md"
+            data-ref="targetImg"
+            data-signals="{
+              targetImgString: '', 
+              targetImgWeights: {}, 
+              targetImgTotalWeight: 0.
+            }"
             data-attr:src="$url || '/assets/images/default.png'"
-            src="/assets/images/default.png" class="block w-100 aspect-4/3 
-              rounded-md"
           />
         </div>
       </div>
@@ -233,7 +245,12 @@
                 if (!image) return;
                 $sourceImgString=image;
                 @post('/api/diff', {
-                  payload: { source: $sourceImgString, targetString: $targetImgString }
+                  payload: { 
+                    source: $sourceImgString, 
+                    targetString: $targetImgString,
+                    targetWeights: $targetImgWeights,
+                    targetTotalWeight: $targetImgTotalWeight,
+                  }
                 });
               });
             "
