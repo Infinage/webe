@@ -44,9 +44,9 @@ func processTargetImageURL(ustr string, width, height int) (image.Image, error) 
 	}
 
 	if !strings.HasPrefix(resp.Header.Get("content-type"), "image/") {
-		return nil, fmt.Errorf("target url returned non image")	
+		return nil, fmt.Errorf("target url returned non image")
 	}
-	
+
 	target, _, err := image.Decode(io.LimitReader(resp.Body, 2<<20))
 	if err != nil {
 		return nil, fmt.Errorf("decode target image: %w", err)
@@ -158,5 +158,5 @@ func (app *App) handleAPIDiffImages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sse := datastar.NewSSE(w, r)
-	sse.MarshalAndPatchSignals(map[string]any{"score": score })
+	sse.MarshalAndPatchSignals(map[string]any{"score": score})
 }

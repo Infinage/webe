@@ -45,7 +45,17 @@
     .token.tag { color: #f472b6 !important; }
   </style>
 </head>
-<body class="bg-gray-800 text-gray-200 min-h-dvh flex flex-col">
+<body class="bg-gray-800 text-gray-200 min-h-dvh flex flex-col"
+  data-signals="{ url: '', html: '', pos: 100, shifted: false, score: 0, errorTimer: 0 }"
+  data-init='
+    $url = localStorage.getItem("url");
+    $html = localStorage.getItem("html") || 
+      "<div class=\"p-2\">" + "\n\t" +
+      "<div class=\"h-25 w-25 bg-[#dd6b4d]\"></div>" + "\n" +
+      "</div>"
+    ;
+  '
+>
   <header class="flex flex-wrap bg-gray-800 py-4 px-6 gap-4 items-center 
     border-b border-b-white/10"
   >
@@ -58,6 +68,7 @@
           @post('/api/target', {payload: el.value});
           $preview.contentWindow.postMessage({html: $html}, '*');
         }
+        localStorage.setItem('url', $url);
       "
       class="bg-gray-500 text-gray-200 border border-white/10 focus:outline-none 
         p-2 flex-1 md:max-w-1/2 rounded-md max-w-full"
@@ -65,7 +76,7 @@
     <span class="text-yellow-300 md:ml-auto text-xl">
       <span class="font-medium uppercase tracking-wider text-gray-400">Score</span>
       <span class="ml-2 font-mono font-semibold"
-        data-signals:score="0" data-text="$score + '%'"
+        data-text="$score + '%'"
         data-class="{
           'text-green-400': $score >= 80,
           'text-yellow-400': $score >= 41 && $score < 80,
@@ -77,11 +88,6 @@
   </header>
 
   <div class="grid flex-1 grid-cols-1 gap-4 p-4 md:grid-cols-[1fr_auto]"
-    data-signals:html='
-      "<div class=\"p-2\">" + "\n\t" +
-      "<div class=\"h-25 w-25 bg-[#dd6b4d]\"></div>" + "\n" +
-      "</div>"
-    '
   >
     <!-- Editor panel -->
     <section class="flex min-h-87.5 flex-col overflow-hidden rounded-xl border 
@@ -101,6 +107,7 @@
             let timeout;
             jar.onUpdate(code => {
               $html = code;
+              localStorage.setItem('html', code);
               clearTimeout(timeout);
               timeout = setTimeout(() => {
                 if (containsScript(code)) return;
@@ -164,8 +171,8 @@
         </div>
 
         <!-- Comparison viewport -->
-        <div class="relative aspect-4/3 max-w-100 overflow-hidden rounded-md border 
-          border-white/10 mx-auto" data-signals="{pos: 100, shifted: false}"
+        <div class="relative aspect-4/3 max-w-100 overflow-hidden rounded-md 
+          border border-white/10 mx-auto"
           data-on:keydown__window="if (evt.key === 'Shift') $shifted = true;"
           data-on:keyup__window="if (evt.key === 'Shift') $shifted = false;"
         >
@@ -228,6 +235,7 @@
             step="0.1" data-bind="pos" aria-label="Compare target and preview" 
             class="absolute inset-0 z-20 m-0 h-full w-full cursor-ew-resize opacity-0"
             data-class="{'cursor-ew-resize': !$shifted, 'cursor-ns-resize': $shifted}"
+            data-on:mouseleave="$pos = 100; $_sliderMouseIn = false;"
             data-on:mousemove="
               $_sliderMouseIn = true;
               const rect = el.getBoundingClientRect();
@@ -236,14 +244,13 @@
               const mag = $shifted? magY: magX;
               $pos = Math.max(0, Math.min(100, mag * 100));
             "
-            data-on:mouseleave="$pos = 100; $_sliderMouseIn = false;"
           />
 
           <!-- Hidden rendering iframe -->
           <iframe src="/assets/html/sandbox.html"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts allow-same-origin" data-ref:preview
             class="absolute right-full aspect-4/3 max-w-100 overflow-hidden"
-            data-ref:preview
+            data-attr="{ height: $targetImg.height, width: $targetImg.width, }"
             data-on:load="el.contentWindow.postMessage({html: $html}, '*')"
             data-on:message__window="
               if (event.origin !== window.location.origin) return;
@@ -259,10 +266,6 @@
                 });
               });
             "
-            data-attr="{
-              height: $targetImg.naturalHeight,
-              width: $targetImg.naturalWidth
-            }"
           ></iframe>
         </div>
       </div>
@@ -270,7 +273,8 @@
   </div>
 
   <!-- Error toast -->
-  <div data-signals:errorTimer="0" data-show="$showError" 
+  <div 
+    data-show="$showError" 
     data-on-signal-patch-filter="{include: '/^showError$/'}"
     data-on-signal-patch="$showError? 
       (clearTimeout($errorTimer), $errorTimer = setTimeout(() => $showError = false, 3000))

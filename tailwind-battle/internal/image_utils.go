@@ -31,10 +31,17 @@ func getWeights(img image.Image) (map[uint16]float64, float64) {
 		}
 	}
 
+	// Total pixel count to filter out noise
+	totalPixels := bounds.Dx() * bounds.Dy()
+	noiseThreshold := 1/1000.
+
 	// Weight of a color = 1 / sqrt(freq)
 	var totalWeight float64
 	weights := make(map[uint16]float64)
 	for color, count := range pixelCounts {
+		if float64(count) / float64(totalPixels) < noiseThreshold {
+			continue
+		}
 		weight := 1 / math.Sqrt(float64(count))
 		weights[color] = weight
 		totalWeight += float64(count) * weight
@@ -53,12 +60,27 @@ func diffImages(source, target image.Image, targetWeights map[uint16]float64,
 			target.Bounds())
 	}
 
+	abs := func(a, b uint32) uint32 {
+		if a < b {
+			return b - a
+		}
+		return a - b
+	}
+
+	pixelAlmostEq := func(x, y int, tolerance uint32) bool {
+		r1, g1, b1, _ := source.At(x, y).RGBA()	
+		r2, g2, b2, _ := target.At(x, y).RGBA()	
+		return abs(r1, r2) <= tolerance && 
+			abs(g1, g2) <= tolerance && 
+			abs(b1, b2) <= tolerance
+	}
+
 	var score float64
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			key := colorKey(target, x, y)
-			if key == colorKey(source, x, y) {
-				score += targetWeights[key]
+			if wt, ok := targetWeights[key]; ok && pixelAlmostEq(x, y, 3000) {
+				score += wt
 			}
 		}
 	}
@@ -91,6 +113,6 @@ func loadImageFromBase64Blob(raw string) (image.Image, error) {
 // rescaleImage redraws the input image into the required shape.
 func rescaleImage(img image.Image, width, height int) image.Image {
 	dstImg := image.NewRGBA(image.Rect(0, 0, width, height))
-	draw.BiLinear.Scale(dstImg, dstImg.Bounds(), img, img.Bounds(), draw.Over, nil)
+    draw.NearestNeighbor.Scale(dstImg, dstImg.Bounds(), img, img.Bounds(), draw.Src, nil)
 	return dstImg
 }
