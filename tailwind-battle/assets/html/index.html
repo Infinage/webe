@@ -64,10 +64,8 @@
     </h1>
     <input data-bind="url" type="url" placeholder="Target image URL" 
       data-on:input__debounce.500ms="
-        if (el.value) {
-          @post('/api/target', {payload: el.value});
-          $preview.contentWindow.postMessage({html: $html}, '*');
-        }
+        el.value && @post('/api/target', {payload: el.value});
+        $preview.contentWindow.postMessage({html: $html}, '*');
         localStorage.setItem('url', $url);
       "
       class="bg-gray-500 text-gray-200 border border-white/10 focus:outline-none 
