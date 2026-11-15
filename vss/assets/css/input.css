@@ -247,3 +247,28 @@
     }
   }
 }
+
+/* Site-visit form (06 contact) — error/success states and the select
+   chevron are state + background-image behaviors, not utilities.
+   Plain classes (not @utility): the --on modifiers are toggled by JS
+   and never appear in markup, so Tailwind would not emit them. */
+.ferr {
+  display: none;
+  font: 600 12px/1.4 var(--font-sans);
+  color: #b3372c;
+  margin: 6px 0 0;
+}
+.ferr--on { display: block; }
+.fsuccess { display: none; }
+.fsuccess--on { display: block; }
+@utility sel-chevron {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%230e2a47' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+/* invalid state — beats the Tailwind border-color utility via specificity */
+.fld :is(input, select, textarea)[aria-invalid='true'] {
+  border-color: #b3372c;
+}

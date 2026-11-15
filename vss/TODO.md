@@ -247,6 +247,16 @@ CORRECTION: Agent B's "canon violation" on 06 contact facts is REFUTED — PRODU
 - LESSON: djlint must run as `djlint assets/html --configuration ~/.djlintrc --check` (profile golang, ignore H021); bare `djlint .` misses the config
 - LESSON: compressed-summary claims ("footer fix landed in 90eec32") were wrong — b30 had no footer work; verify before trusting summaries
 
+## Implementation iteration 5 — 05-about + 06-contact (2026-11-15)
+
+- [x] 05-about converted to Go template (hero photo, founder story split, values grid, timeline, stat strip with counters, 5-photo proof mosaic with rotating arrows, CTA band) — desktop verified vs artifact
+- [x] 06-contact converted (hero, form card + navy info card + visit-steps card, contact form) — desktop verified
+- [x] layout.html: toast pill now gated on `{{ if .SampleFlag }}` — contact has no flag (was rendering empty pill on contact only)
+- [x] Fixed: contact form dead — `.formcard` class was missing from the card container, `initVisitForm` threw on `card.querySelector`; validation errors + success panel now work (verified: empty submit → 3 red errors + aria-invalid; filled → "Request received / Thanks Karthik …")
+- [x] Fixed: `.ferr`/`.ferr--on`/`.fsuccess--on` never compiled — Tailwind v4 `@utility` with `&--on` nesting emits nothing; converted to plain CSS classes in input.css (they're JS-toggled state classes, never in markup). Rebuilt index.css with standalone `tailwindcss` CLI
+- [x] Contact verified desktop (hero/form/errors/success/info/steps/footer) + mobile 390 (hero, form, info card); gofmt/go vet clean
+- [ ] Admin screens (07–09) remain static placeholders — deliberately not converted yet
+
 ## Next iteration — derive architecture from approved designs
 
 - [ ] Present the 9 artifacts + rationale to client for approval

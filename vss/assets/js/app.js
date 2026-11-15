@@ -48,8 +48,12 @@ const initNode = (root) => {
   root.querySelectorAll('.reveal').forEach((el) => rio.observe(el));
   root.querySelectorAll('#plotmap').forEach(initMap);
   root.querySelectorAll('.galwrap').forEach(initGallery);
+  root.querySelectorAll('.pf-photos').forEach(initProof);
+  root.querySelectorAll('.visit-form').forEach(initVisitForm);
   if (root.matches('#plotmap')) initMap(root);
   if (root.matches('.galwrap')) initGallery(root);
+  if (root.matches('.pf-photos')) initProof(root);
+  if (root.matches('.visit-form')) initVisitForm(root);
   root.querySelectorAll('.prop').forEach((el) => {
     if (el._litInit) return;
     el._litInit = true;
@@ -219,5 +223,90 @@ const initGallery = (wrap) => {
 };
 addEventListener('resize', () =>
   document.querySelectorAll('.galwrap').forEach((w) => w._vssGalSync && w._vssGalSync()));
+
+// ---------- proof gallery (05 about) ----------
+// arrows rotate every tile through a pool of site photos; ‹ moves the
+// window back, › forward — direct port of the 05 artifact script
+const initProof = (wrap) => {
+  if (!wrap.matches('.pf-photos') || wrap._vssPf) return;
+  const prev = wrap.querySelector('.pf-prev');
+  const next = wrap.querySelector('.pf-next');
+  if (!prev || !next) return;
+  wrap._vssPf = true;
+  const pool = [
+    { src: '/assets/img/proof-stakes.jpg', cap: 'Plot stakes and numbering on the ground' },
+    { src: '/assets/img/proof-visit.jpg', cap: 'Site visit walkthrough' },
+    { src: '/assets/img/proof-roads.jpg', cap: 'Finished internal roads' },
+    { src: '/assets/img/proof-site-2.jpg', cap: 'Layout overview on handover day' },
+    { src: '/assets/img/proof-launch.jpg', cap: 'Launch day — project name to be confirmed*' },
+    { src: '/assets/img/proof-event.jpg', cap: 'Customer meet — details awaited from client*' },
+  ];
+  const tiles = [...wrap.querySelectorAll('.pf-tile')]
+    .sort((a, b) => +a.dataset.tile - +b.dataset.tile);
+  let off = 0;
+  let busy = false;
+  // dir = -1 for › (tiles exit left, enter from right), +1 for ‹ (reverse)
+  const slide = (dir) => {
+    if (busy) return;
+    busy = true;
+    tiles.forEach((t, i) => {
+      const it = pool[(i + off + pool.length) % pool.length];
+      setTimeout(() => {
+        t.style.transition = 'transform .18s ease, opacity .18s ease';
+        t.style.transform = `translateX(${dir * -30}px)`;
+        t.style.opacity = '0';
+        setTimeout(() => {
+          t.querySelector('img').src = it.src;
+          t.querySelector('.cap-t').textContent = it.cap;
+          t.style.transition = 'none';
+          t.style.transform = `translateX(${dir * 30}px)`;
+          requestAnimationFrame(() => {
+            t.style.transition =
+              'transform .3s cubic-bezier(.22,.61,.36,1), opacity .3s ease';
+            t.style.transform = 'translateX(0)';
+            t.style.opacity = '1';
+          });
+        }, 190);
+      }, i * 55);
+    });
+    setTimeout(() => { busy = false; }, 700);
+  };
+  prev.onclick = () => { off = (off + pool.length - 1) % pool.length; slide(1); };
+  next.onclick = () => { off = (off + 1) % pool.length; slide(-1); };
+};
+
+// ---------- site-visit form (06 contact) ----------
+// validate, then swap the form card to the inline confirmation — direct
+// port of the 06 artifact script (demo only, no backend yet)
+const initVisitForm = (form) => {
+  if (form._vssVisit) return;
+  form._vssVisit = true;
+  const card = form.closest('.formcard');
+  const name = form.querySelector('#v-name');
+  const phone = form.querySelector('#v-phone');
+  const ok = form.querySelector('#v-ok');
+  const setErr = (input, errId, bad) => {
+    document.getElementById(errId).classList.toggle('ferr--on', bad);
+    input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    return bad;
+  };
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const badName = setErr(name, 'err-name', !name.value.trim());
+    const badPhone = setErr(phone, 'err-phone', phone.value.replace(/\D/g, '').length < 10);
+    const badOk = setErr(ok, 'err-ok', !ok.checked);
+    if (badName || badPhone || badOk) {
+      form.querySelector('[aria-invalid="true"]')?.focus();
+      return;
+    }
+    card.querySelector('.d-name').textContent = name.value.trim().split(/\s+/)[0];
+    card.querySelector('.d-phone').textContent = phone.value.trim();
+    form.style.display = 'none';
+    card.querySelector('.f-title').textContent = 'Request received';
+    card.querySelector('.f-intro').style.display = 'none';
+    card.querySelector('#v-done').classList.add('fsuccess--on');
+    card.querySelector('#v-done').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+};
 
 initNode(document.body);

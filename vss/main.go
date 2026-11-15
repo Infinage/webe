@@ -308,6 +308,8 @@ var pages = map[string]string{
 	"home":           "home.html",
 	"projects":       "projects.html",
 	"project-detail": "project-detail.html",
+	"about":          "about.html",
+	"contact":        "contact.html",
 	"placeholder":    "placeholder.html",
 }
 
@@ -415,6 +417,7 @@ func loadTemplates() error {
 	tmpl = make(map[string]*template.Template)
 	base, err := template.New("base").Funcs(template.FuncMap{
 		"add": func(a, b int) int { return a + b },
+		"mul": func(a, b int) int { return a * b },
 	}).ParseFS(os.DirFS("assets"),
 		"html/layout.html", "html/partials.html")
 	if err != nil {
@@ -555,6 +558,111 @@ func projectsData() []PRow {
 	}
 }
 
+// aboutData is sample content mirroring the approved 05-about
+// artifact. Client-supplied facts (founding year, founder's name,
+// pull-quote wording, pipeline) are marked * until they arrive.
+func aboutData() map[string]any {
+	req := func(s string) string {
+		return `<span class="font-semibold text-brass">` + s + `</span>`
+	}
+	return map[string]any{
+		"Values": []map[string]string{
+			{"No": "01", "Title": "Approvals before sales",
+				"Body": "Nothing is offered until the layout papers are in order. Approval documents are shared openly with every buyer."},
+			{"No": "02", "Title": "The plan is the ground truth",
+				"Body": "Plot sizes, road widths and boundaries on the plan match the ground. If a survey disagrees, we fix the ground."},
+			{"No": "03", "Title": "Honest pricing",
+				"Body": "One clear price per plot, stated upfront. No pressure escalation, no hidden charges introduced after booking."},
+			{"No": "04", "Title": "Handover with papers",
+				"Body": "Registration support, patta transfer guidance and a defined handover checklist — the plot is yours in fact, not just in promise."},
+		},
+		"Timeline": []struct {
+			Yr, Title string
+			Body      template.HTML
+			Pending   bool
+		}{
+			{"Origins*", "The lesson",
+				template.HTML("Working inside another real estate firm, our founder saw documentation that left buyers worried and confused. " + req("Founding year awaited from client.*")), true},
+			{"Founded*", "VSS Associates",
+				template.HTML("He left to build a firm where the papers are clear and the ground is honest — and grew it from the bottom up, plot by plot. " + req("Year and founder's name awaited from client.*")), true},
+			{"Today", "4 layouts delivered",
+				template.HTML("Chandrayan and Srivelan are live on this site with a further " + req("4 layouts to be listed — client input required.*")), false},
+			{"Next", "Upcoming layouts*",
+				template.HTML(req("Pipeline projects and target years awaited from client.*")), true},
+		},
+		"Tiles": []struct {
+			Img, Alt, Cap string
+			Lead, Right   bool
+		}{
+			{"proof-build.jpg", "Completed compound wall at a VSS layout",
+				"Compound wall at handover · project name to be confirmed*", true, false},
+			{"proof-stakes.jpg", "Plot number board at a VSS layout",
+				"Plot stakes and numbering on the ground", false, false},
+			{"proof-visit.jpg", "Site visit walkthrough at a VSS layout",
+				"Site visit walkthrough", false, false},
+			{"proof-roads.jpg", "Finished internal roads at a VSS layout",
+				"Finished internal roads", false, false},
+			{"aerial-close.jpg", "Aerial close-up of a completed VSS layout",
+				"Layout overview on handover day", false, true},
+		},
+		"Stats": []struct {
+			Target int
+			Label  string
+			Req    bool
+		}{
+			{4, "Layouts delivered", false},
+			{600, "Plots delivered", true},
+			{120, "Acres developed", true},
+			{100, "% DTCP approved", true},
+		},
+	}
+}
+
+func about(w http.ResponseWriter, r *http.Request) {
+	render(w, r, "about", Page{
+		Title:       "About — VSS Associates",
+		Data:        aboutData(),
+		DtcpNote:    "Every layout sold here is DTCP approved — approval numbers published per project",
+		SampleFlag:  "story beats, years & proof numbers marked * await client supply",
+		FlagDismiss: true,
+	})
+}
+
+// contactData holds only the repeating collections (info rows, visit
+// steps); headline and form copy live directly in contact.html.
+func contactData() map[string]any {
+	return map[string]any{
+		"Info": []struct {
+			Icon template.HTML
+			K    string
+			V    template.HTML
+		}{
+			{`<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>`,
+				"Phone", "044 4208 7913"},
+			{`<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>`,
+				"Email", "contact@vssassociates.com"},
+			{`<svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>`,
+				"Office", template.HTML("No. 11, West Karikalan Street, 1st Floor,<br>(Opp. to SBI Bank), Adambakkam,<br>Chennai – 600 088")},
+			{`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+				"Working hours", template.HTML("Mon – Sat, 8.00 – 18.00<br>Sunday closed")},
+		},
+		"Steps": []struct{ T, D string }{
+			{"Share your interest", "Form or phone — whichever is easier."},
+			{"We confirm the slot", "Within a working day, by phone."},
+			{"Walk the layout", "Plot plan and approval documents in hand."},
+			{"Decide at leisure", "No on-the-spot pressure; prices hold as stated."},
+		},
+	}
+}
+
+func contact(w http.ResponseWriter, r *http.Request) {
+	render(w, r, "contact", Page{
+		Title:    "Contact / Book a Visit — VSS Associates",
+		Data:     contactData(),
+		DtcpNote: "All layouts marketed are subject to DTCP approval — approval numbers published per project",
+	})
+}
+
 func projects(w http.ResponseWriter, r *http.Request) {
 	rows := projectsData()
 	for i := range rows {
@@ -638,8 +746,8 @@ func main() {
 		}
 		placeholder("Project")(w, r)
 	})
-	mux.Handle("GET /about", placeholder("About"))
-	mux.Handle("GET /contact", placeholder("Contact"))
+	mux.HandleFunc("GET /about", about)
+	mux.HandleFunc("GET /contact", contact)
 	mux.Handle("GET /admin/login", placeholder("Staff login"))
 	mux.HandleFunc("/", notFound)
 
