@@ -18,6 +18,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/starfederation/datastar-go/datastar"
 )
@@ -297,6 +298,12 @@ type Page struct {
 	HeaderSolid bool // solid header (pages without a dark hero)
 	Data        any
 
+	// admin screens (07–09): the layout swaps the site header/footer
+	// for the navy adminbar; the login screen runs bare (no bar).
+	Admin    bool
+	AdminBar bool
+	AdminTab string // active adminbar tab: projects | plots
+
 	// per-artifact wordings (footer compliance line + floating
 	// sample-data chip differ between the approved screens)
 	DtcpNote    string
@@ -311,6 +318,9 @@ var pages = map[string]string{
 	"about":          "about.html",
 	"contact":        "contact.html",
 	"placeholder":    "placeholder.html",
+	"admin-login":    "admin-login.html",
+	"admin-projects": "admin-projects.html",
+	"admin-plots":    "admin-plots.html",
 }
 
 var tmpl map[string]*template.Template
@@ -484,6 +494,32 @@ func render(w http.ResponseWriter, r *http.Request, name string, p Page) {
 		return
 	}
 	renderFull(w, name, p)
+}
+
+// renderPane patches a sub-section (e.g. the admin editor panes) over
+// SSE instead of <main>; the URL is kept in sync with replaceState so
+// browser history isn't spammed by selection clicks.
+func renderPane(w http.ResponseWriter, r *http.Request,
+	name, pane string, p Page,
+) {
+	var content bytes.Buffer
+	if err := tmpl[name].ExecuteTemplate(&content, pane, p); err != nil {
+		log.Printf("render %s: %v", pane, err)
+		http.Error(w, "template error", http.StatusInternalServerError)
+		return
+	}
+	elem := fmt.Sprintf("<div id=%q>%s</div>", pane, content.String())
+	sse := datastar.NewSSE(w, r)
+	if err := sse.PatchElements(elem); err != nil {
+		log.Printf("patch elements: %v", err)
+		return
+	}
+	if err := sse.ExecuteScript(
+		fmt.Sprintf("history.replaceState(null, '', %q); "+
+			"window.vssAdminInit && window.vssAdminInit()", r.URL.RequestURI()),
+	); err != nil {
+		log.Printf("replaceState script: %v", err)
+	}
 }
 
 // projectsData is sample content mirroring the approved 02-projects
@@ -708,6 +744,220 @@ func placeholder(title string) http.HandlerFunc {
 	}
 }
 
+// ---- admin screens (07–09) -------------------------------------------
+// Demo flow per the approved artifacts: sign-in continues straight to
+// the projects screen; real auth + data model arrive in a later
+// iteration.
+
+func adminLogin(w http.ResponseWriter, r *http.Request) {
+	render(w, r, "admin-login", Page{
+		Title: "Admin sign in — VSS Associates",
+		Admin: true,
+	})
+}
+
+// adminImage is one entry in the demo image manager: Src for the
+// <img>, N the 1-based label (1 = "Cover"), I the 0-based index the
+// move/remove actions address.
+type adminImage struct {
+	Src string
+	N   int
+	I   int
+}
+
+// DelJS is the two-step delete handler for this image. Built in Go and
+// typed template.JS because html/template's JS-context escaping mangles
+// the $sN signal interpolation inside the multi-statement block.
+func (a adminImage) DelJS() template.JS {
+	return template.JS(fmt.Sprintf(
+		`return (() => { if (!$s%d) { $s%d = true; setTimeout(() => $s%d = false, 2500); return; } return @get('/admin/projects?del=%d'); })()`,
+		a.N, a.N, a.N, a.I))
+}
+
+// adminEd is the dummy editor payload — mirrors the approved 08
+// artifact (Landmark City); placeholder facts are marked * there.
+type adminEd struct {
+	Name, Loc, Status, Plots, Area, Price, Size string
+	ApprNo, Docs                                string
+}
+
+// adminProjectsData is sample content mirroring the approved 08
+// artifact. Real data modelling comes in a later iteration.
+func adminProjectsData() (list []struct {
+	Name, Meta, Img string
+	Live            bool
+}, ed adminEd, imgs []adminImage) {
+	list = []struct {
+		Name, Meta, Img string
+		Live            bool
+	}{
+		{"Landmark City", "Chennai North · 24 plots", "card-landmark.jpg", true},
+		{"Srivelan Nagar", "Chennai · plots tbc*", "card-srivelan.jpg", true},
+		{"Chandrayan", "Chennai · plots tbc*", "card-chandrayan.jpg", true},
+		{"Project 4", "name & facts awaited*", "proof-site-2.jpg", false},
+		{"Project 5", "name & facts awaited*", "proof-stakes.jpg", false},
+		{"Project 6", "name & facts awaited*", "proof-build.jpg", false},
+	}
+	ed = adminEd{
+		Name:   "Landmark City",
+		Loc:    "Chennai North, Tamil Nadu*",
+		Status: "live",
+		Plots:  "24",
+		Area:   "— (awaited*)",
+		Price:  "₹XX lakh onwards*",
+		Size:   "600 – 2,400 sq.ft*",
+		ApprNo: "e.g. DTCP/50,2021 — format awaited*",
+		Docs:   "Approval letter · Layout plan · Patta copy (checkbox list awaited*)",
+	}
+	for i, src := range adminImgs {
+		imgs = append(imgs, adminImage{Src: src, N: i + 1, I: i})
+	}
+	return list, ed, imgs
+}
+
+// adminImgs is the demo image order for the editor; the move/remove
+// actions mutate it (server-side dummy state until the data model).
+var adminImgs = []string{
+	"card-landmark.jpg", "proof-roads.jpg", "proof-build.jpg", "proof-stakes.jpg",
+}
+
+// adminPlot is one demo plot on the 09 layout canvas. Geometry (X, Y,
+// TX, TY) is computed in Go from the artifact's canonical grid — 12
+// columns per row (68px pitch 72px), A row above the spine road, B row
+// below; same viewBox (1060×470) as the public site plan.
+type adminPlot struct {
+	No, St, Price, Dims, Facing string
+	Area                        int
+	X, Y, TX, TY                int
+	I                           int
+}
+
+// DotJS builds the status-dot click expression for this plot. Built in
+// Go and typed template.JS because html/template's JS-context escaping
+// quotes the interpolated signal name ($st_"B2"), which breaks the
+// identifier (same reason as adminImage.DelJS).
+func (p adminPlot) DotJS(st string) template.JS {
+	return template.JS("$st_" + p.No + " = '" + st + "'")
+}
+
+// adminPlotsData is sample content mirroring the approved 09 artifact
+// (24 plots; every derived price carries the * placeholder mark — real
+// prices awaited from the client).
+func adminPlotsData() []adminPlot {
+	specs := []struct {
+		no, st string
+		area   int
+		dims   string
+	}{
+		{"A1", "available", 1200, "30 × 50*"}, {"A2", "available", 1200, "30 × 50*"},
+		{"A3", "available", 1200, "30 × 50*"}, {"A4", "available", 1200, "30 × 50*"},
+		{"A5", "available", 1500, "30 × 50*"}, {"A6", "available", 1500, "30 × 50*"},
+		{"A7", "available", 1500, "30 × 50*"}, {"A8", "available", 1500, "30 × 50*"},
+		{"A9", "sold", 1800, "36 × 50*"}, {"A10", "reserved", 1800, "36 × 50*"},
+		{"A11", "available", 1800, "36 × 50*"}, {"A12", "sold", 1800, "36 × 50*"},
+		{"B1", "sold", 2400, "40 × 60*"}, {"B2", "available", 2400, "40 × 60*"},
+		{"B3", "reserved", 1500, "30 × 50*"}, {"B4", "sold", 1500, "30 × 50*"},
+		{"B5", "available", 1500, "30 × 50*"}, {"B6", "available", 1800, "36 × 50*"},
+		{"B7", "available", 1500, "30 × 50*"}, {"B8", "available", 1500, "30 × 50*"},
+		{"B9", "available", 1500, "30 × 50*"}, {"B10", "reserved", 1500, "30 × 50*"},
+		{"B11", "sold", 1500, "30 × 50*"}, {"B12", "sold", 1500, "30 × 50*"},
+	}
+	plots := make([]adminPlot, len(specs))
+	for i, s := range specs {
+		x := 100 + (i%12)*72
+		y := 62
+		if i >= 12 {
+			y = 278
+		}
+		facing := "West road"
+		if i >= 12 {
+			facing = "East road"
+		}
+		plots[i] = adminPlot{
+			No: s.no, St: s.st, Area: s.area, Dims: s.dims,
+			Price:  fmt.Sprintf("%.1f*", float64(s.area)*.0185),
+			Facing: facing,
+			X:      x, Y: y, TX: x + 34, TY: y + 67, I: i,
+		}
+	}
+	return plots
+}
+
+// adminPlotSel resolves the ?sel= parameter (or A5 default) and returns
+// the selected plot plus its "next plot" neighbour for the form footer.
+func adminPlotSel(plots []adminPlot, sel string) (adminPlot, string) {
+	idx := 4 // A5 — the artifact's default selection
+	for i := range plots {
+		if plots[i].No == sel {
+			idx = i
+			break
+		}
+	}
+	return plots[idx], plots[(idx+1)%len(plots)].No
+}
+
+func adminPlots(w http.ResponseWriter, r *http.Request) {
+	plots := adminPlotsData()
+	sel, next := adminPlotSel(plots, r.URL.Query().Get("sel"))
+	base := Page{
+		Title: "Plot layout — VSS Admin",
+		Admin: true, AdminBar: true, AdminTab: "plots",
+	}
+
+	// plot selection patches only the side form over SSE
+	if r.URL.Query().Get("sel") != "" && isFragment(r) {
+		base.Data = map[string]any{"Sel": sel, "Next": next}
+		renderPane(w, r, "admin-plots", "pform", base)
+		return
+	}
+
+	base.Data = map[string]any{"Plots": plots, "Sel": sel, "Next": next}
+	render(w, r, "admin-plots", base)
+}
+
+var adminMu sync.Mutex
+
+func adminProjects(w http.ResponseWriter, r *http.Request) {
+	adminMu.Lock()
+	defer adminMu.Unlock()
+
+	// image move / remove: mutate the demo order and patch the pane
+	q := r.URL.Query()
+	mv, del := q.Get("mv"), q.Get("del")
+	if mv != "" {
+		i, err := strconv.Atoi(mv)
+		if err == nil && i >= 0 && i < len(adminImgs) {
+			j := i + 1
+			if q.Get("dir") == "left" {
+				j = i - 1
+			}
+			if j >= 0 && j < len(adminImgs) {
+				adminImgs[i], adminImgs[j] = adminImgs[j], adminImgs[i]
+			}
+		}
+	} else if del != "" {
+		if i, err := strconv.Atoi(del); err == nil && i >= 0 && i < len(adminImgs) {
+			adminImgs = append(adminImgs[:i], adminImgs[i+1:]...)
+		}
+	}
+	if mv != "" || del != "" {
+		_, _, imgs := adminProjectsData()
+		renderPane(w, r, "admin-projects", "admin-imgs", Page{
+			Title: "Projects — VSS Admin",
+			Admin: true, AdminBar: true, AdminTab: "projects",
+			Data: map[string]any{"Images": imgs},
+		})
+		return
+	}
+
+	list, ed, imgs := adminProjectsData()
+	render(w, r, "admin-projects", Page{
+		Title: "Projects — VSS Admin",
+		Admin: true, AdminBar: true, AdminTab: "projects",
+		Data: map[string]any{"Projects": list, "Ed": ed, "Images": imgs},
+	})
+}
+
 func notFound(w http.ResponseWriter, r *http.Request) {
 	if isFragment(r) {
 		renderFragment(w, r, "placeholder", Page{
@@ -748,7 +998,9 @@ func main() {
 	})
 	mux.HandleFunc("GET /about", about)
 	mux.HandleFunc("GET /contact", contact)
-	mux.Handle("GET /admin/login", placeholder("Staff login"))
+	mux.HandleFunc("GET /admin/login", adminLogin)
+	mux.HandleFunc("GET /admin/projects", adminProjects)
+	mux.HandleFunc("GET /admin/plots", adminPlots)
 	mux.HandleFunc("/", notFound)
 
 	addr := "127.0.0.1:" + port()

@@ -1,0 +1,202 @@
+{{ define "main" }}
+  {{/* 08 admin-projects artifact: two-pane project administration.
+      Dummy data from Go (real data model later). Project-list
+      selection runs on the $sel/$name signals; image reorder/remove
+      round-trips through the server and patches the #imgs grid; the
+      remaining demo-only controls say so via vssToast. */}}
+  <div class="awrap" data-signals="{ sel: '{{ .Data.Ed.Name }}', name: '{{ .Data.Ed.Name }}', s1: false, s2: false, s3: false, s4: false }">
+    <div class="ahead">
+      <div>
+        <h1>Projects</h1>
+        <p class="sub">Add, edit and publish layouts. Publishing shows the project on the website immediately.</p>
+      </div>
+    </div>
+
+    <div class="panes">
+      {{/* ==== project list ==== */}}
+      <aside class="plist">
+        <h2>All projects ({{ len .Data.Projects }})</h2>
+        {{ range .Data.Projects }}
+          <button
+            type="button"
+            class="pitem"
+            data-class:pitem--on="$sel === '{{ .Name }}'"
+            data-attr:aria-current="$sel === '{{ .Name }}' ? 'true' : false"
+            data-on:click__prevent="$sel = '{{ .Name }}'; $name = '{{ .Name }}'"
+          >
+            <img alt="" src="/assets/img/{{ .Img }}">
+            <span><span class="pn">{{ .Name }}</span><span class="pmeta">{{ .Meta }}</span></span>
+            <span class="pbadge {{ if .Live }}pbadge--live{{ else }}pbadge--draft{{ end }}">{{ if .Live }}Live{{ else }}Draft{{ end }}</span>
+          </button>
+        {{ end }}
+        <button
+          class="addnew"
+          data-on:click__prevent="vssToast('Demo: new-project flow not wired in this mockup')"
+          type="button"
+        ><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add new project</button>
+      </aside>
+
+      {{/* ==== editor ==== */}}
+      <main class="editor">
+        <div class="edhead">
+          <h2 data-text="$sel">{{ .Data.Ed.Name }}</h2>
+          <span class="sep"></span>
+          <a
+            class="btn btn-navy btn-sm"
+            data-on:click__prevent="@get('/projects/landmark-city')"
+            href="/projects/landmark-city"
+          >Preview page →</a>
+        </div>
+
+        <div class="edbody">
+          <div class="fgrid">
+            <div class="fld fspan2">
+              <label for="e-name">Project name</label>
+              <input data-bind="name" id="e-name" value="{{ .Data.Ed.Name }}">
+            </div>
+            <div class="fld">
+              <label for="e-loc">Location</label>
+              <input id="e-loc" value="{{ .Data.Ed.Loc }}">
+              <p class="fhint">Town/city shown on the project card and detail page.</p>
+            </div>
+            <div class="fld">
+              <label for="e-status">Status</label>
+              <select id="e-status">
+                <option {{ if eq .Data.Ed.Status "live" }}selected{{ end }}>Live (visible on website)</option>
+                <option {{ if eq .Data.Ed.Status "draft" }}selected{{ end }}>Draft (admin only)</option>
+                <option {{ if eq .Data.Ed.Status "sold" }}selected{{ end }}>Sold out (archive)</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label for="e-plots">Total plots</label>
+              <input id="e-plots" value="{{ .Data.Ed.Plots }}">
+            </div>
+            <div class="fld">
+              <label for="e-area">Total area (acres)</label>
+              <input id="e-area" value="{{ .Data.Ed.Area }}">
+            </div>
+            <div class="fld">
+              <label for="e-price">Price</label>
+              <input id="e-price" value="{{ .Data.Ed.Price }}">
+              <p class="fhint">Use “Price on request” to hide numbers.</p>
+            </div>
+            <div class="fld">
+              <label for="e-size">Plot size range</label>
+              <input id="e-size" value="{{ .Data.Ed.Size }}">
+            </div>
+            <div class="fld fspan2">
+              <label for="e-blurb">Short description (project card)</label>
+              <textarea id="e-blurb" placeholder="One or two sentences shown on the projects page…"></textarea>
+            </div>
+            <div class="fld fspan2">
+              <label for="e-story">Project story (detail page)</label>
+              <textarea id="e-story" placeholder="Longer narrative shown on the project detail page…"></textarea>
+            </div>
+          </div>
+
+          {{/* approval */}}
+          <div class="sect">
+            <h3>Approval &amp; verification</h3>
+            <div class="fgrid">
+              <div class="fld">
+                <label for="e-appr">Approval authority</label>
+                <select id="e-appr">
+                  <option selected>DTCP</option>
+                  <option>RERA</option>
+                  <option>Other*</option>
+                  <option>Pending</option>
+                </select>
+              </div>
+              <div class="fld">
+                <label for="e-apprno">Approval number</label>
+                <input id="e-apprno" value="{{ .Data.Ed.ApprNo }}">
+              </div>
+              <div class="fld fspan2">
+                <label for="e-docs">Documents offered to buyers</label>
+                <input id="e-docs" value="{{ .Data.Ed.Docs }}">
+              </div>
+            </div>
+          </div>
+
+          {{/* images — reorder/remove round-trip through the server and
+              patch the #admin-imgs pane; server holds the demo order until
+              the real data model lands */}}
+          <div class="sect">
+            <h3>Project images — first image is the card &amp; hero cover</h3>
+            <div id="admin-imgs">{{ template "admin-imgs" . }}</div>
+            <button
+              class="imgadd"
+              data-on:click__prevent="vssToast('Demo: upload not wired in this mockup')"
+              type="button"
+            >+ Upload images<br><span class="imgadd-sub">JPG · up to 5 MB each*</span></button>
+          </div>
+
+          {{/* plots link */}}
+          <div class="sect">
+            <h3>Plot layout</h3>
+            <div class="plotlink">
+              <p>24 plots defined · 15* available · 3* reserved · 6* sold — counts update the website automatically.</p>
+              <a
+                class="btn btn-navy btn-sm"
+                data-on:click__prevent="@get('/admin/plots')"
+                href="/admin/plots"
+              >Edit plot layout →</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="edfoot">
+          <p class="note">Fields marked <span class="req">*</span> are placeholders — publish only with real, client-confirmed facts.</p>
+          <span class="sep"></span>
+          <button
+            class="btn btn-navy btn-sm"
+            data-on:click__prevent="vssToast('Demo: draft saving not wired in this mockup')"
+            type="button"
+          >Save draft</button>
+          <button
+            class="btn btn-gold btn-sm"
+            data-on:click__prevent="return (() => {
+              const fields = [...document.querySelectorAll('.edbody input, .edbody textarea')];
+              const n = fields.filter(f => (f.value || '').includes('*')).length
+                      + fields.filter(f => f.tagName === 'TEXTAREA' && f.placeholder && !f.value).length;
+              if (n > 0 && !window.confirm(n + ' placeholder field' + (n > 1 ? 's' : '') + ' detected — publish anyway?')) return;
+              vssToast('Demo: publish not wired in this mockup');
+            })()"
+            type="button"
+          >Publish changes</button>
+        </div>
+      </main>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "admin-imgs" }}
+  {{/* image grid — rendered inline and as the fragment response for the
+      move/remove actions (renderPane merges the wrapper back by id) */}}
+  <div class="imgs">
+    {{ range .Data.Images }}
+      <div class="imgc{{ if eq .N 1 }} imgc--cover{{ end }}">
+        <img alt="" src="/assets/img/{{ .Src }}">
+        <span class="no">{{ if eq .N 1 }}Cover{{ else }}{{ .N }}{{ end }}</span>
+        <div class="acts">
+          <button
+            aria-label="Move image {{ .N }} left"
+            data-on:click__prevent="@get('/admin/projects?mv={{ .I }}&amp;dir=left')"
+            type="button"
+          >←</button>
+          <button
+            aria-label="Move image {{ .N }} right"
+            data-on:click__prevent="@get('/admin/projects?mv={{ .I }}&amp;dir=right')"
+            type="button"
+          >→</button>
+          <button
+            data-attr:aria-label="$s{{ .N }} ? 'Confirm remove image {{ .N }}' : 'Remove image {{ .N }}'"
+            data-on:click__prevent="{{ .DelJS }}"
+            data-text="$s{{ .N }} ? 'Sure?' : '✕'"
+            type="button"
+          >✕</button>
+        </div>
+      </div>
+    {{ end }}
+  </div>
+{{ end }}

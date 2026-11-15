@@ -6,36 +6,47 @@
       <meta content="width=device-width, initial-scale=1" name="viewport">
       <title>{{ .Title }}</title>
   <meta name="description" content="VSS Associates — DTCP-approved plotted developments in Chennai. Four layouts, clear titles, support from first visit to patta.">
-      <link href="/assets/css/index.css?v=4" rel="stylesheet">
+      <link href="/assets/css/index.css?v=5" rel="stylesheet">
       <script src="/assets/js/datastar.js" type="module"></script>
-      <script defer src="/assets/js/app.js?v=6"></script>
+      <script defer src="/assets/js/app.js?v=7"></script>
       <noscript>
         <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
       </noscript>
     </head>
     <body
+      {{ if not .Admin }}
       {{/* 03 artifact: clicking anywhere outside the plan/panel/zoom controls
           deselects the plot; Esc too. $sel only exists on the project-detail
           page — the undefined guard keeps this inert everywhere else. */}}
       data-on:click="$sel !== undefined && !(evt.target.closest && evt.target.closest('#plotmap, .zoomctl, #plotPanel')) && ($sel = '')"
       data-on:keydown__escape="$sel !== undefined && ($sel = '')"
+      {{ end }}
     >
       <a
         class="absolute left-4 top-[-48px] z-[200] rounded-b-sm bg-navy px-[18px] py-3 text-[13px] font-bold leading-none text-white transition-[top] duration-150 focus:top-0"
         href="#main"
       >Skip to content</a>
-      {{ template "header" . }}
-      <main id="main">
-        {{ template "main" . }}
-      </main>
-      {{ template "footer" . }}
-      {{ if .SampleFlag }}<div
-        class="fixed bottom-[18px] right-[18px] z-[90] hidden max-w-[320px] rounded-full bg-navy/92 px-4 py-[10px] text-center text-xs font-semibold leading-[1.4] text-white shadow-lift min-[701px]:block"
-      ><b class="text-gold-soft">Sample data</b> — {{ .SampleFlag }}{{ if .FlagDismiss }} <button
-        type="button" aria-label="Dismiss sample-data note"
-        class="ml-[10px] inline-block h-[20px] w-[20px] cursor-pointer rounded-full border-0 bg-white/12 text-[12px] leading-none text-white align-middle"
-        onclick="this.closest('.fixed').remove()"
-      >✕</button>{{ end }}</div>{{ end }}
+      {{ if .Admin }}
+        {{/* 07–09: bare layout — navy adminbar instead of site chrome; the
+            login screen (no AdminBar) runs with nothing above <main>. */}}
+        {{ if .AdminBar }}{{ template "adminbar" . }}{{ end }}
+        <main id="main">
+          {{ template "main" . }}
+        </main>
+      {{ else }}
+        {{ template "header" . }}
+        <main id="main">
+          {{ template "main" . }}
+        </main>
+        {{ template "footer" . }}
+        {{ if .SampleFlag }}<div
+          class="fixed bottom-[18px] right-[18px] z-[90] hidden max-w-[320px] rounded-full bg-navy/92 px-4 py-[10px] text-center text-xs font-semibold leading-[1.4] text-white shadow-lift min-[701px]:block"
+        ><b class="text-gold-soft">Sample data</b> — {{ .SampleFlag }}{{ if .FlagDismiss }} <button
+          type="button" aria-label="Dismiss sample-data note"
+          class="ml-[10px] inline-block h-[20px] w-[20px] cursor-pointer rounded-full border-0 bg-white/12 text-[12px] leading-none text-white align-middle"
+          onclick="this.closest('.fixed').remove()"
+        >✕</button>{{ end }}</div>{{ end }}
+      {{ end }}
     </body>
   </html>
 {{ end }}

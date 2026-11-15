@@ -180,3 +180,38 @@
     </div>
   </footer>
 {{ end }}
+
+{{ define "adminbar" }}
+  {{/* 08/09 artifact: navy admin top bar — shared chrome for admin screens.
+      ≤960px the nav wraps below the logo row (artifact seam). */}}
+  <header class="sticky top-0 z-40 bg-navy text-white">
+    <div
+      class="mx-auto flex max-w-[1200px] flex-wrap items-center gap-[22px] px-6 py-[14px] max-[960px]:row-gap-[6px] max-[960px]:px-5 max-[960px]:py-3"
+    >
+      <span class="brand-logo h-10 w-[161px]" aria-label="VSS Associates" role="img"></span>
+      <span
+        class="inline-block rounded-[6px] border border-gold/35 px-[10px] py-[6px] text-[11px] font-bold uppercase leading-none tracking-[.18em] text-gold-soft"
+      >Admin</span>
+      <nav
+        class="ml-auto flex items-center gap-5 max-[960px]:order-5 max-[960px]:w-full max-[960px]:gap-[18px] max-[960px]:border-t max-[960px]:border-white/15 max-[960px]:pt-[10px]"
+      >
+        <a
+          class="border-b-2 pb-[2px] text-[13.5px] font-semibold leading-none {{ if eq .AdminTab "projects" }}border-gold text-white{{ else }}border-transparent text-white/65 hover:border-gold hover:text-white{{ end }}"
+          data-on:click__prevent="@get('/admin/projects')"
+          href="/admin/projects"
+        >Projects</a>
+        <a
+          class="border-b-2 pb-[2px] text-[13.5px] font-semibold leading-none {{ if eq .AdminTab "plots" }}border-gold text-white{{ else }}border-transparent text-white/65 hover:border-gold hover:text-white{{ end }}"
+          data-on:click__prevent="@get('/admin/plots')"
+          href="/admin/plots"
+        >Plots</a>
+        <a
+          class="border-b-2 border-transparent pb-[2px] text-[13.5px] font-semibold leading-none text-white/65 hover:border-gold hover:text-white"
+          data-on:click__prevent="vssToast('Demo: enquiries inbox not wired in this mockup')"
+          href="#"
+        >Enquiries</a>
+      </nav>
+      <span class="text-[12.5px] font-semibold leading-none text-white/50 max-[960px]:ml-auto">office@vss</span>
+    </div>
+  </header>
+{{ end }}
