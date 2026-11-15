@@ -68,6 +68,52 @@ type FAQ struct {
 	Req    bool // starred — client confirmation required
 }
 
+// PSpec is one fact cell in a projects-index row.
+type PSpec struct {
+	K, V string
+	Req  bool // starred — client confirmation required
+}
+
+// PRow is one editorial project row on the projects index.
+type PRow struct {
+	Num                string // two-digit ghost numeral
+	Loc                string
+	LocReq             bool
+	Name               string
+	DTCP               bool
+	Status             string // second badge text, without its trailing star
+	StatusReq          bool   // star as <em class=req> (client confirmation)
+	StatusStar         bool   // star as plain text
+	Quiet              bool   // row being prepared: no link, no availability strip
+	Muted              string
+	Specs              []PSpec
+	Avail              int // availability strip counts; all zero = no strip
+	Resv, Sold         int
+	FrontImg, FrontAlt string
+	L2Img              string
+	Href               string // "" = decorative deck (quiet row)
+	First, Even        bool   // computed row position (overlap, deck fan)
+}
+
+// Total is the full plot count behind the availability strip.
+func (p PRow) Total() int { return p.Avail + p.Resv + p.Sold }
+
+// Dots renders the availability strip in artifact order: available
+// ("on"), reserved ("rsv"), sold ("off").
+func (p PRow) Dots() []string {
+	dots := make([]string, 0, p.Avail+p.Resv+p.Sold)
+	for range p.Avail {
+		dots = append(dots, "on")
+	}
+	for range p.Resv {
+		dots = append(dots, "rsv")
+	}
+	for range p.Sold {
+		dots = append(dots, "off")
+	}
+	return dots
+}
+
 // Page carries everything the layout and page templates need.
 type Page struct {
 	Title       string
@@ -77,6 +123,7 @@ type Page struct {
 
 var pages = map[string]string{
 	"home":        "home.html",
+	"projects":    "projects.html",
 	"placeholder": "placeholder.html",
 }
 
@@ -232,7 +279,8 @@ func renderFragment(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if err := sse.ExecuteScript(
-		fmt.Sprintf("history.pushState(null, '', %q); document.title = %q",
+		fmt.Sprintf("history.pushState(null, '', %q); document.title = %q; "+
+			"window.scrollTo({top: 0, behavior: 'instant'})",
 			r.URL.Path, p.Title),
 	); err != nil {
 		log.Printf("pushState script: %v", err)
@@ -247,6 +295,90 @@ func render(w http.ResponseWriter, r *http.Request, name string, p Page) {
 		return
 	}
 	renderFull(w, name, p)
+}
+
+// projectsData is sample content mirroring the approved 02-projects
+// artifact. Real data modelling comes in a later iteration.
+func projectsData() []PRow {
+	return []PRow{
+		{
+			Num: "01", Loc: "Chennai North", LocReq: true,
+			Name: "Landmark City", DTCP: true,
+			Status: "15 available", StatusReq: true,
+			Specs: []PSpec{
+				{K: "Extent", V: "~9.8 acres", Req: true},
+				{K: "Plots", V: "24", Req: true},
+				{K: "Plot size", V: "600–2,400 sq.ft", Req: true},
+				{K: "Price", V: "₹1,850 / sq.ft", Req: true},
+			},
+			Avail: 15, Resv: 3, Sold: 6,
+			FrontImg: "card-landmark.jpg",
+			FrontAlt: "Landmark City — DTCP approved signboard at the layout entrance",
+			L2Img:    "proof-roads.jpg",
+			Href:     "/projects/landmark-city",
+		},
+		{
+			Num: "02", Loc: "Chennai North", LocReq: true,
+			Name: "Srivelan Nagar", DTCP: true,
+			Status: "Now selling", StatusStar: true,
+			Specs: []PSpec{
+				{K: "Extent", V: "~7.4 acres", Req: true},
+				{K: "Plots", V: "36", Req: true},
+				{K: "Plot size", V: "800–2,600 sq.ft", Req: true},
+				{K: "Price", V: "On request", Req: true},
+			},
+			Avail: 28, Resv: 4, Sold: 4,
+			FrontImg: "card-srivelan.jpg",
+			FrontAlt: "Srivelan Nagar — DTCP approved entrance signboard",
+			L2Img:    "proof-site-2.jpg",
+			Href:     "/projects/srivelan-nagar",
+		},
+		{
+			Num: "03", Loc: "Thiruppalai Nadu", LocReq: true,
+			Name: "Chandrayan Nagar", DTCP: true,
+			Status: "Limited plots", StatusReq: true,
+			Specs: []PSpec{
+				{K: "Extent", V: "~6.2 acres", Req: true},
+				{K: "Plots", V: "30", Req: true},
+				{K: "Plot size", V: "600–1,800 sq.ft", Req: true},
+				{K: "Price", V: "On request", Req: true},
+			},
+			Avail: 19, Resv: 4, Sold: 7,
+			FrontImg: "card-chandrayan.jpg",
+			FrontAlt: "Chandrayan Nagar — DTCP approved entrance signboard",
+			L2Img:    "proof-site-1.jpg",
+			Href:     "/projects/chandrayan-nagar",
+		},
+		{
+			Num: "04", Loc: "OMR, Chennai",
+			Name:  "Fourth layout — in preparation",
+			Quiet: true,
+			Muted: "A new VSS layout on the OMR corridor is being prepared for " +
+				"release. Facts and approval details will be published here once " +
+				"verified — nothing is offered until then.",
+			Specs: []PSpec{
+				{K: "Extent", V: "—"},
+				{K: "Plots", V: "—"},
+				{K: "Approval", V: "In process"},
+				{K: "Price", V: "On request"},
+			},
+			FrontImg: "aerial-close.jpg",
+			FrontAlt: "Aerial concept render — new layout under preparation",
+			L2Img:    "aerial-rows.jpg",
+		},
+	}
+}
+
+func projects(w http.ResponseWriter, r *http.Request) {
+	rows := projectsData()
+	for i := range rows {
+		rows[i].First = i == 0
+		rows[i].Even = i%2 == 1
+	}
+	render(w, r, "projects", Page{
+		Title: "Projects — VSS Associates",
+		Data:  map[string]any{"Rows": rows},
+	})
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -291,7 +423,14 @@ func main() {
 	mux.Handle("GET /assets/",
 		http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	mux.HandleFunc("GET /{$}", home)
-	mux.Handle("GET /projects", placeholder("Projects"))
+	mux.HandleFunc("GET /projects", projects)
+	mux.HandleFunc("GET /projects/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/projects/" {
+			http.Redirect(w, r, "/projects", http.StatusPermanentRedirect)
+			return
+		}
+		notFound(w, r)
+	})
 	mux.Handle("GET /projects/{slug}", placeholder("Project"))
 	mux.Handle("GET /about", placeholder("About"))
 	mux.Handle("GET /contact", placeholder("Contact"))

@@ -211,8 +211,23 @@ CORRECTION: Agent B's "canon violation" on 06 contact facts is REFUTED — PRODU
 - [x] All component CSS moved into templates as native Tailwind utilities (layout, partials, home, placeholder); footer inline styles converted too
 - [x] Radius tokens added to @theme (rounded-sm 8 / md 12 / lg 16 = meridian --r-*)
 - [x] docs/STYLE.md — meridian→Tailwind migration guide for remaining pages
-- [ ] User visual re-verification (headed browser) after the migration — spacing/type must be pixel-identical
+- [x] User visual re-verification (headed browser) after the migration — spacing/type must be pixel-identical
 - [ ] djlint reformat note: home.html grew ~2× from single_attribute_per_line; class strings are untouched
+
+## Implementation iteration 3 — 02-projects + post-verification fixes (2026-11-15)
+
+- [x] 02-projects implemented (hero + 4 data-driven rows + fragment nav), verified desktop/mobile vs artifact, committed `4535e32`…`0d570f1`
+- [x] agent-browser functional QA: zero console errors; fragment nav proven no-reload; both pages render
+- [x] sm call-button fix: base `a{color:navy}` beat inherited header color — `max-md:text-current` on the call link (white over hero glass, navy on solid header)
+- [x] sample-data note: ≤700px renders as 2nd bullet under the DTCP line in footer legal row; ≥701px keeps the fixed dark pill (matches artifact)
+- [x] lg home grid fix: `.sh-lead{grid-row:span 2}` was missing — `row-span-2 max-lg:row-span-1` on the lead card; verified 594px lead vs 2×287px side cards
+- [x] fragment-nav scroll-to-top: `window.scrollTo({top:0,behavior:'instant'})` appended to the server's post-patch ExecuteScript (main.go)
+- [x] NOTE: air only watches go/html — the tailwindcss --watch process must run alongside (`make dev`); after class edits with no rebuild, `row-span-2` silently missing from index.css cost a debug round
+- [x] sm marker hover (client request m01173): max-sm caption hover no longer translates left — feedback via size instead (`b` 14→15.5px, `span` 12→12.5px, transform:none); verified via computed styles + screenshot on 390px viewport
+- [x] reveal replay after fragment nav: morphed `.reveal` nodes (attribute-mutation branch in app.js) are re-observed with hidden state committed instantly (transition:none + reflow) so the 0→1 rise replays from opacity 0 — verified opacity ramps 0→0.02→0.33→0.74→0.92→1.00 over ~700ms; app.js cache-bust → v=4
+- [x] `/projects/` trailing slash now 308-redirects to `/projects` (was 404); deep links unaffected; verified via curl (air rebuilt on main.go change)
+- [x] `.djlintrc` added (profile golang, ignore H021 for intentional per-element CSS vars / reveal delays, max_line_length 200) — djlint clean on all 5 templates; committed `90eec32`, pushed
+- [x] /projects/ trailing-slash 404 fixed in main.go (redirect)
 
 ## Next iteration — derive architecture from approved designs
 
