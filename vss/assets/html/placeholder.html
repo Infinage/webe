@@ -1,0 +1,19 @@
+{{ define "main" }}
+  <section class="py-24 max-md:py-16">
+    <div class="mx-auto max-w-[1200px] px-7">
+      <p
+        class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-brass"
+      >Under construction</p>
+      <h2
+        class="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-navy"
+      >{{ .Data.Title }}</h2>
+      <p class="max-w-[62ch] text-[18px] leading-[1.65] text-ink-soft">
+        This screen arrives in a later iteration — its approved
+        design will be converted from the Lavish artifact in due course.
+      </p>
+      <a class="btn-text" data-on:click__prevent="@get('/')" href="/">
+        Back to home <span class="arr">→</span>
+      </a>
+    </div>
+  </section>
+{{ end }}

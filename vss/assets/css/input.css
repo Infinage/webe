@@ -1,0 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,560..640&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* Only scan our templates — keep .lavish artifacts out of the build. */
+@source "../html";
+
+/* ============================================================
+   MERIDIAN — VSS Associates design tokens (Tailwind v4).
+   Styling lives in the templates as native utilities; this file
+   holds ONLY: theme tokens, global resets, and the tiny set of
+   @utility primitives that utilities cannot express (multi-state
+   pseudo-element composites — see docs/STYLE.md for the map).
+   ============================================================ */
+@theme {
+  --color-navy: #0e2a47;
+  --color-navy-deep: #081d33;
+  --color-gold: #c9a24b;
+  --color-gold-soft: #e8d9b4;
+  --color-brass: #856517; /* small-text gold — ≥4.5:1 on paper/card/badge */
+  --color-card: #ffffff;
+  --color-paper: #f6f4ef;
+  --color-line: #e3ded3;
+  --color-line-strong: #cfc8b8; /* stronger hairline — timeline, dropzones */
+  --color-warm: #efeadd; /* warm sand surface — admin bg, wells, hovers */
+  --color-ink: #1d232b;
+  --color-ink-soft: #4a5563;
+  --color-ink-faint: #626c7a; /* sub-12px labels & hints */
+  --color-green: #1d6b45;
+  --color-green-bg: #eef7f1;
+  --color-red: #a3543d;
+  --color-red-bg: #fbf1ee;
+
+  --shadow-card: 0 2px 8px rgba(14, 42, 71, .09);
+  --shadow-lift: 0 14px 40px rgba(14, 42, 71, .16);
+
+  /* Breakpoints mirror the approved artifacts' seams */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 900px;
+  --breakpoint-lg: 1020px;
+  --breakpoint-xl: 1280px;
+
+  /* Radii mirror meridian.css --r-sm/--r-md/--r-lg */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
+
+  /* scroll-cue dot (01 hero rail) */
+  --animate-cuedot: cuedot 2.2s cubic-bezier(.45, 0, .3, 1) infinite;
+  @keyframes cuedot {
+    0% { top: 0; opacity: 0; }
+    10% { opacity: 1; }
+    62% { top: 64px; opacity: 1; }
+    100% { top: 72px; opacity: 0; }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    margin: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  :where(p, h1, h2, h3, h4, h5, h6, li, dd, blockquote, figcaption, td, th,
+    .badge, .label) {
+    overflow-wrap: anywhere;
+  }
+  :where(img, svg, video, canvas, iframe) {
+    max-width: 100%;
+    height: auto;
+  }
+  img {
+    display: block;
+  }
+  a {
+    color: var(--color-navy);
+    text-decoration: none;
+  }
+}
+
+/* ---------- primitives (kept out of templates on purpose) ---------- */
+
+/* Buttons: single-token primitive reused on every page; variants
+   compose in markup (btn btn-gold btn-sm). */
+@utility btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font: 600 15px/1 var(--font-sans);
+  padding: 15px 26px; border-radius: 999px; border: 0;
+  cursor: pointer; text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease,
+    background .18s ease;
+  &:hover { transform: translateY(-1px); }
+}
+@utility btn-gold {
+  background: var(--color-gold); color: var(--color-navy-deep);
+  box-shadow: 0 2px 10px rgba(201, 162, 75, .35);
+  &:hover { background: #d6b15e; }
+}
+@utility btn-navy { background: var(--color-navy); color: #fff; }
+/* solid white chip — holds AA on any photo (navy on white ≈ 12:1) */
+@utility btn-ghost-dark {
+  background: #fff; color: var(--color-navy);
+  border: 1px solid rgba(255, 255, 255, .4);
+  &:hover { background: var(--color-paper); }
+}
+@utility btn-outline {
+  background: transparent; color: var(--color-navy);
+  border: 1.5px solid var(--color-navy);
+  &:hover { background: var(--color-navy); color: #fff; }
+}
+@utility btn-text {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: none; color: var(--color-navy); border-radius: 0;
+  font-weight: 700; padding: 10px 4px; margin: -10px -4px;
+  cursor: pointer; text-decoration: none;
+  transition: color .18s ease;
+  &:hover { transform: none; color: var(--color-brass); }
+  & .arr { transition: transform .18s ease; }
+  &:hover .arr { transform: translateX(4px); }
+}
+@utility btn-sm { padding: 11px 20px; font-size: 13px; }
+
+/* Company logo sprite — background-image swap on header solid state
+   cannot be a utility chain. Size stays in markup (w-/h-). */
+@utility brand-logo {
+  display: inline-block;
+  background: url('/assets/img/brand-white.png') no-repeat
+    left center / contain;
+  .site-header--solid & { background-image: url('/assets/img/brand-red.png'); }
+}
+
+/* Reveal-on-scroll hook — JS adds .in (app.js); motion-reduce makes
+   everything instantly visible. */
+@utility reveal {
+  opacity: 0; transform: translateY(26px);
+  transition: opacity .7s ease, transform .7s ease;
+  &.in { opacity: 1; transform: none; }
+  @variant motion-reduce { opacity: 1; transform: none; transition: none; }
+}
+
+/* Geographic band marker (01 home): pin + stem + hover tip with a
+   focus-within state and a mobile re-layout to static caption cards. */
+@utility marker {
+  position: absolute; transform: translate(-50%, -100%); text-align: left;
+  & .pin {
+    display: block; width: 16px; height: 16px;
+    border-radius: 50% 50% 50% 0; background: var(--color-gold);
+    transform: rotate(-45deg); box-shadow: 0 2px 8px rgba(0, 0, 0, .4);
+    margin: 0 auto; position: relative; z-index: 2;
+  }
+  & .pin::after {
+    content: ''; position: absolute; inset: 5px; border-radius: 50%;
+    background: var(--color-navy-deep);
+  }
+  & .tip {
+    position: absolute; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: #fff; color: var(--color-navy); border-radius: 8px;
+    padding: 12px 16px; box-shadow: var(--shadow-lift); opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+    white-space: nowrap; z-index: 3; text-align: center;
+  }
+  & .tip b { display: block; font-size: 14px; }
+  & .tip span { font-size: 12px; color: var(--color-ink-soft); }
+  & .stem {
+    display: block; width: 1.5px; height: 26px;
+    background: rgba(255, 255, 255, .65); margin: 0 auto;
+  }
+  &:hover .tip, &:focus-within .tip {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+  }
+  /* pins become labeled cards: pin above, tip content as static caption */
+  @variant max-sm {
+    position: static; transform: none;
+    display: flex; flex-direction: column;
+    & .pin { order: -1; margin: 0 0 10px; align-self: flex-start; }
+    & .tip {
+      position: static; transform: none; opacity: 1; pointer-events: auto;
+      background: none; box-shadow: none; border-radius: 0; padding: 0;
+      white-space: normal; text-align: left;
+    }
+    & .tip b { color: #fff; }
+    & .tip span { color: rgba(255, 255, 255, .75); }
+    & .stem { display: none; }
+    /* the base hover tip transform would still shift the static caption
+       left — on sm give feedback via size instead (client request) */
+    &:hover .tip, &:focus-within .tip {
+      transform: none;
+      & b { font-size: 15.5px; }
+      & span { font-size: 12.5px; }
+    }
+  }
+}

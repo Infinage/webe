@@ -1,0 +1,10 @@
+# air build output
+tmp/
+
+# stray screenshot artifacts from browser tooling
+/viewport
+/viewport2
+/empty.png
+/fullPage
+/element
+/--viewport

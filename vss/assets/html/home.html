@@ -1,0 +1,455 @@
+{{ define "main" }}
+
+  {{/* ================= HERO ================= */}}
+  <section
+    class="relative flex min-h-[92vh] items-end overflow-hidden text-white max-sm:min-h-[88vh]"
+  >
+    <div
+      class="absolute inset-0 bg-cover bg-center"
+      style="background-image:url('/assets/img/aerial-hero.jpg')"
+    ></div>
+    <div
+      class="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,29,51,.60)_0%,rgba(8,29,51,.24)_42%,rgba(8,29,51,.78)_100%)]"
+    ></div>
+    <div class="relative z-[2] w-full pb-[96px]">
+      <div
+        class="mx-auto grid max-w-[1200px] grid-cols-[1fr_auto] items-end gap-12 px-7 max-lg:grid-cols-1"
+      >
+        <div class="max-w-[720px] pb-[26px]">
+          <p
+            class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-gold-soft reveal"
+          >DTCP-approved plotted development · Chennai</p>
+          <h1
+            class="m-0 text-[clamp(40px,5.4vw,64px)] font-extrabold leading-[1.06] tracking-[-.02em] tabular-nums"
+          >
+            Plots you can build on,
+            <br>
+            <span
+              class="font-serif text-[.98em] font-semibold italic leading-none tracking-[-.005em] text-gold-soft"
+            >with confidence.</span>
+          </h1>
+          <p
+            class="mb-[34px] mt-[22px] max-w-[52ch] text-[17.5px] leading-[1.65] text-white/82"
+          >
+            VSS Associates lays out land the way a family buys it — approved first, walked
+            in person, priced on the ground. Four layouts, clear titles, and the same office that sells you
+            the plot stands beside you till the patta.
+          </p>
+          <div class="flex flex-wrap items-center gap-[18px]">
+            <a
+              class="btn btn-gold"
+              data-on:click__prevent="@get('/projects')"
+              href="/projects"
+            >Explore our projects</a>
+            <a
+              class="inline-flex items-center gap-[9px] py-[13px] text-[15px] font-bold text-white/85 hover:text-gold-soft [&>svg]:h-[15px] [&>svg]:w-[15px] [&>svg]:fill-current"
+              href="tel:04442087913"
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M6.6 10.8a15.9 15.9 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.57 3.6 1 1 0 01-.25 1z" />
+              </svg>
+              044 4208 7913
+            </a>
+          </div>
+          <p
+            class="m-0 mt-[18px] text-[11.5px] tracking-[.04em] text-white/66"
+          >Concept render — site photography to follow</p>
+        </div>
+        <aside
+          class="flex flex-col items-end gap-[18px] text-[12.5px] font-semibold uppercase tracking-[.14em] text-white/75 max-lg:hidden"
+        >
+          <div class="flex flex-col items-center gap-3"><span>Scroll</span><span
+            class="relative h-[72px] w-px bg-white/35 after:absolute after:-left-[2.5px] after:top-0 after:h-1.5 after:w-1.5 after:animate-cuedot after:rounded-full after:bg-gold"
+          ></span></div>
+          <div class="text-right leading-[2]">
+            <b class="text-white">Chennai</b>
+            <br>
+            Tamil Nadu · IN
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  {{/* ================= STAT BAND ================= */}}
+  <div class="relative z-[5] -mt-[74px] max-sm:-mt-[40px]">
+    <section
+      class="rounded-[2px] border-t-[3px] border-gold bg-card shadow-card"
+      aria-label="Company statistics"
+    >
+      <div
+        class="mx-auto grid max-w-[1200px] grid-cols-5 gap-5 px-7 py-[34px] max-md:grid-cols-2"
+      >
+        {{ range .Data.Stats }}
+          <div class="text-center">
+            <div
+              class="flex min-h-[44px] items-baseline justify-center text-[clamp(26px,2.6vw,36px)] font-extrabold tracking-[-.01em] text-navy tabular-nums"
+            ><span class="count" data-target="{{ .Target }}">0</span>{{ if .Unit }}<span class="ml-[2px] text-[max(.55em,12px)] font-bold text-brass">{{ .Unit }}</span>{{ end }}{{ if .Req }}<sup class="font-bold text-brass">*</sup>{{ end }}</div>
+            <div
+              class="mt-1 text-[11.5px] font-bold uppercase tracking-[.14em] text-ink-soft"
+            >{{ .Label }}</div>
+          </div>
+        {{ end }}
+      </div>
+    </section>
+  </div>
+
+  {{/* ================= PROJECTS AT A GLANCE ================= */}}
+  <section id="projects" class="py-24 max-md:py-16">
+    <div class="mx-auto max-w-[1200px] px-7">
+      <div
+        class="mb-[34px] flex items-end justify-between gap-6 max-sm:flex-col max-sm:items-start reveal"
+      >
+        <div>
+          <p
+            class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-brass"
+          >Projects at a glance</p>
+          <h2
+            class="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-navy"
+          >
+            Four layouts.
+            <br>
+            One standard.
+          </h2>
+        </div>
+        <a
+          class="btn-text"
+          data-on:click__prevent="@get('/projects')"
+          href="/projects"
+        >View all projects <span class="arr">→</span></a>
+      </div>
+
+      <div class="grid grid-cols-[1.45fr_1fr] gap-5 max-lg:grid-cols-1">
+        {{ range .Data.Projects }}
+          {{ if .Lead }}
+            <article
+              class="group bg-card row-span-2 max-lg:row-span-1 flex flex-col overflow-hidden rounded-md shadow-card transition-[opacity,transform,box-shadow,translate] duration-[700ms,700ms,250ms,250ms] hover:[translate:0_-4px] hover:shadow-lift motion-reduce:transition-none reveal"
+            >
+              <a
+                class="relative block h-[400px] overflow-hidden max-lg:h-[320px] max-sm:h-[250px] after:absolute after:inset-0 after:bg-[linear-gradient(180deg,rgba(8,29,51,0)_55%,rgba(8,29,51,.42))] after:content-['']"
+                data-on:click__prevent="@get('{{ .Href }}')"
+                href="{{ .Href }}"
+              >
+                <img
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.045]"
+                  alt="{{ .Name }} — site photo to follow"
+                  src="{{ .Image }}"
+                >
+                {{ template "stamp" }}
+                <span
+                  class="absolute bottom-4 left-[18px] z-[2] text-[12.5px] font-semibold uppercase tracking-[.1em] text-white/88"
+                >{{ .Loc }}</span>
+              </a>
+              <div class="flex flex-1 flex-col gap-[10px] px-6 pb-6 pt-[22px]">
+                <h3
+                  class="m-0 text-[25px] font-extrabold tracking-[-.01em] text-navy"
+                >{{ .Name }}</h3>
+                <div class="grid grid-cols-2 gap-x-[36px] max-sm:grid-cols-1">
+                  {{ range .Specs }}
+                    <div
+                      class="flex items-baseline justify-between gap-3 border-t border-line py-[5.5px] [&:nth-last-child(-n+2)]:border-b max-sm:[&:nth-last-child(-n+2)]:border-b-0 max-sm:[&:last-child]:border-b"
+                    ><span class="text-[11px] font-bold uppercase tracking-[.12em] text-ink-soft">{{ .K }}</span><b class="whitespace-nowrap text-[13px] font-bold text-navy">{{ .V }}</b></div>
+                  {{ end }}
+                </div>
+                <div
+                  class="mt-auto flex items-center justify-between gap-4 border-t-0 pt-0"
+                >
+                  <span
+                    class="text-[12.5px] text-ink-faint"
+                  >{{ .Status }}</span>
+                  <a
+                    class="btn-text text-[13.5px]"
+                    data-on:click__prevent="@get('{{ .Href }}')"
+                    href="{{ .Href }}"
+                  >View project <span class="arr">→</span></a>
+                </div>
+              </div>
+            </article>
+          {{ else }}
+            <article
+              class="group flex flex-row overflow-hidden rounded-md bg-card shadow-card transition-[opacity,transform,box-shadow,translate] duration-[700ms,700ms,250ms,250ms] hover:[translate:0_-4px] hover:shadow-lift motion-reduce:transition-none [&_.stamp]:left-2 [&_.stamp]:top-2 [&_.stamp]:h-11 [&_.stamp]:w-11 max-sm:[&_.stamp]:h-9 max-sm:[&_.stamp]:w-9 reveal"
+            >
+              <a
+                class="relative block w-[150px] flex-none overflow-hidden after:hidden max-sm:w-[104px]"
+                data-on:click__prevent="@get('{{ .Href }}')"
+                href="{{ .Href }}"
+              >
+                <img
+                  class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.045]"
+                  alt="{{ .Name }} — site photo to follow"
+                  src="{{ .Image }}"
+                >
+                {{ template "stamp" }}
+              </a>
+              <div
+                class="flex flex-1 flex-col justify-center gap-[7px] px-5 py-[18px] max-sm:px-4 max-sm:py-[14px]"
+              >
+                <h3
+                  class="m-0 text-[17.5px] font-extrabold tracking-[-.01em] text-navy"
+                >{{ .Name }}</h3>
+                <p
+                  class="m-0 text-[11px] font-bold uppercase tracking-[.12em] text-ink-faint"
+                >{{ .Loc }}</p>
+                <div class="flex flex-col">
+                  {{ range .Specs }}
+                    <div
+                      class="flex items-baseline justify-between gap-3 border-t border-line py-[4.5px] [&:last-child]:border-b"
+                    ><span class="text-[11px] font-bold uppercase tracking-[.12em] text-ink-soft">{{ .K }}</span><b class="whitespace-nowrap text-[13px] font-bold text-navy">{{ .V }}</b></div>
+                  {{ end }}
+                </div>
+                <div
+                  class="mt-2 flex items-center justify-between gap-[10px] border-t-0 pt-0"
+                >
+                  <span
+                    class="text-[12.5px] text-ink-faint"
+                  >{{ .Status }}</span>
+                  <a
+                    class="btn-text text-[13.5px]"
+                    data-on:click__prevent="@get('{{ .Href }}')"
+                    href="{{ .Href }}"
+                  >View project <span class="arr">→</span></a>
+                </div>
+              </div>
+            </article>
+          {{ end }}
+        {{ end }}
+
+        <a
+          class="col-span-full flex items-center justify-between gap-6 rounded-[10px] border-[1.5px] border-dashed border-[#cfc4ab] px-6 py-[18px] text-navy hover:border-gold max-sm:flex-col max-sm:items-start max-sm:gap-3 reveal"
+          data-on:click__prevent="@get('/contact')"
+          href="/contact"
+        >
+          <div>
+            <h3
+              class="m-0 text-[17px] font-extrabold text-navy"
+            >OMR project</h3>
+            <p class="mb-0 mt-1 text-[13.5px] text-ink-soft">OMR, Chennai* · extent, plots and pricing to be published after approval.</p>
+          </div>
+          <div class="flex flex-none items-center gap-[18px]">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-3 py-1.5 text-[11.5px] font-bold uppercase tracking-[.08em] text-ink-soft"
+            >Details being prepared</span>
+            <span class="btn-text">Enquire <span class="arr">→</span></span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {{/* ================= VALUE PROPS ================= */}}
+  <section id="value" class="py-24 max-md:py-16">
+    <div class="mx-auto max-w-[1200px] px-7">
+      <div class="mb-12 max-w-[640px] reveal">
+        <p
+          class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-brass"
+        >How we add value to your ground</p>
+        <h2
+          class="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-navy"
+        >Bought the way a family buys it.</h2>
+      </div>
+      <div class="max-w-[980px]">
+        {{ range .Data.Props }}
+          <div
+            class="group grid grid-cols-[120px_1fr] items-baseline gap-8 border-t border-line py-10 first:border-t-0 first:pt-0 max-sm:grid-cols-[64px_1fr] max-sm:gap-5 reveal"
+          >
+            <div
+              class="text-[64px] font-extrabold leading-none tracking-[-.03em] text-transparent tabular-nums [-webkit-text-stroke-color:#cbb47e] [-webkit-text-stroke-width:1.4px] transition-[color,-webkit-text-stroke-color] duration-[350ms] group-hover:text-gold group-hover:[-webkit-text-stroke-color:var(--color-gold)] [.lit_&]:text-gold [.lit_&]:[-webkit-text-stroke-color:var(--color-gold)] motion-reduce:transition-none max-sm:text-[44px]"
+            >{{ .Num }}</div>
+            <div>
+              <h3 class="m-0 mb-[10px] text-[22px] font-extrabold tracking-[-.01em] text-navy">{{ if .Href }}<a
+                class="text-inherit"
+                data-on:click__prevent="@get('{{ .Href }}')"
+                href="{{ .Href }}"
+              >{{ .Title }}</a>{{ else }}{{ .Title }}{{ end }}</h3>
+              <p class="m-0 max-w-[58ch] text-ink-soft">{{ .Body }}</p>
+            </div>
+          </div>
+        {{ end }}
+      </div>
+    </div>
+  </section>
+
+  {{/* ================= GEOGRAPHIC BAND ================= */}}
+  <section id="where" class="relative overflow-hidden text-white">
+    <div
+      class="absolute inset-0 bg-cover bg-center"
+      style="background-image:url('/assets/img/aerial-band.jpg')"
+    ></div>
+    <div
+      class="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,29,51,.82),rgba(8,29,51,.66))]"
+    ></div>
+    <div class="relative z-[2] pt-[110px] pb-[130px]">
+      <div class="mx-auto max-w-[1200px] px-7">
+        <p
+          class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-gold-soft reveal"
+        >Where we work</p>
+        <div class="flex flex-wrap items-end justify-between gap-8">
+          <h2
+            class="m-0 mb-0 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-white reveal"
+          >
+            Four layouts across
+            <br>
+            Chennai's growth corridors.
+          </h2>
+          <!-- deviation from locked artifact (user request): gold button instead of white ghost -->
+          <a
+            class="btn btn-gold reveal"
+            data-on:click__prevent="@get('/projects')"
+            href="/projects"
+          >Explore by location</a>
+        </div>
+        <div
+          class="relative mt-16 h-[220px] max-sm:h-auto max-sm:grid max-sm:grid-cols-2 max-sm:gap-7"
+          aria-label="Project locations — illustrative positions"
+        >
+          <svg
+            class="absolute inset-0 h-full w-full"
+            aria-hidden="true"
+            preserveAspectRatio="xMidYMid slice"
+            viewBox="0 0 1200 220"
+          >
+            <g fill="none" stroke="rgba(255,255,255,.10)" stroke-width="1">
+            <path d="M0 30 H1200 M0 80 H1200 M0 130 H1200 M0 180 H1200"></path>
+            <path d="M100 0 V220 M320 0 V220 M540 0 V220 M760 0 V220 M980 0 V220"></path>
+            </g>
+            <g fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2">
+            <path d="M1200 40 C 900 70, 700 140, 380 160 S 60 200, 0 210"></path>
+            <path d="M0 120 C 240 100, 520 96, 1200 150"></path>
+            </g>
+            <text fill="rgba(255,255,255,.35)" font-family="Manrope, sans-serif" font-size="12" letter-spacing=".14em" x="1128" y="30">BAY OF BENGAL</text>
+          </svg>
+          {{ range .Data.Markers }}
+            <a
+              class="marker"
+              data-on:click__prevent="@get('{{ .Href }}')"
+              href="{{ .Href }}"
+              style="left:{{ .Left }};
+                     top:{{ .Top }}"
+            >
+              <span class="tip"><b>{{ .Name }}</b><span>{{ .Sub }}</span></span>
+              <span class="stem"></span><span class="pin"></span>
+            </a>
+          {{ end }}
+        </div>
+        <p class="mt-10 text-[12.5px] text-white/55">Marker positions are illustrative — exact locations <span class="font-bold text-brass">await client confirmation*</span></p>
+      </div>
+    </div>
+  </section>
+
+  {{/* ================= PROCESS ================= */}}
+  <section class="bg-card py-24 max-md:py-16">
+    <div class="mx-auto max-w-[1200px] px-7">
+      <div class="mb-12 max-w-[640px] reveal">
+        <p
+          class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-brass"
+        >The buying process</p>
+        <h2
+          class="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-navy"
+        >From first visit to patta in four steps.</h2>
+      </div>
+      <div
+        class="relative grid grid-cols-4 max-lg:grid-cols-2 max-lg:gap-y-10 max-sm:grid-cols-1 before:absolute before:left-[8%] before:right-[8%] before:top-[27px] before:h-px before:bg-line before:content-[''] max-lg:before:hidden"
+      >
+        {{ range .Data.Steps }}
+          <div class="group relative pr-[28px] reveal">
+            <div
+              class="relative z-[2] flex h-[54px] w-[54px] cursor-default items-center justify-center rounded-full border-2 border-gold bg-card text-[17px] font-extrabold text-brass tabular-nums transition-colors duration-200 group-hover:bg-gold group-hover:text-navy-deep"
+            >{{ .Num }}</div>
+            <h3
+              class="mb-2 mt-5 text-[17px] font-extrabold text-navy"
+            >{{ .Title }}</h3>
+            <p class="m-0 text-[14.5px] text-ink-soft">{{ .Body }}</p>
+          </div>
+        {{ end }}
+      </div>
+    </div>
+  </section>
+
+  {{/* ================= FAQ ================= */}}
+  <section class="py-24 max-md:py-16">
+    <div
+      class="mx-auto grid max-w-[1200px] grid-cols-[5fr_7fr] items-start gap-[72px] px-7 max-lg:grid-cols-1 max-lg:gap-10"
+    >
+      <div class="reveal">
+        <p
+          class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-brass"
+        >Questions</p>
+        <h2
+          class="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-navy"
+        >
+          Asked before
+          <br>
+          every booking.
+        </h2>
+        <p class="max-w-[62ch] text-base leading-[1.65] text-ink-soft">
+          Straight answers, or an honest "we'll confirm that in
+          writing" — nothing else.
+        </p>
+        <a
+          class="btn-text mt-[18px]!"
+          data-on:click__prevent="@get('/contact')"
+          href="/contact"
+        >Ask us directly <span class="arr">→</span></a>
+      </div>
+      <div class="border-t border-line reveal">
+        {{ range .Data.FAQs }}
+          <details
+            class="group border-b border-line"
+            {{ if .Open }}
+            open{{ end }}
+          >
+            <summary
+              class="flex cursor-pointer list-none items-center gap-[18px] px-1 py-[22px] text-[17px] font-bold text-navy [&::-webkit-details-marker]:hidden [&::after]:ml-auto [&::after]:text-[22px] [&::after]:text-gold [&::after]:content-['+'] [&::after]:transition-transform [&::after]:duration-200 group-open:[&::after]:rotate-45"
+            ><span class="min-w-[28px] text-[13px] font-extrabold text-brass tabular-nums">{{ .Idx }}</span> {{ .Q }}{{ if .Req }} <sup class="font-bold text-brass">*</sup>{{ end }}</summary>
+            <div
+              class="max-w-[68ch] px-1 pb-6 pl-[50px] text-ink-soft"
+            >{{ .A }}</div>
+          </details>
+        {{ end }}
+      </div>
+    </div>
+  </section>
+
+  {{/* ================= CTA BAND ================= */}}
+  <section class="relative overflow-hidden text-white">
+    <div
+      class="absolute inset-0 bg-[url(/assets/img/aerial-rows.jpg)] bg-cover bg-center opacity-[.38] saturate-[.9]"
+    ></div>
+    <div
+      class="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,29,51,.88),rgba(8,29,51,.55))]"
+    ></div>
+    <div
+      class="relative z-[2] mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-10 px-7 py-[88px]"
+    >
+      <div class="reveal">
+        <p
+          class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-gold-soft"
+        >Final step</p>
+        <h2
+          class="m-0 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-white"
+        >
+          Walk the ground
+          <br>
+          before you decide.
+        </h2>
+      </div>
+      <div class="flex flex-wrap items-center gap-[18px] reveal">
+        <a
+          class="btn btn-gold"
+          data-on:click__prevent="@get('/contact')"
+          href="/contact"
+        >Book a Visit</a>
+        <a
+          class="inline-flex items-center gap-[9px] py-[13px] text-[15px] font-bold text-white/85 hover:text-gold-soft [&>svg]:h-[15px] [&>svg]:w-[15px] [&>svg]:fill-current"
+          href="tel:04442087913"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M6.6 10.8a15.9 15.9 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.57 3.6 1 1 0 01-.25 1z" />
+          </svg>
+          044 4208 7913
+        </a>
+      </div>
+    </div>
+  </section>
+
+{{ end }}
