@@ -48,13 +48,17 @@
     'Segoe UI', sans-serif;
   --font-serif: 'Fraunces', Georgia, serif;
 
-  /* scroll-cue dot (01 hero rail) */
+  /* scroll-cue dot (01 hero rail) + drip (03 fixed-hero scroll cue) */
   --animate-cuedot: cuedot 2.2s cubic-bezier(.45, 0, .3, 1) infinite;
   @keyframes cuedot {
     0% { top: 0; opacity: 0; }
     10% { opacity: 1; }
     62% { top: 64px; opacity: 1; }
     100% { top: 72px; opacity: 0; }
+  }
+  --animate-drip: drip 2.2s ease-in-out infinite;
+  @keyframes drip {
+    to { top: 120%; }
   }
 }
 
@@ -137,6 +141,47 @@
   background: url('/assets/img/brand-white.png') no-repeat
     left center / contain;
   .site-header--solid & { background-image: url('/assets/img/brand-red.png'); }
+}
+
+/* SVG site-plan plot vocabulary (03 project detail) — seven states
+   that utilities can't express per-element (fill/stroke/filter swaps
+   on the same SVG node, toggled by Datastar data-class). Hover is the
+   artifact's .plot--hover, expressed as CSS :hover here. */
+@utility plot {
+  cursor: pointer;
+  transition: fill .15s ease, stroke .15s ease;
+  &:hover {
+    stroke: var(--color-gold);
+    stroke-width: 2.4;
+    filter: drop-shadow(0 0 6px rgba(201, 162, 75, .55));
+  }
+}
+@utility plot--available {
+  fill: #fff; stroke: var(--color-navy); stroke-width: 1; opacity: .92;
+}
+@utility plot--reserved {
+  fill: #f3e7c9; stroke: var(--color-gold); stroke-width: 1.4;
+}
+@utility plot--sold {
+  fill: #14314f; stroke: #14314f; stroke-width: 1;
+}
+@utility plot--selected {
+  stroke: var(--color-navy-deep); stroke-width: 3;
+  filter: drop-shadow(0 2px 8px rgba(14, 42, 71, .4));
+}
+/* !important mirrors the artifact cascade (inline .plot--dimmed declared after
+   the linked sheet): Tailwind may sort this utility before plot--available,
+   whose opacity would otherwise override dimming — leaving "dimmed" plots
+   fully visible AND unclickable. */
+@utility plot--dimmed {
+  opacity: .22 !important; pointer-events: none !important;
+}
+@utility plot-label {
+  font-family: var(--font-sans); font-size: 9px; font-weight: 700;
+  fill: var(--color-navy); pointer-events: none;
+}
+@utility plot-label--sold {
+  fill: rgba(255, 255, 255, .75);
 }
 
 /* Reveal-on-scroll hook — JS adds .in (app.js); motion-reduce makes

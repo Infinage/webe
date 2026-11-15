@@ -1,5 +1,8 @@
 # TODO — VSS website revamp
 
+## Go implementation (this iteration)
+- [x] Bug fix — project-detail plan layout wasn't updating the plot-detail card on real clicks. Root cause: `assets/js/app.js` `initMap()` called `svg.setPointerCapture()` on pointerdown, retargeting the browser click away from the `<g class=plot>` `data-on:click` handlers (same artifact 03 R10 lesson). Fix: capture is now taken lazily on first ≥6px move (drag), and tap-select/deselect moved to the svg `pointerup` handler (tap < 6px → select plot / deselect on empty map), ported from `.lavish/screens/03-project-detail.html`. Panel data needs no dummy wiring — Go already feeds it via `PlotsJSON` signals. Verified: real clicks select (A5/B6/A9 incl. sold copy), empty-map tap + Esc deselect, drag preserves selection, Reserved filter dims 21, desktop + mobile screenshots clean.
+
 ## Iteration status — visual design phase (this iteration)
 
 **Completed**
@@ -228,6 +231,21 @@ CORRECTION: Agent B's "canon violation" on 06 contact facts is REFUTED — PRODU
 - [x] `/projects/` trailing slash now 308-redirects to `/projects` (was 404); deep links unaffected; verified via curl (air rebuilt on main.go change)
 - [x] `.djlintrc` added (profile golang, ignore H021 for intentional per-element CSS vars / reveal delays, max_line_length 200) — djlint clean on all 5 templates; committed `90eec32`, pushed
 - [x] /projects/ trailing-slash 404 fixed in main.go (redirect)
+
+## Implementation iteration 4 — 03-project-detail (2026-11-15)
+
+- [x] Full artifact conversion: hero (concept render, badge, spec bar, scroll cue) · facts band · interactive site plan (SVG grid, Datastar $sel/$filter/$plots signals, zoom/pan/fit, focus-on-select recentering) · plot detail panel (empty ↔ selected states) · story (stacked polaroids) · gallery (1 card/step arrows) · location ledger (navy) · verification (signboard + vlist) · CTA band · footer
+- [x] Shared partials reused: header, footer, floating sample-data chip — per-artifact wordings now data-driven (Page.DtcpNote / Page.SampleFlag / Page.FlagDismiss): home "values marked *", projects "extents, counts, prices", detail "plot facts, prices & stats" + ✕ dismiss button; footer DTCP line likewise per-page
+- [x] Footnote/panel fine print use artifact's `.req` brass-bold styling (font-bold text-brass) — was ink-soft
+- [x] Fixed: galnav prev/next hook classes dropped in conversion (arrows dead); verified 1 card/step scroll + disabled states
+- [x] Verified vs artifact: desktop all sections + selected-plot label overlap (artifact renders identically), mobile hero/map/plot-select/panel, fragment nav (no reload, map+gallery init), /projects/ 308, home/projects unchanged
+- [x] gofmt/go vet clean; djlint clean; `bin/` gitignored (local build artifact)
+
+## Post-commit fixes (2026-11-15) — commit `2517702`
+- [x] Site plan regressions fixed (root causes: ①`evt` vs `.evt` typo in marker down/handler expressions; ② plot--dimmed opacity lost the cascade vs plot--available status utility → made !important with rationale comment mirroring artifact order; ③ click-outside lived on the content-slide div, missing header/footer → moved to <body> in layout.html with `$sel !== undefined` guard, inert on pages without the map; Esc deselect now guarded the same way). Verified: all 4 chips dim exactly their non-matching statuses with zero console errors, click-after-filter updates panel (B3), footer click deselects, Esc works, home body clicks inert
+- [x] Footer stacked rows on sm (client request, overrides artifact's 2-col ≤900): ≤640 single column · 641–900 two columns (artifact) · ≥901 artifact 4-col grid; mobile-first min-[641px]/min-[901px] variants (max-[900px] max-variant lost the cascade to grid-cols-1 — use min- up). Shared partial → applies to all pages. Verified 390/800/1440 + screenshot
+- LESSON: djlint must run as `djlint assets/html --configuration ~/.djlintrc --check` (profile golang, ignore H021); bare `djlint .` misses the config
+- LESSON: compressed-summary claims ("footer fix landed in 90eec32") were wrong — b30 had no footer work; verify before trusting summaries
 
 ## Next iteration — derive architecture from approved designs
 

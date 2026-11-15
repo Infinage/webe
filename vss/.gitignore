@@ -20,3 +20,4 @@ tmp/
 
 # VSS source-material originals (web-optimized copies live in assets/img)
 site_content/
+bin/

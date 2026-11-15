@@ -70,10 +70,14 @@
 {{ end }}
 
 {{ define "footer" }}
-  <footer class="bg-navy-deep pt-[72px] text-white/82">
+  {{/* z-[2] keeps the footer above 03's fixed hero (z-0); harmless elsewhere */}}
+  <footer class="relative z-[2] bg-navy-deep pt-[72px] text-white/82">
     <div class="mx-auto max-w-[1200px] px-7">
+      {{/* ≤640 = single stacked row (client request, overrides the
+          artifact's 2-col sm) · 641–900 = artifact's 2-col tablet grid ·
+          901+ = artifact's 1.6/1/1/1.2 cols */}}
       <div
-        class="grid grid-cols-[1.6fr_1fr_1fr_1.2fr] gap-10 pb-14 max-md:grid-cols-2"
+        class="grid grid-cols-1 min-[641px]:grid-cols-2 min-[901px]:grid-cols-[1.6fr_1fr_1fr_1.2fr] gap-8 min-[901px]:gap-10 pb-14"
       >
         <div>
           <div class="mb-[14px] flex items-center gap-3">
@@ -170,8 +174,8 @@
         class="flex flex-wrap justify-between gap-4 border-t border-white/12 py-5 pb-[26px] text-[12.5px] text-white/55"
       >
         <span>© VSS Associates. All rights reserved.</span>
-        <span class="text-white/75">✓ Every layout sold here is DTCP approved — approval numbers published on each project page.</span>
-        <span class="hidden w-full max-[700px]:block text-white/75">✳ <b class="text-gold-soft">Sample data</b> — values marked * await client supply</span>
+        <span class="text-white/75">{{ .DtcpNote }}</span>
+        <span class="hidden w-full max-[700px]:block text-white/75">✳ <b class="text-gold-soft">Sample data</b> — {{ .SampleFlag }}</span>
       </div>
     </div>
   </footer>

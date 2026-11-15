@@ -9,11 +9,14 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
+	"math"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/starfederation/datastar-go/datastar"
@@ -114,17 +117,198 @@ func (p PRow) Dots() []string {
 	return dots
 }
 
+// Plot is one plot on the interactive site plan. Every fact is
+// sample data (asterisked in the UI) pending client supply.
+type Plot struct {
+	N       string // plot id, e.g. "A1"
+	St      string // available | reserved | sold
+	Status  string // panel status line, pre-computed
+	Dims    string // panel dimensions line, pre-computed
+	Area    int    // sq.ft
+	AreaFmt string // "1,200" — en-IN grouped, for SVG + panel
+	Facing  string
+	Corner  bool
+	Price   string // panel price line, pre-computed
+	Cta     string // panel CTA label, pre-computed
+	Note    string // panel fine-print, pre-computed
+	X, Y    int    // SVG rect origin (layout geometry, not serialised)
+}
+
+// signalsMap is the JSON payload bound into Datastar signals; the
+// site-plan template reads $plots.<id> for every panel field.
+func (p Plot) signalsMap() map[string]any {
+	return map[string]any{
+		"st": p.St, "status": p.Status, "dims": p.Dims,
+		"area": p.AreaFmt + " sq.ft", "facing": p.Facing,
+		"corner": p.Corner, "price": p.Price, "cta": p.Cta, "note": p.Note,
+	}
+}
+
+// GItem is one gallery figure.
+type GItem struct {
+	Img, Alt, Num, Title, Cap string
+}
+
+// LRow is one landmark distance row.
+type LRow struct {
+	Name, Sub, Dist string
+}
+
+// Legend is one filter pill on the site plan.
+type Legend struct {
+	Key, Label string
+	Swatch     string // "" for All; av | rs | so
+}
+
+// projectDetailData is sample content mirroring the approved
+// 03-project-detail artifact (Landmark City).
+func projectDetailData() map[string]any {
+	seeds := []struct {
+		N    string
+		St   string
+		Area int
+	}{
+		{"A1", "available", 1200}, {"A2", "available", 1200},
+		{"A3", "available", 1200}, {"A4", "available", 1200},
+		{"A5", "available", 1500}, {"A6", "available", 1500},
+		{"A7", "available", 1500}, {"A8", "available", 1500},
+		{"A9", "sold", 1800}, {"A10", "reserved", 1800},
+		{"A11", "available", 1800}, {"A12", "sold", 1800},
+		{"B1", "sold", 2400}, {"B2", "available", 2400},
+		{"B3", "reserved", 1500}, {"B4", "sold", 1500},
+		{"B5", "available", 1500}, {"B6", "available", 1800},
+		{"B7", "available", 1500}, {"B8", "available", 1500},
+		{"B9", "available", 1500}, {"B10", "reserved", 1500},
+		{"B11", "sold", 1500}, {"B12", "sold", 1500},
+	}
+
+	const pricePerSft = 1850
+	plots := make([]Plot, 0, len(seeds))
+	signals := map[string]any{}
+	counts := map[string]int{"all": len(seeds)}
+	for i, s := range seeds {
+		w := int(math.Round(math.Sqrt(float64(s.Area)/1.5)/5) * 5)
+		d := int(math.Round(float64(s.Area)/float64(w)/5) * 5)
+		areaFmt := enIN(s.Area)
+		p := Plot{
+			N: s.N, St: s.St, Area: s.Area, AreaFmt: areaFmt,
+			Dims:   fmt.Sprintf("%d × %d ft*", w, d),
+			Facing: "East road",
+			Corner: s.N == "A1" || s.N == "A12" || s.N == "B1" || s.N == "B12",
+			// two rows of 12, top row faces the west road
+			X: 100 + (i%12)*73,
+			Y: 258,
+		}
+		if s.N[0] == 'A' {
+			p.Facing = "West road"
+			p.Y = 62
+		}
+		switch s.St {
+		case "available":
+			p.Status = "Available"
+			p.Price = fmt.Sprintf("₹%.1f lakh*", float64(s.Area)*pricePerSft/100000)
+			p.Cta = "Reserve for a site visit"
+			p.Note = "Prices exclude registration & statutory charges.*"
+			counts["available"]++
+		case "reserved":
+			p.Status = "Reserved — not bookable"
+			p.Price = "—"
+			p.Cta = "Ask about remaining plots"
+			p.Note = "Reserved — under advance, not bookable."
+			counts["reserved"]++
+		default:
+			p.Status = "Sold — not bookable"
+			p.Price = "—"
+			p.Cta = "Ask about remaining plots"
+			p.Note = "Sold — shown for orientation only."
+			counts["sold"]++
+		}
+		plots = append(plots, p)
+		signals[s.N] = p.signalsMap()
+	}
+	plotsJSON, err := json.Marshal(signals)
+	if err != nil {
+		log.Printf("plots signals: %v", err)
+	}
+
+	legend := []Legend{
+		{Key: "all", Label: fmt.Sprintf("All · %d", counts["all"])},
+		{Key: "available", Label: fmt.Sprintf("Available · %d", counts["available"]), Swatch: "av"},
+		{Key: "reserved", Label: fmt.Sprintf("Reserved · %d", counts["reserved"]), Swatch: "rs"},
+		{Key: "sold", Label: fmt.Sprintf("Sold · %d", counts["sold"]), Swatch: "so"},
+	}
+
+	gallery := []GItem{
+		{Img: "card-landmark.jpg", Alt: "Entrance signboard of Landmark City", Num: "01",
+			Title: "Entrance signboard", Cap: "— approval number displayed at the gate"},
+		{Img: "proof-roads.jpg", Alt: "Internal roads laid between plots", Num: "02",
+			Title: "Site progress", Cap: "— internal roads & plot kerbs"},
+		{Img: "proof-stakes.jpg", Alt: "Plot edges and road kerbs marked out", Num: "03",
+			Title: "Plot edges", Cap: "— marked out for site visits"},
+		{Img: "proof-visit.jpg", Alt: "Site visit group walking the layout", Num: "04",
+			Title: "Site visits", Cap: "— walk the ground before you buy"},
+		{Img: "proof-launch.jpg", Alt: "Launch event canopy", Num: "05",
+			Title: "Launch day", Cap: "— booking event under canopy"},
+		{Img: "proof-build.jpg", Alt: "Boundary construction work", Num: "06",
+			Title: "Work in progress", Cap: "— boundary development"},
+	}
+
+	locRows := []LRow{
+		{Name: "Nearest bus stop", Sub: "Minjur bus stand*", Dist: "~2 km*"},
+		{Name: "Schools & colleges", Sub: "Ponneri school cluster*", Dist: "~4 km*"},
+		{Name: "Hospital", Sub: "Govt. hospital, Ponneri*", Dist: "~6 km*"},
+		{Name: "Railway / metro station", Sub: "Ponneri railway station*", Dist: "~5 km*"},
+		{Name: "Market & daily needs", Sub: "Minjur market*", Dist: "~2 km*"},
+	}
+
+	return map[string]any{
+		"Name":       "Landmark City",
+		"Loc":        "Chennai North* · DTCP approved",
+		"Sub":        "24 plots around a central spine road — extent ~9.8 acres*. A concept render stands in for project photography until client assets are supplied.",
+		"AvailBadge": fmt.Sprintf("%d of %d plots available*", counts["available"], counts["all"]),
+		"Plots":      plots,
+		"PlotsJSON":  string(plotsJSON),
+		"Legend":     legend,
+		"Gallery":    gallery,
+		"LocRows":    locRows,
+	}
+}
+
+// enIN formats an integer with western comma grouping — matches
+// toLocaleString('en-IN') for the sample range (≤ 9,999).
+func enIN(n int) string {
+	s := strconv.Itoa(n)
+	if len(s) <= 3 {
+		return s
+	}
+	var b strings.Builder
+	for i, r := range s {
+		if i > 0 && (len(s)-i)%3 == 0 {
+			b.WriteByte(',')
+		}
+		b.WriteRune(r)
+	}
+	return b.String()
+}
+
 // Page carries everything the layout and page templates need.
 type Page struct {
 	Title       string
 	HeaderSolid bool // solid header (pages without a dark hero)
 	Data        any
+
+	// per-artifact wordings (footer compliance line + floating
+	// sample-data chip differ between the approved screens)
+	DtcpNote    string
+	SampleFlag  string
+	FlagDismiss bool // 03-detail's chip carries a dismiss button
 }
 
 var pages = map[string]string{
-	"home":        "home.html",
-	"projects":    "projects.html",
-	"placeholder": "placeholder.html",
+	"home":           "home.html",
+	"projects":       "projects.html",
+	"project-detail": "project-detail.html",
+	"placeholder":    "placeholder.html",
 }
 
 var tmpl map[string]*template.Template
@@ -229,7 +413,9 @@ func homeData() map[string]any {
 // per page so every page can define its own "main" template.
 func loadTemplates() error {
 	tmpl = make(map[string]*template.Template)
-	base, err := template.ParseFS(os.DirFS("assets"),
+	base, err := template.New("base").Funcs(template.FuncMap{
+		"add": func(a, b int) int { return a + b },
+	}).ParseFS(os.DirFS("assets"),
 		"html/layout.html", "html/partials.html")
 	if err != nil {
 		return fmt.Errorf("parse shared templates: %w", err)
@@ -376,15 +562,29 @@ func projects(w http.ResponseWriter, r *http.Request) {
 		rows[i].Even = i%2 == 1
 	}
 	render(w, r, "projects", Page{
-		Title: "Projects — VSS Associates",
-		Data:  map[string]any{"Rows": rows},
+		Title:      "Projects — VSS Associates",
+		Data:       map[string]any{"Rows": rows},
+		DtcpNote:   "DTCP status published per project — approved before offered",
+		SampleFlag: "extents, counts, prices marked * await client supply",
+	})
+}
+
+func projectDetail(w http.ResponseWriter, r *http.Request) {
+	render(w, r, "project-detail", Page{
+		Title:       "Landmark City — VSS Associates",
+		Data:        projectDetailData(),
+		DtcpNote:    "All layouts DTCP approved — approval numbers published per project",
+		SampleFlag:  "plot facts, prices & stats marked * await client supply",
+		FlagDismiss: true,
 	})
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
 	render(w, r, "home", Page{
-		Title: "VSS Associates — DTCP-approved plots in Chennai",
-		Data:  homeData(),
+		Title:      "VSS Associates — DTCP-approved plots in Chennai",
+		Data:       homeData(),
+		DtcpNote:   "✓ Every layout sold here is DTCP approved — approval numbers published on each project page.",
+		SampleFlag: "values marked * await client supply",
 	})
 }
 
@@ -431,7 +631,13 @@ func main() {
 		}
 		notFound(w, r)
 	})
-	mux.Handle("GET /projects/{slug}", placeholder("Project"))
+	mux.HandleFunc("GET /projects/{slug}", func(w http.ResponseWriter, r *http.Request) {
+		if r.PathValue("slug") == "landmark-city" {
+			projectDetail(w, r)
+			return
+		}
+		placeholder("Project")(w, r)
+	})
 	mux.Handle("GET /about", placeholder("About"))
 	mux.Handle("GET /contact", placeholder("Contact"))
 	mux.Handle("GET /admin/login", placeholder("Staff login"))

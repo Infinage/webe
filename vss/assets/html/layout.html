@@ -6,11 +6,20 @@
       <meta content="width=device-width, initial-scale=1" name="viewport">
       <title>{{ .Title }}</title>
   <meta name="description" content="VSS Associates — DTCP-approved plotted developments in Chennai. Four layouts, clear titles, support from first visit to patta.">
-      <link href="/assets/css/index.css?v=2" rel="stylesheet">
+      <link href="/assets/css/index.css?v=4" rel="stylesheet">
       <script src="/assets/js/datastar.js" type="module"></script>
-      <script defer src="/assets/js/app.js?v=4"></script>
+      <script defer src="/assets/js/app.js?v=5"></script>
+      <noscript>
+        <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
+      </noscript>
     </head>
-    <body>
+    <body
+      {{/* 03 artifact: clicking anywhere outside the plan/panel/zoom controls
+          deselects the plot; Esc too. $sel only exists on the project-detail
+          page — the undefined guard keeps this inert everywhere else. */}}
+      data-on:click="$sel !== undefined && !(evt.target.closest && evt.target.closest('#plotmap, .zoomctl, #plotPanel')) && ($sel = '')"
+      data-on:keydown__escape="$sel !== undefined && ($sel = '')"
+    >
       <a
         class="absolute left-4 top-[-48px] z-[200] rounded-b-sm bg-navy px-[18px] py-3 text-[13px] font-bold leading-none text-white transition-[top] duration-150 focus:top-0"
         href="#main"
@@ -22,7 +31,11 @@
       {{ template "footer" . }}
       <div
         class="fixed bottom-[18px] right-[18px] z-[90] hidden max-w-[320px] rounded-full bg-navy/92 px-4 py-[10px] text-center text-xs font-semibold leading-[1.4] text-white shadow-lift min-[701px]:block"
-      ><b class="text-gold-soft">Sample data</b> — values marked * await client supply</div>
+      ><b class="text-gold-soft">Sample data</b> — {{ .SampleFlag }}{{ if .FlagDismiss }} <button
+        type="button" aria-label="Dismiss sample-data note"
+        class="ml-[10px] inline-block h-[20px] w-[20px] cursor-pointer rounded-full border-0 bg-white/12 text-[12px] leading-none text-white align-middle"
+        onclick="this.closest('.fixed').remove()"
+      >✕</button>{{ end }}</div>
     </body>
   </html>
 {{ end }}

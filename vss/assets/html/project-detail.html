@@ -1,0 +1,283 @@
+{{ define "main" }}
+
+  {{/* ================= FIXED HERO ================= */}}
+  {{/* Kendrick-style persistent background: the aerial photo stays fixed
+      while opaque content bands slide over it. On ≤900px it becomes
+      absolute (page scrolls normally, artifact media query). */}}
+  <div
+    class="fixed inset-0 z-0 max-md:absolute max-md:h-[92vh]"
+    data-signals="{_y: 0}"
+    data-init="$_y = window.scrollY;"
+    data-on:scroll__window__passive="$_y = window.scrollY;"
+  >
+    <div
+      class="absolute inset-0 bg-cover bg-[position:center_70%]"
+      style="background-image:url('/assets/img/aerial-band.jpg')"
+      role="img"
+      aria-label="Aerial concept render — plots around a central spine road"
+    ></div>
+    <div
+      class="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,29,51,.55),rgba(8,29,51,.18)_40%,rgba(8,29,51,.72)_100%)]"
+      data-style:filter="'brightness(' + Math.max(.55, 1 - $_y/(innerHeight*1.4)) + ')'"
+    ></div>
+    <div
+      class="relative z-[2] mx-auto flex h-full max-w-[1280px] flex-col justify-end px-[28px] pb-[130px] text-white max-md:pb-[90px]"
+      data-style:opacity="Math.max(0, 1 - $_y/(innerHeight*.5))"
+    >
+      <p class="m-0 mb-[14px] text-[12.5px] font-bold uppercase tracking-[.2em] text-gold-soft">{{ .Data.Loc }}</p>
+      <h1 class="m-0 text-[clamp(52px,7.5vw,96px)] font-extrabold leading-[.98] tracking-[-.025em]">{{ .Data.Name }}</h1>
+      <p class="mt-4 max-w-[46ch] text-[17px] text-white/85">
+        {{ .Data.Sub }}
+      </p>
+      <div class="absolute bottom-[40px] right-[28px] flex items-center gap-3 text-[12px] font-bold uppercase tracking-[.18em] text-white/80">
+        <span>Scroll</span>
+        <span class="relative h-[56px] w-px overflow-hidden bg-white/50 after:absolute after:top-[-100%] after:left-0 after:h-1/2 after:w-full after:bg-gold after:animate-drip"></span>
+      </div>
+    </div>
+  </div>
+
+  {{/* ================= CONTENT SLIDES OVER THE HERO ================= */}}
+  {{/* Click-outside/Esc deselect lives on <body> in layout.html — the artifact
+      uses a document-level listener, which also covers header/footer. */}}
+  <div class="relative z-[2] mt-[100vh] max-md:mt-[92vh]">
+
+    {{/* ================= QUICK FACTS BAND ================= */}}
+    <section class="rounded-tl-lg rounded-tr-[14px] bg-card shadow-[0_-18px_50px_rgba(8,29,51,.25)]" id="top">
+      <div class="mx-auto grid max-w-[1200px] grid-cols-5 px-7 pt-10 pb-[34px] max-md:grid-cols-2 max-md:gap-[18px] max-md:p-[28px_22px]">
+        <div class="border-l border-line pl-[26px] first:border-l-0 first:pl-0 max-md:border-l-0 max-md:p-0">
+          <div class="mb-[6px] text-[11px] font-bold uppercase tracking-[.12em] text-ink-faint">Extent</div>
+          <div class="text-[20px] leading-[1.2] font-extrabold text-navy tabular-nums">~9.8 acres<em class="font-bold text-brass not-italic">*</em></div>
+        </div>
+        <div class="border-l border-line pl-[26px] first:border-l-0 first:pl-0 max-md:border-l-0 max-md:p-0">
+          <div class="mb-[6px] text-[11px] font-bold uppercase tracking-[.12em] text-ink-faint">Plots</div>
+          <div class="text-[20px] leading-[1.2] font-extrabold text-navy tabular-nums">24<em class="font-bold text-brass not-italic">*</em></div>
+        </div>
+        <div class="border-l border-line pl-[26px] first:border-l-0 first:pl-0 max-md:border-l-0 max-md:p-0">
+          <div class="mb-[6px] text-[11px] font-bold uppercase tracking-[.12em] text-ink-faint">Plot size</div>
+          <div class="text-[20px] leading-[1.2] font-extrabold text-navy tabular-nums">1,200 – 2,400 sq.ft<em class="font-bold text-brass not-italic">*</em></div>
+        </div>
+        <div class="border-l border-line pl-[26px] first:border-l-0 first:pl-0 max-md:border-l-0 max-md:p-0">
+          <div class="mb-[6px] text-[11px] font-bold uppercase tracking-[.12em] text-ink-faint">Price</div>
+          <div class="text-[20px] leading-[1.2] font-extrabold text-navy tabular-nums">₹1,850/sq.ft<em class="font-bold text-brass not-italic">*</em></div>
+        </div>
+        <div class="border-l border-line pl-[26px] first:border-l-0 first:pl-0 max-md:border-l-0 max-md:p-0">
+          <div class="mb-[6px] text-[11px] font-bold uppercase tracking-[.12em] text-ink-faint">Status</div>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-green-bg px-3 py-1.5 text-[11.5px] font-bold tracking-[.08em] text-green uppercase">{{ .Data.AvailBadge }}</span>
+        </div>
+      </div>
+    </section>
+
+    {{/* ================= AVAILABILITY — INTERACTIVE SITE PLAN ================= */}}
+    <section class="bg-card py-24 max-md:py-16" id="availability">
+      <div class="relative mx-auto max-w-[1200px] px-7 max-md:px-5">
+        <div class="reveal mb-12 max-w-[640px]">
+          <p class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-brass">Availability</p>
+          <h2 class="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-navy">Choose your plot<br>before you visit.</h2>
+          <p class="max-w-[62ch] text-[18px] leading-[1.65] text-ink-soft">Live plot states from the site plan. Select any plot to see its number, area, facing and price — then book a site visit and walk it in person.</p>
+        </div>
+
+        <div
+          class="grid grid-cols-[2.2fr_1fr] items-start gap-9 max-md:grid-cols-1"
+          data-signals="{ filter: 'all', sel: '', plots: {{ .Data.PlotsJSON }} }"
+        >
+          {{/* ---- map card ---- */}}
+          <div class="reveal overflow-hidden rounded-md bg-card shadow-card">
+            <div class="flex flex-wrap items-center justify-start gap-[30px] border-b border-line px-[22px] py-4">
+              <span class="text-[17px] font-extrabold text-navy">Site plan — {{ .Data.Name }}<em class="font-bold text-brass not-italic">*</em></span>
+              <span class="ml-auto flex flex-wrap gap-2 text-[12.5px] font-semibold text-ink-soft" role="group" aria-label="Filter plots by status">
+                {{ range .Data.Legend }}
+                  <button
+                    type="button"
+                    class="cursor-pointer rounded-full border border-line bg-white px-3 py-[7px] font-semibold text-ink-soft transition-colors duration-150 hover:border-[rgba(14,42,71,.4)] hover:text-navy [&.is-on]:bg-[rgba(201,162,75,.14)] [&.is-on]:border-gold [&.is-on]:text-navy"
+                    data-on:click="$filter = '{{ .Key }}'"
+                    data-class:is-on="$filter === '{{ .Key }}'"
+                  >
+                    {{ if .Swatch }}
+                      <i class="mr-[6px] inline-block h-[11px] w-[11px] rounded-[3px] align-[-1px] {{ if eq .Swatch "av" }}border-[1.4px] border-navy bg-white{{ else if eq .Swatch "rs" }}border-[1.4px] border-gold bg-[#f3e7c9]{{ else }}bg-[#14314f]{{ end }}"></i>
+                    {{ end }}{{ .Label }}
+                  </button>
+                {{ end }}
+              </span>
+            </div>
+            <div class="mapwrap relative">
+              <svg
+                id="plotmap"
+                class="block h-auto w-full cursor-grab [touch-action:pan-y] active:cursor-grabbing"
+                viewBox="0 0 1060 430"
+                role="group"
+                aria-label="Interactive plot layout of {{ .Data.Name }}"
+              >
+                {{/* roads */}}
+                <rect x="52" y="30" width="44" height="370" fill="#eceadf"></rect>
+                <text x="74" y="219" transform="rotate(-90 74 215)" text-anchor="middle" fill="#a9a99a" font-size="10" font-weight="700" letter-spacing=".14em" font-family="Manrope, sans-serif">WEST ROAD*</text>
+                <rect x="964" y="30" width="44" height="370" fill="#eceadf"></rect>
+                <text x="986" y="219" transform="rotate(-90 986 215)" text-anchor="middle" fill="#a9a99a" font-size="10" font-weight="700" letter-spacing=".14em" font-family="Manrope, sans-serif">EAST ROAD*</text>
+                <rect x="96" y="185" width="868" height="60" fill="#eceadf"></rect>
+                <text x="530" y="219" text-anchor="middle" fill="#a9a99a" font-size="13" font-weight="700" letter-spacing=".14em" font-family="Manrope, sans-serif">SPINE ROAD*</text>
+
+                {{ range .Data.Plots }}
+                  {{/* status class spelled out — Tailwind scans literals, not expressions */}}
+                  <g
+                    class="plot{{ if eq .St "available" }} plot--available{{ else if eq .St "reserved" }} plot--reserved{{ else }} plot--sold{{ end }}"
+                    data-n="{{ .N }}"
+                    role="button"
+                    aria-label="Plot {{ .N }}, {{ .St }}"
+                    data-class:plot--selected="$sel === '{{ .N }}'"
+                    data-class:plot--dimmed="$filter !== 'all' && $plots.{{ .N }}.st !== $filter"
+                    data-attr:aria-disabled="$filter !== 'all' && $plots.{{ .N }}.st !== $filter ? 'true' : 'false'"
+                    data-attr:tabindex="$filter !== 'all' && $plots.{{ .N }}.st !== $filter ? '-1' : '0'"
+                    data-on:click="$sel = '{{ .N }}'; vssFocusPlot('{{ .N }}')"
+                    data-on:keydown__prevent="(evt.key === 'Enter' || evt.key === ' ') && ($sel = '{{ .N }}') && vssFocusPlot('{{ .N }}')"
+                  >
+                    <rect x="{{ .X }}" y="{{ .Y }}" width="68" height="112" rx="4"></rect>
+                    <text x="{{ add .X 34 }}" y="{{ add .Y 52 }}" text-anchor="middle" class="plot-label{{ if eq .St "sold" }} plot-label--sold{{ end }}">{{ .N }}</text>
+                    <text x="{{ add .X 34 }}" y="{{ add .Y 68 }}" text-anchor="middle" class="plot-label{{ if eq .St "sold" }} plot-label--sold{{ end }}" opacity=".65" font-size="8">{{ .AreaFmt }} sft</text>
+                  </g>
+                {{ end }}
+              </svg>
+              <noscript>
+                <p class="px-[14px] py-[10px] text-[13.5px] text-ink-soft">The interactive site plan needs JavaScript — for plot availability without it, call <a class="font-bold text-navy" href="tel:04442087913">044 4208 7913</a>.</p>
+              </noscript>
+              <span
+                class="zoomctl absolute right-[14px] bottom-[14px] z-[3] flex gap-1.5 opacity-0 shadow-lift transition-opacity duration-[350ms] pointer-events-none focus-within:pointer-events-auto focus-within:opacity-100 [&.zoomctl--live]:pointer-events-auto [&.zoomctl--live]:opacity-100"
+              >
+                <button class="zbtn h-[34px] w-[34px] cursor-pointer rounded-sm border border-line bg-white text-[16px] leading-none font-bold text-navy shadow-card transition-colors duration-150 hover:bg-paper" id="zin" type="button" aria-label="Zoom in">+</button>
+                <button class="zbtn h-[34px] w-[34px] cursor-pointer rounded-sm border border-line bg-white text-[16px] leading-none font-bold text-navy shadow-card transition-colors duration-150 hover:bg-paper" id="zout" type="button" aria-label="Zoom out">−</button>
+                <button class="zbtn h-[34px] w-auto cursor-pointer rounded-sm border border-line bg-white px-3 text-[12px] font-bold text-navy shadow-card transition-colors duration-150 hover:bg-paper" id="zfit" type="button">Fit</button>
+              </span>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-line px-[22px] py-[14px] text-[13px] text-ink-soft">
+              <span class="font-bold text-brass">Site plan geometry is illustrative — dimensions &amp; orientation await client supply*</span>
+              <span>Scroll to zoom · drag to pan · tap a plot for details</span>
+            </div>
+          </div>
+
+          {{/* ---- plot detail panel ---- */}}
+          <aside
+            id="plotPanel"
+            class="reveal rounded-md bg-navy-deep px-[30px] pt-[30px] pb-[34px] text-[#eef2f6] shadow-lift [transition-delay:.12s]! sticky top-[96px] [&.is-empty]:flex [&.is-empty]:flex-col [&.is-empty]:justify-center [&.is-empty]:min-h-[545px] max-md:static max-sm:mx-auto max-sm:w-[min(420px,calc(100%-28px))] min-[901px]:absolute min-[901px]:right-[28px] min-[901px]:top-1/2 min-[901px]:w-[calc((100%-36px)/3.2)] min-[901px]:-translate-y-1/2"
+            data-class:is-empty="!$sel"
+          >
+            <div class="flex flex-col justify-center text-[15px] leading-[1.7] text-white/65" data-show="!$sel">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#c9a24b" stroke-width="1.4" class="mb-[18px] block opacity-80"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 3v18"/></svg>
+              <p class="m-0"><b class="text-white">Select a plot</b> on the site plan to see its number, dimensions, area, facing and price.</p>
+              <p class="m-0 mt-3 text-[13.5px] font-bold text-brass">All plot figures are sample data awaiting client supply.*</p>
+            </div>
+            <div data-show="$sel">
+              <div class="mb-2 text-[11px] font-bold uppercase tracking-[.16em] text-gold-soft">Plot details</div>
+              <h3 class="m-0 mb-[6px] text-[30px] font-extrabold tracking-[-.02em] text-white" data-text="$sel">A1</h3>
+              <div class="my-5 grid border-t border-white/14">
+                <div class="flex justify-between border-b border-white/14 py-[11px] text-[14.5px]"><span class="font-semibold text-white/60">Status</span><span class="font-bold tabular-nums" data-text="$plots[$sel].status">Available</span></div>
+                <div class="flex justify-between border-b border-white/14 py-[11px] text-[14.5px]"><span class="font-semibold text-white/60">Dimensions</span><span class="font-bold tabular-nums" data-text="$plots[$sel].dims">30 × 40 ft*</span></div>
+                <div class="flex justify-between border-b border-white/14 py-[11px] text-[14.5px]"><span class="font-semibold text-white/60">Area</span><span class="font-bold tabular-nums" data-text="$plots[$sel].area">1,200 sq.ft</span></div>
+                <div class="flex justify-between border-b border-white/14 py-[11px] text-[14.5px]"><span class="font-semibold text-white/60">Facing</span><span class="font-bold tabular-nums" data-text="$plots[$sel].facing">West road</span></div>
+                <div class="flex justify-between border-b border-white/14 py-[11px] text-[14.5px]"><span class="font-semibold text-white/60">Corner plot</span><span class="font-bold tabular-nums" data-text="$plots[$sel].corner ? 'Yes' : 'No'">No</span></div>
+                <div class="flex justify-between border-b border-white/14 py-[11px] text-[14.5px]"><span class="font-semibold text-white/60">Price</span><span class="font-bold tabular-nums" data-text="$plots[$sel].price">₹22.2 lakh</span></div>
+              </div>
+              <a class="btn btn-gold w-full justify-center" data-text="$plots[$sel].cta" data-on:click__prevent="@get('/contact')" href="/contact">Reserve for a site visit</a>
+              <p class="mt-3 text-center text-xs text-white/50" data-text="$plots[$sel].note">Prices exclude registration &amp; statutory charges.*</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    {{/* ================= STORY ================= */}}
+    <section class="bg-paper py-24 max-md:py-16">
+      <div class="mx-auto grid max-w-[1200px] grid-cols-[1fr_1.1fr] items-center gap-[72px] px-7 max-md:grid-cols-1 max-md:gap-9">
+        <div class="reveal">
+          <p class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-brass">The layout</p>
+          <h2 class="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-navy">Planned around the way the ground actually works.</h2>
+          <p class="max-w-[62ch] text-[18px] leading-[1.65] text-ink-soft">Landmark City was laid out with a single central spine road, plots on either side, and internal roads wide enough for two vehicles to pass. Boundaries are staked and fenced — the plan you see here is the ground you walk.</p>
+          <blockquote class="mt-6 border-l-2 border-[color-mix(in_srgb,var(--color-gold)_45%,transparent)] pl-[18px] text-[15px] leading-[1.6] font-normal text-ink-soft italic">Approved before it was offered — the DTCP number is published on the signboard at the gate.</blockquote>
+          <p class="mt-[18px] text-[13.5px] text-ink-soft">Narrative copy pending client confirmation — supplied facts will replace this text.<em class="font-bold text-brass not-italic">*</em></p>
+        </div>
+        {{/* stacked polaroids: hover straightens + enlarges either card */}}
+        <div class="reveal relative pb-14 [transition-delay:.12s]! max-md:pb-10">
+          <img class="rounded-md border-8 border-card shadow-lift -rotate-[2.2deg] transition-[transform,box-shadow] duration-[350ms] hover:z-[3] hover:rotate-0 hover:scale-[1.09] hover:shadow-[0_28px_60px_rgba(8,29,51,.35)]" src="/assets/img/aerial-rows.jpg" alt="Aerial concept render — plot rows and internal roads">
+          <img class="absolute right-[-30px] bottom-0 z-[2] w-1/2 cursor-pointer rounded-md border-8 border-card shadow-lift rotate-[2.4deg] transition-[transform,box-shadow] duration-[350ms] hover:z-[3] hover:rotate-0 hover:scale-[1.09] hover:shadow-[0_28px_60px_rgba(8,29,51,.35)] max-md:right-2" src="/assets/img/proof-stakes.jpg" alt="Real photo — staked plot boundaries at a VSS layout">
+        </div>
+      </div>
+    </section>
+
+    {{/* ================= GALLERY ================= */}}
+    <section class="bg-card py-24 max-md:py-16">
+      <div class="mx-auto max-w-[1200px] px-7 max-md:px-5">
+        <div class="reveal mb-12 max-w-[640px]">
+          <p class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-brass">From the ground</p>
+          <h2 class="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-navy">Real photographs,<br>not renderings.</h2>
+        </div>
+        {{/* one-card-per-click carousel, same arrow vocabulary as the home page */}}
+        <div class="galwrap relative">
+          <button class="galnav prev absolute top-[122px] left-[-12px] z-[3] grid h-[46px] w-[46px] cursor-pointer place-items-center rounded-full border border-line bg-[rgba(253,251,246,.92)] text-[18px] leading-none text-navy shadow-lift transition-[transform,border-color,color] duration-200 hover:scale-[1.06] hover:border-gold hover:text-brass disabled:cursor-default disabled:opacity-35 disabled:transform-none max-md:top-[88px] max-md:h-10 max-md:w-10" type="button" aria-label="Previous photos">‹</button>
+          <div class="gal reveal flex gap-[18px] overflow-x-auto pb-[14px] [scroll-snap-type:x_mandatory] [&::-webkit-scrollbar]:h-[8px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-line">
+            {{ range .Data.Gallery }}
+              <figure class="group m-0 shrink-0 basis-[clamp(300px,34vw,420px)] snap-start transition-transform duration-300 hover:-translate-y-[6px]">
+                <img class="h-[280px] w-full rounded-md object-cover shadow-card transition-transform duration-[350ms] group-hover:scale-[1.025] max-md:h-[210px]" src="/assets/img/{{ .Img }}" alt="{{ .Alt }}">
+                <figcaption class="mt-[10px] flex items-baseline gap-2 text-[12.5px] text-ink-soft"><span class="text-[11px] font-extrabold text-brass">{{ .Num }}</span> <b class="font-bold text-navy">{{ .Title }}</b> {{ .Cap }}</figcaption>
+              </figure>
+            {{ end }}
+          </div>
+          <button class="galnav next absolute top-[122px] right-[-12px] z-[3] grid h-[46px] w-[46px] cursor-pointer place-items-center rounded-full border border-line bg-[rgba(253,251,246,.92)] text-[18px] leading-none text-navy shadow-lift transition-[transform,border-color,color] duration-200 hover:scale-[1.06] hover:border-gold hover:text-brass disabled:cursor-default disabled:opacity-35 disabled:transform-none max-md:top-[88px] max-md:h-10 max-md:w-10" type="button" aria-label="More photos">›</button>
+        </div>
+        <p class="mt-[14px] text-[13px] text-ink-soft">Photographs from VSS site records — captions to be confirmed with the client.<em class="font-bold text-brass not-italic">*</em></p>
+      </div>
+    </section>
+
+    {{/* ================= LOCATION ================= */}}
+    <section class="bg-navy py-24 text-[#eef2f6] max-md:py-16">
+      <div class="mx-auto grid max-w-[1200px] grid-cols-[1fr_1.25fr] items-center gap-16 px-7 max-md:grid-cols-1 max-md:gap-9">
+        <div class="reveal">
+          <p class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-gold-soft">Location</p>
+          <h2 class="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-white">North Chennai,<br>on the growth side of town.</h2>
+          <p class="max-w-[62ch] text-[18px] leading-[1.65] text-white/78">Reachable from the city via the northern corridor. Distances below are indicative — confirmed figures will be published after verification.</p>
+        </div>
+        <div class="reveal [transition-delay:.12s]!">
+          <div class="grid border-t border-white/16">
+            {{ range .Data.LocRows }}
+              <div class="flex items-baseline justify-between gap-5 border-b border-white/16 px-0.5 py-[15px]">
+                <span class="text-[15.5px] font-bold text-white">{{ .Name }}<small class="mt-0.5 block text-[12px] font-medium text-white/55">{{ .Sub }}</small></span>
+                <span class="text-[15px] font-extrabold whitespace-nowrap text-gold-soft tabular-nums">{{ .Dist }}</span>
+              </div>
+            {{ end }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {{/* ================= VERIFICATION ================= */}}
+    <section class="bg-card py-24 max-md:py-16">
+      <div class="mx-auto grid max-w-[1200px] grid-cols-[.9fr_1.1fr] items-center gap-16 px-7 max-md:grid-cols-1 max-md:gap-9">
+        <div class="reveal relative">
+          <img class="rounded-md shadow-lift" src="/assets/img/card-landmark.jpg" alt="Landmark City entrance signboard showing DTCP approval">
+          <span class="absolute bottom-4 left-4 rounded-full bg-[rgba(8,29,51,.82)] px-[14px] py-2 text-[11.5px] font-bold uppercase tracking-[.1em] text-white backdrop-blur-sm">Signboard at the gate</span>
+        </div>
+        <div class="reveal [transition-delay:.12s]!">
+          <p class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-brass">Verification</p>
+          <h2 class="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-navy">Approved before it's offered.</h2>
+          <ul class="m-0 mt-[26px] grid list-none gap-4 p-0">
+            <li class="flex gap-4 text-[15px] text-ink-soft"><span class="grid h-[34px] w-[34px] flex-none place-items-center rounded-full bg-green-bg font-extrabold text-green">✓</span><span><b class="font-bold text-ink">DTCP approval</b> — the layout is approved by the Directorate of Town &amp; Country Planning before release.</span></li>
+            <li class="flex gap-4 text-[15px] text-ink-soft"><span class="grid h-[34px] w-[34px] flex-none place-items-center rounded-full bg-green-bg font-extrabold text-green">✓</span><span><b class="font-bold text-ink">Clear title</b> — paperwork verified by the same office that sells you the plot.</span></li>
+            <li class="flex gap-4 text-[15px] text-ink-soft"><span class="grid h-[34px] w-[34px] flex-none place-items-center rounded-full bg-green-bg font-extrabold text-green">✓</span><span><b class="font-bold text-ink">Patta support</b> — registration and patta transfer handled end to end.</span></li>
+          </ul>
+          <div class="mt-[22px] rounded-sm border-[1.5px] border-dashed border-gold bg-paper px-5 py-4 text-[14px] text-ink-soft">Approval number: to be published — the number visible on the signboard photograph is awaiting client confirmation.<em class="font-bold text-brass not-italic">*</em></div>
+        </div>
+      </div>
+    </section>
+
+    {{/* ================= CTA ================= */}}
+    <section class="relative overflow-hidden text-white">
+      <div class="absolute inset-0 bg-cover bg-center opacity-[.38] saturate-[.9]" style="background-image:url('/assets/img/aerial-close.jpg')" aria-hidden="true"></div>
+      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,29,51,.88),rgba(8,29,51,.55))]"></div>
+      <div class="relative z-[2] mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-10 px-7 py-[88px]">
+        <div class="reveal">
+          <p class="m-0 mb-[14px] text-xs font-bold uppercase tracking-[.16em] text-gold-soft">Final step</p>
+          <h2 class="m-0 text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.12] tracking-[-.015em] text-white">Walk your plot<br>before you pay a rupee.</h2>
+        </div>
+        <div class="reveal flex flex-wrap items-center gap-4">
+          <a class="btn btn-gold" data-on:click__prevent="@get('/contact')" href="/contact">Book a Visit</a>
+          <a class="btn btn-ghost-dark tabular-nums" href="tel:04442087913">Call 044-4208 7913</a>
+        </div>
+      </div>
+    </section>
+  </div>{{ end }}
