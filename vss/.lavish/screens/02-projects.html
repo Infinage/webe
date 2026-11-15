@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSS Associates — Screen 02 · Projects Index</title>
+<link rel="stylesheet" href="meridian.css?v=13">
+<style>
+/* ============ page-specific: projects index ============ */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,560..640&display=swap');
+
+/* hero — same photo-treatment vocabulary as about/contact (aerial photo + warm paper veil) */
+/* hero matches 05-about exactly: same 678px height, same 1100px text column, text starts at the same point */
+.phero { position: relative; overflow: hidden; color: var(--navy); padding: 180px 0 110px; min-height: 678px; }
+/* hero photo = the supplied empty-layout shot (client, R28): roads cut, saplings staked.
+   Anchor 40% so the road bend and tree line sit behind the headline zone, not raw sky. */
+.phero .bg { position: absolute; inset: 0; background: url('assets/hero-layout.jpg') center 40% / cover no-repeat; }
+/* hero veil adopts the approved About grammar (R29, client call): navy gradient from the left
+   over the photo — dark where the headline sits, clearing to the right so the layout reads —
+   instead of the cream wash. The glass header keeps its white logo and links over it. */
+.phero .veil { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(8,29,51,.82) 0%, rgba(8,29,51,.62) 40%, rgba(8,29,51,.18) 66%, rgba(8,29,51,.08) 100%), linear-gradient(180deg, rgba(8,29,51,.30), rgba(8,29,51,0) 38%, rgba(8,29,51,.55)); }
+/* hero follows the approved About/Contact grammar: eyebrow → one large headline → one short sentence; no second column, no divider */
+.phero .wrap { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+/* headline voice matches About (R29): white sans with a gold italic serif counter-voice */
+.phero .eyebrow { color: var(--gold-soft); font-weight: 800; font-size: 13px; letter-spacing: .18em; margin-bottom: 26px; }
+.phero h1 { font: 800 clamp(40px, 5.4vw, 68px)/1.05 'Manrope', sans-serif; color: #fff; letter-spacing: -.03em; margin: 0; }
+.phero h1 .accent { font: italic 600 .98em/1 'Fraunces', Georgia, serif; color: var(--gold); letter-spacing: -.01em; }
+.phero .sub { margin: 18px 0 0; max-width: 54ch; font-size: 17px; line-height: 1.6; color: rgba(255,255,255,.85); }
+
+/* aerial strip */
+/* editorial project rows — containerised like the About page; rounded cards with breathing gap */
+.rows { display: grid; gap: 44px; max-width: var(--maxw); margin: 0 auto; padding: 0 28px 44px; }
+/* wide screens: breathing room between the hero and the first card — at 1300+ the deck
+   breakout already reaches ~26px above the card tops, so the fan needs air (client tweak, R30) */
+@media (min-width:1300px) { .rows { padding-top: 34px; } }
+/* first project card overlaps the hero seam only — never rises above the hero text (ends ~441px) */
+.rows .prow:first-child { margin-top: -100px; position: relative; z-index: 1; }
+.prow { display: grid; grid-template-columns: 1.15fr 1fr; min-height: 460px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); }
+.prow:nth-child(even) { direction: rtl; }
+.prow:nth-child(even) > * { direction: ltr; }
+.prow .media { position: relative; min-height: 320px; background: var(--card); }
+/* photo deck — a stack of gallery cards per project: front photo on a white mat,
+   a second photo card, a tan card and a white card fanned out behind (client reference).
+   The whole deck keeps the odd/even mild tilt; the deck is a link to the project page. */
+/* deck breaks out of the card frame: it spills past the card's outer edge
+   (left on odd rows, right on even rows) and above/below, while staying clear
+   of the info column. Frost/ghost numerals sit ≥26px inside media, so the
+   20px blur bleed stays within bounds even with clipping removed. */
+.deck { position: absolute; inset: -22px 26px -22px -26px; z-index: 30; display: block; text-decoration: none; transform: rotate(1deg); transition: transform .7s ease; }
+div.deck { cursor: default; }
+.prow:nth-child(even) .deck { inset: -22px -26px -22px 26px; transform: rotate(-1deg); }
+/* deck cards read as a rounded stack at every size (client, R22) — radius bumped 12→16 so the
+   rounding is unmistakable on small screens where the stack is at its densest */
+.deck-card { position: absolute; inset: 0; border-radius: var(--r-lg); box-shadow: 0 10px 26px rgba(8,29,51,.14); }
+.deck-l4 { background: #fff; transform: rotate(7deg) translate(14px, 10px); }
+/* l3 peek band reads as a white-bordered print too (client, R23) — the white frame is painted
+   as an inset box-shadow ring, which follows the card's rounded corners exactly */
+.deck-l3 { background: #d8a578; transform: rotate(-4deg) translate(-12px, -14px); box-shadow: inset 0 0 0 6px #fff; }
+/* l2 photo layer must share the deck's full footprint (like the l3/l4 cards) — intrinsic-ratio sizing made each project's peek band a different size (R17) */
+/* every deck photo reads as a white-bordered print, like the front card (client request, R21):
+   padding paints the border inside the img box; object-fit covers the content box within it */
+img.deck-l2 { width: 100%; height: 100%; object-fit: cover; background: #fff; padding: 10px; box-sizing: border-box; transform: rotate(4deg) translate(12px, -10px); }
+/* zoom belongs to the deck itself: hover over the images zooms in, hover out zooms out (R22 —
+   client: "image will zoom when you hover over them only"). Row hover keeps only its shadow.
+   The quiet row's unlinked div.deck zooms too (client, R23 — the zoom is about the imagery,
+   not the link); only its cursor stays default. :has() lets the frosted numeral track the
+   deck's zoom instead of snapping. */
+.prow { transition: box-shadow .55s ease; }
+.prow.rv.in:hover, .prow:not(.rv):hover { box-shadow: 0 18px 44px rgba(8,29,51,.10); }
+.deck:hover, a.deck:focus-visible { transform: rotate(1deg) scale(1.04); }
+.prow:nth-child(even) .deck:hover, .prow:nth-child(even) a.deck:focus-visible { transform: rotate(-1deg) scale(1.04); }
+.prow:has(.deck:hover) .media::before, .prow:has(a.deck:focus-visible) .media::before { transform: scale(1.04); }
+.deck-front { margin: 0; background: #fff; padding: 10px; overflow: hidden; box-shadow: 0 14px 34px rgba(8,29,51,.18); }
+/* photo's inner curve matches the mat's 16px exactly — an 8px inner radius read square against
+   the rounded mat at breakout widths (client, R27); parallel curves keep the print frame even */
+.deck-front img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--r-lg); display: block; transition: transform .7s ease; }
+a.deck:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: var(--r-lg); }
+/* one-line dot legend so the strip vocabulary is defined on this page, not only on 03 */
+.dots-legend { max-width: var(--maxw); margin: 0 auto; padding: 0 28px 44px; font-size: 12.5px; color: var(--ink-soft); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dots-legend .dots { flex: none; }
+.prow .media .ghostnum {
+  position: absolute; right: 44px; bottom: 72px; z-index: 2;
+  font-size: clamp(96px, 10vw, 150px); font-weight: 800; line-height: 1;
+  color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,.75);
+  letter-spacing: -.03em; pointer-events: none;
+}
+/* frosted interior: a blurred copy of the row's own photo, clipped to the glyph shapes,
+   layered exactly under the outlined digits (no pill, no border).
+   Each .media carries data-num="NN" and --frost: url(same image as its img). */
+.prow .media::before {
+  content: attr(data-num);
+  position: absolute; inset: 26px; z-index: 1; pointer-events: none;
+  box-sizing: border-box;
+  display: flex; align-items: flex-end; justify-content: flex-end;
+  padding-right: 18px; padding-bottom: 46px;
+  transition: transform .7s ease; /* frost tracks the deck's motion instead of snapping */
+  font-size: clamp(96px, 10vw, 150px); font-weight: 800; line-height: 1;
+  letter-spacing: -.03em; color: transparent;
+  background-image: var(--frost); background-size: cover; background-position: center;
+  -webkit-background-clip: text; background-clip: text;
+  filter: blur(20px) brightness(1.12);
+}
+.prow .info { padding: 56px 64px; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+.prow .info .loc { font-size: 12.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+.prow h2 { margin: 0; font-size: clamp(26px, 2.6vw, 34px); font-weight: 800; letter-spacing: -.015em; color: var(--navy); }
+.prow .badges { display: flex; gap: 10px; flex-wrap: wrap; }
+.prow .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-sm); overflow: hidden; }
+.prow .specs div { background: var(--card); padding: 12px 16px; }
+.prow .specs .k { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 3px; }
+.prow .specs .v { font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.prow .foot { display: flex; align-items: center; gap: 22px; row-gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+.prow .foot .btn-text { white-space: nowrap; }
+.prow .avail { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); white-space: nowrap; }
+@media (max-width: 900px) { .prow .avail { white-space: normal; flex-wrap: wrap; } }
+.prow .avail .dots { display: inline-flex; gap: 2px; }
+.prow .avail .dots i { width: 6px; height: 6px; border-radius: 2px; background: var(--line); }
+.prow .avail .dots i.on { background: var(--green); }
+.prow .avail .dots i.rsv { background: var(--gold); }
+
+/* quiet row (project being prepared) — media framed exactly like cards 01–03 */
+.prow.quiet { min-height: 0; background: transparent; border-bottom: 1px solid var(--line); }
+
+/* reveal-on-scroll — same grammar as 03/05 */
+.rv { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
+.rv.in { opacity: 1; transform: none; }
+.rv-d1 { transition-delay: .12s; }
+@media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } .prow { transition: none; } .deck:hover, a.deck:focus-visible, .prow:nth-child(even) .deck:hover, .prow:has(.deck:hover) .media::before { transform: none; transition: none; } }
+@media (max-width: 900px) {
+  .phero { padding: 130px 0 60px; min-height: 0; }
+  /* mobile runs the same navy veil as desktop, like About (R29) — one grammar, no special case */
+
+
+  .prow, .prow:nth-child(even) { grid-template-columns: 1fr; direction: ltr; }
+  /* mobile keeps the desktop-style hero overlap (client-tuned depth) */
+  .rows .prow:first-child { margin-top: -40px; }
+  /* full-bleed mobile cards; the deck may overflow the card like on desktop — client prefers the
+     breakout look (R22). The card sits 28px inside the viewport (.rows padding): the box breaks
+     out 6px sideways, and the rotated fan layers add ≈13px more, keeping ≈9px of clear viewport
+     margin at 768px — the widest this layout runs — so nothing gets flat-cut at the edge. */
+  .prow { border-radius: var(--r-lg); }
+  .deck, .prow:nth-child(even) .deck { inset: -16px -6px; }
+  /* the first card overlaps the hero (-40px margin-top) — keep its deck's top inside the card
+     so the fanned stack never climbs into the hero photo on small screens (client, R22) */
+  .rows .prow:first-child .deck { inset: 18px -6px -16px; }
+  .deck-l4 { transform: rotate(5deg) translate(6px, 4px); }
+  .deck-l3 { transform: rotate(-3deg) translate(-5px, -6px); }
+  img.deck-l2 { transform: rotate(3deg) translate(5px, -4px); } /* size follows the same 100%×100% rule (R17) */
+  /* all rows share the same media strip height on mobile — the quiet row's deck must match the others.
+     641–900px is the md column layout: 240px read ~1:4 against the row width (client, R22) — bump to 300px.
+     Phones ≤560px pin back to 240px below, where the narrower screen restores the proportion. */
+  .prow.quiet .media { min-height: 300px; }
+  .prow .media, .prow .info { min-width: 0; }
+  .prow .media { min-height: 300px; }
+  .prow .info { padding: 32px 24px 40px; }
+  .prow .specs { grid-template-columns: 1fr 1fr; }
+  .prow .specs div { min-width: 0; }
+  .prow .specs .v { white-space: normal; }
+}
+/* between 900 and 1200px the 2×2 spec cells get tight — allow values to wrap before they clip;
+   md screens also get a taller media strip so the decks don't read squat between breakpoints (R19) */
+@media (max-width: 1100px) and (min-width: 901px) {
+  .prow .specs .v { white-space: normal; }
+  .prow .media { min-height: 400px; }
+  .prow { min-height: 500px; }
+  /* md fact cells are too narrow for label+value side by side (~9.8/acres fragments) —
+     stack them like the ≤560px rule does (R19) */
+  .prow .specs div { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .prow .specs .k { margin-bottom: 0; }
+  /* the nowrap availability strip's text overflows its column at md by ~12px */
+  .prow .avail { white-space: normal; flex-wrap: wrap; }
+}
+/* below ~1300px the viewport margins are thinner than the deck's breakout fan — contain the
+   deck here like on mobile, or the fanned cards poke past the screen edge (R19) */
+@media (max-width: 1299px) and (min-width: 901px) {
+  .deck, .prow:nth-child(even) .deck { inset: 18px; }
+  /* the desktop layer offsets make l2/l3 poke past the card edge and cover the card's rounded
+     corner, squaring off the media box at md — use the mobile offsets here (R20) */
+  .deck-l4 { transform: rotate(5deg) translate(6px, 4px); }
+  .deck-l3 { transform: rotate(-3deg) translate(-5px, -6px); }
+  img.deck-l2 { transform: rotate(3deg) translate(5px, -4px); }
+}
+/* phones: stack label over value inside each fact cell — the flex row squeezes the 11px
+   label into mid-word wraps (EXTEN/T*) and 4-line values at 390px */
+@media (max-width: 560px) {
+  .prow .media, .prow.quiet .media { min-height: 240px; } /* phone strips stay 240px — the md bump is for tablets */
+  .prow .specs > div { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .prow .specs .k { margin-bottom: 0; }
+}
+</style>
+<noscript>
+  <style>
+    /* no-JS fail-safes: reveal rows render immediately; header goes solid for contrast
+       (glass state is white-on-content once scrolled, and its toggle is JS-only) */
+    .rv { opacity: 1; transform: none; }
+    .site-header { background: var(--paper); color: var(--navy); box-shadow: 0 1px 0 var(--line); }
+    .site-header--glass .brand { color: var(--navy); }
+    .site-header .brand-logo { background-image: url('assets/brand-red.png'); }
+  </style>
+</noscript>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header site-header--glass" id="siteHeader">
+  <div class="bar">
+    <a class="brand" href="01-home.html"><span class="brand-logo" role="img" aria-label="VSS Associates"></span></a>
+    <nav class="nav">
+      <a href="02-projects.html">Projects</a>
+      <a href="05-about.html">About</a>
+      <a href="06-contact.html">Contact</a>
+    </nav>
+    <a class="btn btn-gold btn-sm nav-visit" href="06-contact.html">Book a Visit</a>
+    <a class="nav-call" href="tel:04442087913" aria-label="Call VSS Associates on 044 4208 7913"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.9 15.9 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.57 3.6 1 1 0 01-.25 1z"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+  <!-- typographic hero — same grammar as approved About/Contact heroes -->
+  <section class="phero">
+    <div class="bg" role="img" aria-label="Aerial view of a VSS layout"></div>
+    <div class="veil"></div>
+    <div class="wrap">
+      <p class="eyebrow">Projects</p>
+      <h1>Ground worth<br>standing on.<br><span class="accent">Verified first.</span></h1>
+      <p class="sub">Every layout is DTCP approved before it is offered — the approval number is published on each project page.</p>
+    </div>
+  </section>
+
+  <!-- editorial project rows -->
+  <section class="rows">
+
+    <!-- 01 Landmark City -->
+    <article class="prow rv">
+      <div class="media" data-num="01" style="--frost: url('assets/card-landmark.jpg')">
+        <a class="deck" href="03-project-detail.html">
+          <span class="deck-card deck-l4" aria-hidden="true"></span>
+          <span class="deck-card deck-l3" aria-hidden="true"></span>
+          <img class="deck-card deck-l2" src="assets/proof-roads.jpg" width="1100" height="495" alt="">
+          <figure class="deck-card deck-front"><img src="assets/card-landmark.jpg" width="1200" height="590" alt="Landmark City — DTCP approved signboard at the layout entrance"></figure>
+        </a>
+        <span class="ghostnum" data-num="01" aria-hidden="true">01</span>
+      </div>
+      <div class="info">
+        <p class="loc">Chennai North<em class="req">*</em></p>
+        <h2>Landmark City</h2>
+        <div class="badges">
+          <span class="badge badge-dtcp"><span class="tick">✓</span> DTCP approved</span>
+          <span class="badge badge-status">15 available<em class="req">*</em></span>
+        </div>
+        <div class="specs">
+          <div><div class="k">Extent<em class="req">*</em></div><div class="v">~9.8 acres</div></div>
+          <div><div class="k">Plots<em class="req">*</em></div><div class="v">24</div></div>
+          <div><div class="k">Plot size<em class="req">*</em></div><div class="v">600–2,400 sq.ft</div></div>
+          <div><div class="k">Price<em class="req">*</em></div><div class="v">₹1,850 / sq.ft</div></div>
+        </div>
+        <div class="foot">
+          <a class="btn-text" href="03-project-detail.html">View project <span class="arr">→</span></a>
+          <span class="avail">Availability <span class="dots" role="img" aria-label="15 available · 3 reserved · 6 sold" title="15 available · 3 reserved · 6 sold">
+            <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="rsv"></i><i class="rsv"></i><i class="rsv"></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </span> 15 of 24 available<em class="req">*</em></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 02 Srivelan Nagar -->
+    <article class="prow rv rv-d1">
+      <div class="media" data-num="02" style="--frost: url('assets/card-srivelan.jpg')">
+        <a class="deck" href="03-project-detail.html">
+          <span class="deck-card deck-l4" aria-hidden="true"></span>
+          <span class="deck-card deck-l3" aria-hidden="true"></span>
+          <img class="deck-card deck-l2" src="assets/proof-site-2.jpg" width="1100" height="495" alt="">
+          <figure class="deck-card deck-front"><img src="assets/card-srivelan.jpg" width="1200" height="1078" alt="Srivelan Nagar — DTCP approved entrance signboard"></figure>
+        </a>
+        <span class="ghostnum" data-num="02" aria-hidden="true">02</span>
+      </div>
+      <div class="info">
+        <p class="loc">Chennai North<em class="req">*</em></p>
+        <h2>Srivelan Nagar</h2>
+        <div class="badges">
+          <span class="badge badge-dtcp"><span class="tick">✓</span> DTCP approved</span>
+          <span class="badge badge-status">Now selling*</span>
+        </div>
+        <div class="specs">
+          <div><div class="k">Extent<em class="req">*</em></div><div class="v">~7.4 acres</div></div>
+          <div><div class="k">Plots<em class="req">*</em></div><div class="v">36</div></div>
+          <div><div class="k">Plot size<em class="req">*</em></div><div class="v">800–2,600 sq.ft</div></div>
+          <div><div class="k">Price<em class="req">*</em></div><div class="v">On request</div></div>
+        </div>
+        <div class="foot">
+          <a class="btn-text" href="03-project-detail.html">View project <span class="arr">→</span></a>
+          <span class="avail">Availability <span class="dots" role="img" aria-label="28 available · 4 reserved · 4 sold" title="28 available · 4 reserved · 4 sold">
+            <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="rsv"></i><i class="rsv"></i><i class="rsv"></i><i class="rsv"></i><i></i><i></i><i></i><i></i>
+          </span> 28 of 36 available<em class="req">*</em></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 03 Chandrayan Nagar -->
+    <article class="prow rv">
+      <div class="media" data-num="03" style="--frost: url('assets/card-chandrayan.jpg')">
+        <a class="deck" href="03-project-detail.html">
+          <span class="deck-card deck-l4" aria-hidden="true"></span>
+          <span class="deck-card deck-l3" aria-hidden="true"></span>
+          <img class="deck-card deck-l2" src="assets/proof-site-1.jpg" width="1100" height="495" alt="">
+          <figure class="deck-card deck-front"><img src="assets/card-chandrayan.jpg" width="1200" height="738" alt="Chandrayan Nagar — DTCP approved entrance signboard"></figure>
+        </a>
+        <span class="ghostnum" data-num="03" aria-hidden="true">03</span>
+      </div>
+      <div class="info">
+        <p class="loc">Thiruppalai Nadu<em class="req">*</em></p>
+        <h2>Chandrayan Nagar</h2>
+        <div class="badges">
+          <span class="badge badge-dtcp"><span class="tick">✓</span> DTCP approved</span>
+          <span class="badge badge-status">Limited plots<em class="req">*</em></span>
+        </div>
+        <div class="specs">
+          <div><div class="k">Extent<em class="req">*</em></div><div class="v">~6.2 acres</div></div>
+          <div><div class="k">Plots<em class="req">*</em></div><div class="v">30</div></div>
+          <div><div class="k">Plot size<em class="req">*</em></div><div class="v">600–1,800 sq.ft</div></div>
+          <div><div class="k">Price<em class="req">*</em></div><div class="v">On request</div></div>
+        </div>
+        <div class="foot">
+          <a class="btn-text" href="03-project-detail.html">View project <span class="arr">→</span></a>
+          <span class="avail">Availability <span class="dots" role="img" aria-label="19 available · 4 reserved · 7 sold" title="19 available · 4 reserved · 7 sold">
+            <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="rsv"></i><i class="rsv"></i><i class="rsv"></i><i class="rsv"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </span> 19 of 30 available<em class="req">*</em></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 04 OMR — details being prepared -->
+    <article class="prow quiet rv rv-d1">
+      <div class="media" data-num="04" style="--frost: url('assets/aerial-close.jpg')">
+        <!-- decorative only: the unlaunched row's deck must not link anywhere (its project page doesn't exist yet) -->
+        <div class="deck">
+          <span class="deck-card deck-l4" aria-hidden="true"></span>
+          <span class="deck-card deck-l3" aria-hidden="true"></span>
+          <img class="deck-card deck-l2" src="assets/aerial-rows.jpg" width="1500" height="1050" alt="">
+          <figure class="deck-card deck-front"><img src="assets/aerial-close.jpg" width="1250" height="900" alt="Aerial concept render — new layout under preparation"></figure>
+        </div>
+        <span class="ghostnum" data-num="04" aria-hidden="true">04</span>
+      </div>
+      <div class="info">
+        <p class="loc">OMR, Chennai</p>
+        <h2>Fourth layout — in preparation</h2>
+        <p class="muted" style="max-width:52ch; margin:0">A new VSS layout on the OMR corridor is being prepared for release. Facts and approval details will be published here once verified — nothing is offered until then.</p>
+        <div class="specs">
+          <div><div class="k">Extent</div><div class="v">—</div></div>
+          <div><div class="k">Plots</div><div class="v">—</div></div>
+          <div><div class="k">Approval</div><div class="v">In process</div></div>
+          <div><div class="k">Price</div><div class="v">On request</div></div>
+        </div>
+        <div class="foot">
+          <a class="btn btn-outline btn-sm" href="06-contact.html">Register interest</a>
+        </div>
+      </div>
+    </article>
+    <p class="dots-legend"><span class="dots" aria-hidden="true"><i class="on"></i><i class="rsv"></i><i></i></span> Per-row availability — <b>green</b> available · <b>gold</b> reserved · <b>grey</b> sold. Counts are sample data<em class="req">*</em>.</p>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-band">
+    <div class="bg" aria-hidden="true" style="background-image:url('assets/aerial-rows.jpg')"></div>
+    <div class="veil"></div>
+    <div class="container inner">
+      <div>
+        <p class="eyebrow eyebrow--light">Site visits</p>
+        <h2 class="h-section" style="margin:0; color:#fff">Walk the ground<br>before you decide.</h2>
+      </div>
+      <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap">
+        <a class="btn btn-gold" href="06-contact.html">Book a Visit</a>
+        <a class="btn btn-ghost-dark tnum" href="tel:04442087913">Call 044-4208 7913</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container cols">
+    <div>
+      <div class="brandline"><a class="brand" href="01-home.html" aria-label="VSS Associates"><span class="brand-logo" aria-hidden="true"></span></a></div>
+      <p style="font-size:14.5px; max-width:38ch; opacity:.75">DTCP-approved plotted developments in Chennai. Approved before it's offered — visit the ground before you decide.</p>
+    </div>
+    <div>
+      <h3>Projects</h3>
+      <ul>
+        <li><a href="03-project-detail.html">Landmark City</a></li>
+        <li><a href="03-project-detail.html">Srivelan Nagar</a></li>
+        <li><a href="03-project-detail.html">Chandrayan Nagar</a></li>
+        <li><span aria-current="page">All projects</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Company</h3>
+      <ul>
+        <li><a href="05-about.html">About</a></li>
+        <li><a href="06-contact.html">Contact</a></li>
+        <li><a class="staff" href="07-admin-login.html">Staff login</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Visit us</h3>
+      <p class="addr">No. 11, West Karikalan Street, 1st Floor,<br>(Opp. to SBI Bank), Adambakkam,<br>Chennai – 600 088</p>
+      <p class="addr">044-4208 7913<br>contact@vssassociates.com</p>
+      <p class="addr" style="opacity:.7">Mon – Sat · 8.00 – 18.00<br>Sunday closed</p>
+    </div>
+  </div>
+  <div class="container legal">
+    <span>© VSS Associates, Chennai</span>
+    <span class="dtcp">DTCP status published per project — approved before offered</span>
+  </div>
+</footer>
+
+<div class="sample-flag"><b>Sample data</b> — extents, counts, prices marked * await client supply</div>
+
+
+
+<section class="rationale">
+  <div class="container">
+    <h2><span>02</span> · Projects index — design rationale</h2>
+    <ol>
+      <li><b>Borrowed:</b> Hosachiguru's project pages use full-bleed alternating photo/info bands with restrained editorial type; the quiet "coming" entry mirrors their project-list restraint. The oversized ghost numerals are our typographic signature device (also on 01/03).</li>
+      <li><b>Adapted:</b> instead of Hosachiguru's farm-imagery, each row is anchored by the real VSS signboard photo (proof, not mood); specs live in a compact 2×2 fact table (extent / plots / plot size / price) with every client-unconfirmed figure asterisked; availability for Landmark City is a real 24-dot plot-state strip, not an invented marketing claim.</li>
+      <li><b>Improves on the previous proposal:</b> the old grid of identical cards read as a catalogue. Alternating full-width rows create a rhythm of image→text→image; the quiet OMR row (dashed, dimmed render, "nothing is offered until then") turns a missing project into a credibility statement. The typographic hero + full-width aerial strip gives the page an opening moment instead of jumping straight into listings.</li>
+      <li><b>Client to supply:</b> confirmed extents, plot counts, size ranges, prices &amp; availability counts per project; DTCP approval numbers (visible on signboard photos but unconfirmed); OMR project status/extent; location naming (Thiruppalai Nadu*); a wide landscape photo per project if hero-grade imagery is wanted on rows.</li>
+    </ol>
+    <h2><span>R</span> · Review revisions</h2>
+    <ol>
+      <li><b>R1:</b> availability dot-strip (available / reserved / sold, tooltip breakdown, “N of M available*”) added to rows 01–03; ghostnum raised (bottom 96→72px) so it clears the photo edge; image vertical fill fixed; header active-underline removed; dev-server note added.</li>
+      <li><b>R2:</b> quiet row 04 given the same hairline bottom border as other cards; footer row (button + availability) wraps cleanly instead of breaking mid-text; mobile ≤900px: availability and spec values wrap instead of clipping, and the row grid no longer blows out horizontally (pre-existing bug — page had 147px sideways scroll at 390px).</li>
+      <li><b>R3:</b> hero top padding reduced (172→112px desktop, 130→104px mobile) to remove the dead band under the sticky header; quiet row 04's dark overlay rectangle removed so its photo framing matches cards 01–03 (natural photo, white mat, same ghostnum stroke).</li>
+      <li><b>R4:</b> hero top padding trimmed further (112→92px desktop, 104→84px mobile) per second whitespace comment; row 04 media height raised to the shared 320px and its beige spec cells made white, so the card now matches cards 01–03 structurally — only the copy (“in preparation”, em-dash values) distinguishes it.</li>
+      <li><b>R5:</b> hero padding reverted to R3 values (112px/104px) on client request; ghost numerals (01–04) briefly trialled with gradient fills (gold, then glossy white) at client request — both rejected as too prominent, so the numerals were reverted to the original fully transparent glyphs with a plain 1.5px white outline. <i>(Hero padding was later re-unified at 180px/110px with the About/Contact heroes — see R7/R8; the 112px/104px figures here are historical.)</i></li>
+      <li><b>R6:</b> client liked the glass of the “Call 044-4208 7913” button but wanted it only inside the numerals, not as a pill: each media box now carries a frosted layer (a blurred copy of the row’s own photo, clipped to the digit shapes via background-clip:text) sitting exactly under the outlined digits; blur tuned 7px→12px→20px at client request. Accepted at 20px. Verified on rows 01–04 at 1280px and 390px.</li>
+      <li><b>R7:</b> hero photo must cover the entire text — veil now stays light (≤ .5 alpha) through 82% of the hero height and washes to paper only in the last stretch behind the card seam; first project card overlap reduced −150→−100px so it never rises above the hero text (hero text ends ~441px).</li>
+      <li><b>R8:</b> hero height unified across About/Contact/Projects at About's height (678px at 1280 desktop, min-height 678, mobile min-height:0); text start position and column also matched to About — same 1100px text column (was 1200px container) and content starts at the hero's 180px top padding, not bottom-aligned.</li>
+      <li><b>R9:</b> project rows containerised per client request — the rows section no longer hugs the viewport edges: .rows is constrained to the shared 1200px max-width with 28px side padding (About-page grammar), so page background shows on either side; aerial strip and CTA band stay full-bleed.</li>
+      <li><b>R10:</b> rows softened into cards — 14px corner radius on each project card (1px hairline border, 28px vertical gap replacing the shared edge hairline) and 10px rounded corners on the row photos, which now carry a mild alternating tilt (+1° odd rows, −1° even rows, kept on hover while scaling). Rows fade/rise in once on first scroll into view (same reveal grammar as 03/05; even cards staggered .12s).</li>
+      <li><b>R11:</b> each row's single photo became a stacked gallery deck per client reference — a white-matted front card with the project's lead photo, a second gallery photo card, a tan card and a white card fanned out behind it (the 4th/backmost card white, as requested); the mild odd/even tilt now applies to the whole deck. Front photo keeps the hover zoom; frost digits sit over the front card as before.</li>
+      <li><b>R12:</b> the deck is now a plain link to the project detail page — the gallery is decorative for the index (no arrow button; real galleries will live on the project page) — and the project rows fade in on scroll like the other pages.</li>
+      <li><b>R13:</b> brought into the approved About/Contact family per client brief: hero split removed — no second column, no vertical gold rule, no DTCP explanation block; hero is now the same single-column grammar (eyebrow → one large headline → one short supporting sentence, 1100px column, 678px height). Sample-data note stays only in the floating pill. Project rows kept: already full-bleed alternating photo/info bands with large imagery, badges, restrained meta and quiet “View project” actions. Verified against About + Contact at 1280px. <i>(Renumbered from a duplicate “R9” entry.)</i></li>
+      <li><b>R22:</b> zoom-and-round round — the zoom belongs to the deck itself: hovering the images zooms in, hover out zooms out (row hover keeps only its shadow); the tap-to-zoom experiment for mobile was dropped as overcomplicated. The deck now overflows the card on mobile like on desktop (client prefers the breakout look; sideways breakout ±6px + the rotated fan stay ≈9px inside the 28px viewport margin), except the first card, which overlaps the hero — its deck top stays inside. Deck card radius bumped 12→16px so the rounding reads at small scale, and the md column media strip grows 240→300px (was reading ~1:4).</li>
+      <li><b>R23:</b> fourth live-feedback round — the tan peek band (deck layer 3) reads as a white-bordered print like every other card: a 6px white ring is painted as an inset box-shadow, so it follows the card's 16px rounding exactly (the l3 band was the only layer whose white frame was missing). And the quiet row's unlinked deck now zooms on hover like every other deck — the zoom belongs to the imagery, not to the link.</li>
+      <li><b>R21:</b> third client live-feedback round — hover now zooms the image deck itself (scale 1.04, each row keeps its own tilt; the frosted numeral tracks the zoom) instead of scaling the whole card, which was the previous pass's misread; and every fanned photo behind the front card now reads as a white-bordered print like the front (10px white padding painted inside the img box), across all screen sizes.</li>
+      <li><b>R20:</b> md-visibility round — between 901–1299px the deck is contained (mobile offsets, 18px inset) because thin viewport margins let the breakout fan poke past the screen edge (a stray white dash at md); the md media box gets the front card's rounded corners (the white mat pseudo-radius was 0 at md, squaring the corners); and the hover selector was re-scoped to outrank the reveal rule so hover stays alive after rows reveal.</li>
+      <li><b>R19:</b> md fit round — media strip grows to 400px and fact cells stack label-over-value between 901–1100px (cells were too narrow side-by-side, fragmenting values like “~9.8/acres”); the nowrap availability strip may wrap at md; the deck containment extends to 1299px so the fan never crosses the viewport edge on thin-margin desktops.</li>
+      <li><b>R18:</b> mobile spec stack round — below 560px each fact cell stacks its label over its value (the 11px flex-row label wrapped mid-word at 390px: “EXTEN/T*”); spec values wrap normally inside cells; header CTA hides ≤420px.</li>
+      <li><b>R17:</b> deck geometry round — the second photo card (l2) shares the deck's full footprint like the tan/white cards (intrinsic-ratio sizing made each project's peek band a different size); mobile keeps tighter layer offsets; md media strip height raised.</li>
+      <li><b>R16:</b> second client live-feedback round — row gap increased 28→44px; the photo deck now paints above every white card (z-index 30 — layers can overlap a neighbouring card without hiding behind it); on mobile the first card no longer pulls up into the hero (it overlapped), the deck's stacked layers use tighter offsets so the stack reads cleanly at small sizes, and the quiet row's media strip grows to 280px.</li>
+      <li><b>R15:</b> client live-feedback round — the photo deck now breaks out of the card frame (spills ~22–26px past the card's outer edge and vertically; outward on each row's photo side, still clear of the info column; contained again on mobile where full-bleed cards would clip it at the viewport). Card/media clipping removed — safe because the frost and ghost numerals sit ≥26px inside the media box, within the 20px blur bleed. Row 04's "Register interest" is now a true pill button (it was missing the shared <code>.btn</code> base class, rendering as a square-edged stub).</li>
+      <li><b>R14:</b> critique fix round — the row-01 badge now states “15 available*” (was the contradictory “3 plots remaining*” vs the 15/24 dot strip); footer legal reworded to “DTCP status published per project — approved before offered” so it no longer claims all layouts are approved while row 04 is in process; the unlaunched row's deck is no longer a link (it pointed at Landmark City's page); staff-login link opacity .5→.75 (contrast 3.9→~7:1); footer headings h4→h3 (fixes the h2→h4 skip); dot strips carry aria-labels + an on-page dot legend; scarcity badges unified to the neutral chip style (green stays verification-only, brass stays reserved); asterisks wrapped in brass .req marks and the bare “Chennai North” locations starred; ghost numerals aria-hidden; width/height on all gallery-card images; frost layer tracks the hover zoom smoothly; spec values may wrap between 901–1100px instead of clipping; CTA eyebrow “Final step”→“Site visits”; “All projects” footer link made a current-page span; dead .ghostnum::before rule removed; sample-data pill drops into the flow under the footer on small screens. Shared: header scrim strengthened .42→.55 (worst-case nav contrast), footer link hit-areas +2px, reduced-motion handling for deck/zoom/frost, verified desktop + 390px.</li>
+          <li><b>R24–R26:</b> live-feedback rounds — the quiet row’s unlinked deck zooms on hover like every other deck (the zoom belongs to the imagery, not the link); mobile deck drop-spacing tuned to zero at the client’s size call; the reveal no longer sticks when the cursor rests on a deck mid-reveal (hover completes the reveal instead of freezing it), and the second row’s stagger delay was removed on both breakpoints.</li>
+      <li><b>R27:</b> rounding round — the front photo’s inner curve was 8px inside a 16px white mat, so at breakout widths the photo’s corners read square inside a rounded print. The inner curve now matches the mat exactly (parallel 16px curves), keeping the print frame even all the way round.</li>
+          <li><b>R28:</b> hero photo swapped to the client-supplied empty-layout shot (roads cut, saplings staked) — served as an optimised JPEG (1.0MB vs the 9.3MB PNG) for load speed; anchored at 40% so the road bend and tree line read behind the headline zone.</li>
+          <li><b>R29:</b> hero re-voices onto the approved About grammar (client call — “revert the header, look at how the about page does it”): navy gradient veil over the layout photo instead of the cream wash, white headline with “Verified first.” as the gold italic Fraunces counter-voice, gold eyebrow, white sub; the glass header keeps its original white logo and links. All header scrims and the red-logo/navy-link overrides from this round were reverted.</li>
+          <li><b>R30:</b> project list nudged down 34px on screens ≥1300px (client tweak) — at wide sizes the hero is taller and the deck breakout reaches above the card tops, so the first card needs air; below 1300 the list sits as before.</li>
+    </ol>
+  </div>
+</section>
+<script>
+/* header: transparent over hero, solid after scroll — same as 01-home */
+(() => {
+  const header = document.getElementById('siteHeader');
+  const onScroll = () => header.classList.toggle('site-header--solid', window.scrollY > 60);
+  onScroll(); addEventListener('scroll', onScroll, { passive: true });
+})();
+</script>
+<script>
+/* reveal-on-scroll — same grammar as 03/05 */
+(() => {
+  const io = new IntersectionObserver(es => es.forEach(x => {
+    if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); }
+  }), { threshold: .18 });
+  document.querySelectorAll('.rv').forEach(x => io.observe(x));
+})();
+</script>
+
+</body>
+</html>

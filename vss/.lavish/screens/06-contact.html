@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>06 · Contact / Book a Visit — VSS Associates</title>
+<link rel="stylesheet" href="meridian.css?v=13">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,560..640&display=swap');
+/* ============ 06 · contact / site visit ============ */
+body { background: var(--paper); }
+
+/* hero matches 05-about exactly: same 678px height, same 1100px text column, text starts at the same point */
+.ct-hero {
+  position: relative; color: var(--navy); overflow: hidden;
+  padding: 180px 0 110px;
+  min-height: 678px;
+}
+.ct-hero .bg { position: absolute; inset: 0; background: url('assets/aerial-close.jpg') center 30% / cover no-repeat; }
+/* hero veil: About/02 grammar (R-ct1) with a 06-specific tweak (R-ct2, client call): the bottom
+   shade is lifted from .55 to .05 so the navy "Reach us directly" card no longer merges into the
+   hero behind it; the horizontal dark-left component keeps the headline zone protected */
+.ct-hero .veil { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(8,29,51,.82) 0%, rgba(8,29,51,.62) 40%, rgba(8,29,51,.18) 66%, rgba(8,29,51,.08) 100%), linear-gradient(180deg, rgba(8,29,51,.30), rgba(8,29,51,0) 38%, rgba(8,29,51,.05)); }
+.ct-hero .wrap { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+.ct-hero .eyebrow { margin-bottom: 26px; color: var(--gold-soft); font-weight: 800; font-size: 13px; letter-spacing: .18em; }
+.ct-hero h1 {
+  font: 800 clamp(40px, 5.4vw, 68px)/1.05 'Manrope', sans-serif;
+  color: #fff;
+  letter-spacing: -.03em; margin: 0; max-width: 14ch;
+}
+/* em accent: italic serif (Fraunces) in theme gold — same grammar as 05-about */
+.ct-hero h1 em {
+  font: italic 600 .98em/1 'Fraunces', Georgia, serif;
+  color: var(--gold); letter-spacing: -.01em;
+}
+.ct-hero p { margin: 18px 0 0; max-width: 54ch; font-size: 17px; line-height: 1.6; color: rgba(255,255,255,.85); }
+
+.ct-body {
+  position: relative; z-index: 3;
+  max-width: 1180px; margin: -50px auto 0; padding: 0 28px 110px;
+  display: grid; grid-template-columns: 1.15fr .85fr; gap: 30px; align-items: stretch;
+}
+
+/* ---- form card ---- */
+.formcard {
+  background: #fff; border-radius: var(--r-lg); box-shadow: var(--shadow-lift);
+  padding: clamp(28px, 3.5vw, 48px);
+}
+.formcard .f-kicker { margin-bottom: 14px; }
+.formcard h2 { font: 800 26px/1.2 'Manrope', sans-serif; color: var(--navy); letter-spacing: -.01em; margin: 0; }
+.formcard .f-sub { color: var(--ink-soft); font-size: 14.5px; margin: 8px 0 0; }
+form { margin-top: 28px; display: grid; gap: 20px; }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.fld label {
+  display: block; font: 700 12px/1 'Manrope', sans-serif; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px;
+}
+.fld input, .fld select, .fld textarea {
+  width: 100%; font: 500 15px/1.4 'Manrope', sans-serif; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 14px 16px; outline: none; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.fld input:focus, .fld select:focus, .fld textarea:focus {
+  border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,75,.18);
+  background: #fff;
+}
+.fld textarea { min-height: 110px; resize: vertical; }
+.fld select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%230e2a47' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat: no-repeat; background-position: right 16px center;
+  padding-right: 40px;
+}
+.fconsent { display: flex; gap: 12px; align-items: flex-start; }
+.fconsent input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--gold); flex: none; }
+.fconsent label { font: 500 12.5px/1.5 'Manrope', sans-serif; color: var(--ink-soft); text-transform: none; letter-spacing: 0; margin: 0; }
+.formfoot { display: flex; align-items: center; gap: 20px; margin-top: 6px; flex-wrap: wrap; }
+.formfoot .btn { flex: 1; justify-content: center; min-width: 220px; }
+.formfoot .call {
+  font: 700 14px/1.2 'Manrope', sans-serif; color: var(--navy); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+}
+.formfoot .call .no { color: var(--gold-deep); }
+.fpriv { font: 500 11.5px/1.5 'Manrope', sans-serif; color: var(--ink-faint); margin: 0; }
+.ferr { display: none; font: 600 12px/1.4 'Manrope', sans-serif; color: #b3372c; margin: 6px 0 0; }
+.ferr--on { display: block; }
+.fld input[aria-invalid="true"], .fld select[aria-invalid="true"] { border-color: #b3372c; }
+.fsuccess { display: none; padding: 0; }
+.fsuccess--on { display: block; }
+.fsuccess p { margin: 12px 0 0; max-width: 44ch; color: var(--ink-soft); font-size: 14.5px; line-height: 1.6; }
+.fsuccess .call { font: 700 14px/1.2 'Manrope', sans-serif; color: var(--navy); text-decoration: none; }
+.fsuccess .call .no { color: var(--gold-deep); }
+
+/* ---- side info ---- */
+.ct-side { display: grid; gap: 22px; grid-template-rows: 1fr 1fr; }
+.ct-side .sidecard { height: 100%; box-sizing: border-box; }
+.sidecard {
+  background: var(--navy); color: #fff; border-radius: var(--r-lg); padding: 30px 28px;
+  box-shadow: var(--shadow-lift);
+}
+.sidecard h3 {
+  font: 700 11.5px/1 'Manrope', sans-serif; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--gold-soft); margin: 0 0 20px;
+}
+.ilist { display: grid; gap: 16px; }
+.irow { display: flex; gap: 14px; align-items: flex-start; }
+.irow .ic {
+  width: 38px; height: 38px; border-radius: var(--r-sm); flex: none;
+  background: rgba(201,162,75,.15); border: 1px solid rgba(201,162,75,.35);
+  display: grid; place-items: center;
+}
+.irow .ic svg { width: 17px; height: 17px; stroke: var(--gold-soft); fill: none; stroke-width: 1.8; }
+.irow .k { font: 600 11px/1.4 'Manrope', sans-serif; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+.irow .v { font: 600 15px/1.45 'Manrope', sans-serif; color: #fff; margin-top: 2px; }
+.irow .v .req { color: var(--gold-soft); font-size: 12.5px; font-weight: 500; }
+
+.sidecard--steps { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+.sidecard--steps h3 { color: var(--gold-deep); }
+.steps { counter-reset: st; display: grid; gap: 0; }
+.step { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.step:last-child { border-bottom: 0; }
+.step::before {
+  counter-increment: st; content: counter(st, decimal-leading-zero);
+  font: 800 13px/1.6 'Manrope', sans-serif; color: var(--gold-deep); min-width: 26px;
+}
+.step .t { font: 700 14.5px/1.3 'Manrope', sans-serif; color: var(--navy); }
+.step .d { font: 500 12.5px/1.5 'Manrope', sans-serif; color: var(--ink-soft); margin-top: 2px; }
+
+
+/* ---- responsive ---- */
+@media (max-width: 900px) {
+  .ct-body { grid-template-columns: 1fr; margin-top: -56px; }
+  .frow { grid-template-columns: 1fr; }
+  .ct-hero { padding-top: 130px; min-height: 0; }
+}
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header site-header--glass" id="siteHeader">
+  <div class="bar">
+    <a class="brand" href="01-home.html"><span class="brand-logo" role="img" aria-label="VSS Associates"></span></a>
+    <nav class="nav">
+      <a href="02-projects.html">Projects</a>
+      <a href="05-about.html">About</a>
+      <a href="06-contact.html">Contact</a>
+    </nav>
+    <a class="btn btn-gold btn-sm nav-visit" href="06-contact.html">Book a Visit</a>
+    <a class="nav-call" href="tel:04442087913" aria-label="Call VSS Associates on 044 4208 7913"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.9 15.9 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.57 3.6 1 1 0 01-.25 1z"/></svg></a>
+  </div>
+</header>
+
+<!-- ============ hero ============ -->
+<section class="ct-hero">
+  <div class="bg" role="img" aria-label="Aerial view of a VSS layout"></div>
+  <div class="veil"></div>
+  <div class="wrap">
+    <p class="eyebrow">Contact</p>
+    <h1>Walk the plot before <em>you buy it.</em></h1>
+    <p>Tell us which layout interests you and we will arrange a site visit with the plot plan in hand — approvals included.</p>
+  </div>
+</section>
+
+<!-- ============ body: form + info ============ -->
+<main class="ct-body" id="main">
+
+  <!-- form card -->
+  <div class="formcard">
+    <p class="eyebrow f-kicker">Site visit request</p>
+    <h2>Book a Visit</h2>
+    <p class="f-sub fs-intro">We confirm visits by phone, usually within a working day.</p>
+
+    <form novalidate>
+      <div class="frow">
+        <div class="fld">
+          <label for="f-name">Name</label>
+          <input id="f-name" type="text" placeholder="Your full name" autocomplete="name" required aria-required="true" aria-describedby="err-name">
+          <p class="ferr" id="err-name">Please tell us your name.</p>
+        </div>
+        <div class="fld">
+          <label for="f-phone">Phone</label>
+          <input id="f-phone" type="tel" placeholder="Mobile number" autocomplete="tel" required aria-required="true" aria-describedby="err-phone">
+          <p class="ferr" id="err-phone">Enter the mobile number we should call.</p>
+        </div>
+      </div>
+      <div class="fld">
+        <label for="f-project">Project</label>
+        <select id="f-project">
+          <option value="">Select a project (optional)</option>
+          <option>Landmark City</option>
+          <option>Srivelan Nagar</option>
+          <option>Chandrayan Nagar</option>
+          <option>Not sure yet — advise me</option>
+          <option>Other / general enquiry</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label for="f-msg">Message</label>
+        <textarea id="f-msg" placeholder="Preferred day/time, questions about plots or approvals…"></textarea>
+      </div>
+      <div class="fconsent">
+        <input type="checkbox" id="f-ok" required aria-required="true" aria-describedby="err-ok">
+        <label for="f-ok">I agree to be contacted by VSS Associates about this enquiry. No marketing lists, no third-party sharing.</label>
+      </div>
+      <p class="ferr" id="err-ok">Please tick the consent box so we may call you back.</p>
+      <div class="formfoot">
+        <button class="btn btn-gold" type="submit">Book a Visit</button>
+        <a class="call" href="tel:04442087913">or call <span class="no">044 4208 7913</span></a>
+      </div>
+      <p class="fpriv">Details used only to arrange your visit.</p>
+    </form>
+
+    <div class="fsuccess" id="f-done" role="status">
+      <p>Thanks <b id="done-name"></b> — we'll call you on <b id="done-phone"></b> within a working day to confirm your visit slot.</p>
+      <p>In a hurry? <a class="call" href="tel:04442087913">Call <span class="no">044 4208 7913</span></a></p>
+    </div>
+  </div>
+
+  <!-- side info -->
+  <div class="ct-side">
+    <div class="sidecard">
+      <h3>Reach us directly</h3>
+      <div class="ilist">
+        <div class="irow">
+          <span class="ic"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span>
+          <div><div class="k">Phone</div><div class="v">044 4208 7913</div></div>
+        </div>
+        <div class="irow">
+          <span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+          <div><div class="k">Email</div><div class="v">contact@vssassociates.com</div></div>
+        </div>
+        <div class="irow">
+          <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          <div><div class="k">Office</div><div class="v">No. 11, West Karikalan Street, 1st Floor,<br>(Opp. to SBI Bank), Adambakkam,<br>Chennai – 600 088</div></div>
+        </div>
+        <div class="irow">
+          <span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+          <div><div class="k">Working hours</div><div class="v">Mon – Sat, 8.00 – 18.00<br>Sunday closed</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidecard sidecard--steps">
+      <h3>How a visit works</h3>
+      <div class="steps">
+        <div class="step"><div><div class="t">Share your interest</div><div class="d">Form or phone — whichever is easier.</div></div></div>
+        <div class="step"><div><div class="t">We confirm the slot</div><div class="d">Within a working day, by phone.</div></div></div>
+        <div class="step"><div><div class="t">Walk the layout</div><div class="d">Plot plan and approval documents in hand.</div></div></div>
+        <div class="step"><div><div class="t">Decide at leisure</div><div class="d">No on-the-spot pressure; prices hold as stated.</div></div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container cols">
+    <div>
+      <div class="brandline"><a class="brand" href="01-home.html" aria-label="VSS Associates"><span class="brand-logo" role="img" aria-label="VSS Associates"></span></a></div>
+      <p style="font-size:14.5px; max-width:38ch; opacity:.75">DTCP-approved plotted developments in and around Chennai, Tamil Nadu.</p>
+    </div>
+    <div>
+      <h4>Projects</h4>
+      <ul>
+        <li><a href="03-project-detail.html">Landmark City</a></li>
+        <li><a href="03-project-detail.html">Srivelan Nagar</a></li>
+        <li><a href="03-project-detail.html">Chandrayan Nagar</a></li>
+        <li><a href="02-projects.html">All projects</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Company</h4>
+      <ul>
+        <li><a href="05-about.html">About</a></li>
+        <li><a href="06-contact.html">Contact</a></li>
+        <li><a class="staff" href="07-admin-login.html">Staff login</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Visit us</h4>
+      <p class="addr">VSS Associates office<br>No. 11, West Karikalan Street, 1st Floor,<br>(Opp. to SBI Bank), Adambakkam,<br>Chennai – 600 088</p>
+      <p class="addr">044-4208 7913<br>contact@vssassociates.com</p>
+      <p class="addr" style="opacity:.7">Mon – Sat · 8.00 – 18.00<br>Sunday closed</p>
+    </div>
+  </div>
+  <div class="container legal">
+    <span>© VSS Associates, Chennai</span>
+    <span class="dtcp">All layouts marketed are subject to DTCP approval — approval numbers published per project</span>
+  </div>
+</footer>
+
+<script>
+/* header: transparent over hero, solid after scroll — same as 01-home */
+(() => {
+  const header = document.getElementById('siteHeader');
+  const onScroll = () => header.classList.toggle('site-header--solid', window.scrollY > 60);
+  onScroll(); addEventListener('scroll', onScroll, { passive: true });
+})();
+
+/* site-visit request: validate, then confirm inline (demo — no backend) */
+(() => {
+  const form = document.querySelector('form');
+  const name = document.getElementById('f-name');
+  const phone = document.getElementById('f-phone');
+  const ok = document.getElementById('f-ok');
+  const setErr = (input, errId, bad) => {
+    document.getElementById(errId).classList.toggle('ferr--on', bad);
+    input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    return bad;
+  };
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const badName = setErr(name, 'err-name', !name.value.trim());
+    const badPhone = setErr(phone, 'err-phone', phone.value.replace(/\D/g, '').length < 10);
+    const badOk = setErr(ok, 'err-ok', !ok.checked);
+    if (badName || badPhone || badOk) {
+      form.querySelector('[aria-invalid="true"]')?.focus();
+      return;
+    }
+    document.getElementById('done-name').textContent = name.value.trim().split(/\s+/)[0];
+    document.getElementById('done-phone').textContent = phone.value.trim();
+    form.style.display = 'none';
+    document.querySelector('.formcard h2').textContent = 'Request received';
+    document.querySelector('.fs-intro').style.display = 'none';
+    document.getElementById('f-done').classList.add('fsuccess--on');
+    document.getElementById('f-done').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+})();
+</script>
+</body>
+</html>

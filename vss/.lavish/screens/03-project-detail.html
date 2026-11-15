@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.classList.add('js');</script>
+<title>VSS Associates — Screen 03 · Project Detail (Landmark City)</title>
+<noscript><style>
+  /* no-JS fallback: header solid, reveal sections visible, map notice */
+  .site-header--glass { background: var(--paper); box-shadow: 0 1px 0 var(--line); color: var(--navy); }
+  .site-header--glass .brand, .site-header--glass .nav a { color: var(--navy); }
+  .site-header--glass .bar::before { display: none; }
+  .rv { opacity: 1 !important; transform: none !important; }
+</style></noscript>
+<link rel="stylesheet" href="meridian.css?v=13">
+<style>
+/* ============ page-specific: project detail ============ */
+
+/* --- fixed hero (Kendrick Guehr: background persists, content slides over) --- */
+.fixedhero { position: fixed; inset: 0; z-index: 0; }
+.fixedhero .bg { position: absolute; inset: 0; background: url('assets/aerial-band.jpg') center 70% / cover no-repeat; }
+.fixedhero .veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,29,51,.55), rgba(8,29,51,.18) 40%, rgba(8,29,51,.72) 100%); transition: opacity .2s linear; }
+.fixedhero .inner {
+  position: relative; z-index: 2; color: #fff; height: 100%;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 28px 130px; max-width: 1280px; margin: 0 auto;
+}
+.fixedhero .loc { font-size: 12.5px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-soft); margin-bottom: 14px; }
+.fixedhero h1 { font-size: clamp(52px, 7.5vw, 96px); line-height: .98; font-weight: 800; letter-spacing: -.025em; margin: 0; }
+.fixedhero .sub { margin-top: 16px; font-size: 17px; color: rgba(255,255,255,.85); max-width: 46ch; }
+.fixedhero .scue { position: absolute; right: 28px; bottom: 40px; display: flex; align-items: center; gap: 12px; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; color: rgba(255,255,255,.8); }
+.fixedhero .scue .line { width: 1px; height: 56px; background: rgba(255,255,255,.5); overflow: hidden; position: relative; }
+.fixedhero .scue .line::after { content: ''; position: absolute; top: -100%; width: 100%; height: 50%; background: var(--gold); animation: drip 2.2s ease-in-out infinite; }
+@keyframes drip { to { top: 120%; } }
+
+/* content slides over the fixed hero */
+.slide { position: relative; z-index: 2; margin-top: 100vh; }
+/* footer + rationale must paint above the fixed hero (z-index 0) */
+.site-footer, .rationale { position: relative; z-index: 2; }
+
+/* --- quick facts band (overlaps hero visually on first scroll) --- */
+.factsband { background: var(--card); border-radius: var(--r-lg) 14px 0 0; box-shadow: 0 -18px 50px rgba(8,29,51,.25); }
+.factsband .grid { max-width: var(--maxw); margin: 0 auto; padding: 40px 28px 34px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; }
+.factsband .cell { padding: 4px 26px; border-left: 1px solid var(--line); }
+.factsband .cell:first-child { border-left: 0; padding-left: 0; }
+.factsband .k { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
+.factsband .v { font-size: 20px; font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.2; }
+.factsband .v small { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin-top: 2px; }
+
+/* --- availability --- */
+.availgrid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 36px; align-items: start; }
+.mapcard { background: var(--card); border-radius: var(--r-md); box-shadow: var(--shadow); overflow: hidden; }
+.mapcard .mapbar { display: flex; justify-content: flex-start; align-items: center; padding: 16px 22px; border-bottom: 1px solid var(--line); flex-wrap: wrap; gap: 30px; }
+.mapcard .mapbar .legend { margin-left: auto; }
+.mapwrap { position: relative; }
+.mapwrap .zoomctl { position: absolute; right: 14px; bottom: 14px; opacity: 0; pointer-events: none; transition: opacity .35s ease; box-shadow: var(--shadow-lift); z-index: 3; }
+.mapwrap .zoomctl:focus-within { opacity: 1; pointer-events: auto; }
+.mapwrap .zoomctl--live { opacity: 1; pointer-events: auto; }
+.mapcard .mapbar .title { font-weight: 800; color: var(--navy); font-size: 17px; }
+.legend { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); font-weight: 600; }
+.legend .lg { font: inherit; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink-soft); cursor: pointer; transition: background .15s ease, border-color .15s ease, color .15s ease; }
+.legend .lg:hover { border-color: rgba(14,42,71,.4); color: var(--navy); }
+.legend .lg--on { background: rgba(201,162,75,.14); border-color: var(--gold); color: var(--navy); }
+.legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.legend .l-av { background: #fff; border: 1.4px solid var(--navy); }
+.legend .l-rs { background: #f3e7c9; border: 1.4px solid var(--gold); }
+.legend .l-so { background: #14314f; }
+.mapcard svg { display: block; width: 100%; height: auto; cursor: grab; touch-action: pan-y; }
+.mapcard svg:active { cursor: grabbing; }
+.mapcard .mapfoot { padding: 14px 22px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--ink-soft); flex-wrap: wrap; }
+.plot--dimmed { opacity: .22; pointer-events: none; }
+.zoomctl { display: flex; gap: 6px; }
+.zbtn { width: 34px; height: 34px; border-radius: var(--r-sm); border: 1px solid var(--line); background: #fff; color: var(--navy); font: 700 16px/1 'Manrope', sans-serif; cursor: pointer; box-shadow: var(--shadow); transition: background .15s ease; }
+.zbtn:hover { background: var(--paper); }
+.zbtn--fit { width: auto; padding: 0 12px; font-size: 12px; }
+
+/* plot panel */
+.panel { background: var(--navy-deep); color: #eef2f6; border-radius: var(--r-md); padding: 30px 30px 34px; position: sticky; top: 96px; box-shadow: var(--shadow-lift); }
+.panel .p-k { font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--gold-soft); margin-bottom: 8px; }
+.panel h3 { margin: 0 0 6px; font-size: 30px; font-weight: 800; letter-spacing: -.02em; color: #fff; }
+.panel .rows { display: grid; gap: 0; margin: 20px 0; border-top: 1px solid rgba(255,255,255,.14); }
+.panel .rows div { display: flex; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.14); font-size: 14.5px; }
+.panel .rows .k { color: rgba(255,255,255,.6); font-weight: 600; }
+.panel .rows .v { font-weight: 700; font-variant-numeric: tabular-nums; }
+.panel .empty { color: rgba(255,255,255,.65); font-size: 15px; line-height: 1.7; }
+.panel .empty svg { display: block; margin-bottom: 18px; opacity: .8; }
+.panel .btn { width: 100%; justify-content: center; }
+.panel .fine { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 12px; text-align: center; }
+.panel.is-empty { display: flex; flex-direction: column; justify-content: center; }
+#availability .container { position: relative; }
+@media (min-width: 901px) {
+  #plotPanel { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); width: calc((100% - 36px) / 3.2); }
+  .panel.is-empty { min-height: 545px; }
+}
+
+/* reveal-on-scroll */
+html.js .rv { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
+html.js .rv.in { opacity: 1; transform: none; }
+.rv-d1 { transition-delay: .12s; } .rv-d2 { transition-delay: .24s; }
+
+/* --- story section --- */
+.story { display: grid; grid-template-columns: 1fr 1.1fr; gap: 72px; align-items: center; }
+.story .txt blockquote { margin: 24px 0 0; padding-left: 18px; border-left: 2px solid color-mix(in srgb, var(--gold) 45%, transparent); font-size: 15px; line-height: 1.6; color: var(--ink-soft); font-weight: 400; font-style: italic; }
+/* stacked photo cards, slightly rotated; hovering a card straightens + enlarges it */
+.story .imgstack { position: relative; padding-bottom: 56px; }
+.story .imgstack .m1 { border-radius: var(--r-md); box-shadow: var(--shadow-lift); border: 8px solid var(--card); transform: rotate(-2.2deg); transition: transform .35s ease, box-shadow .35s ease; }
+.story .imgstack .m2 { position: absolute; right: -30px; bottom: 0; width: 50%; border-radius: var(--r-md); box-shadow: var(--shadow-lift); border: 8px solid var(--card); transform: rotate(2.4deg); transition: transform .35s ease, box-shadow .35s ease; z-index: 2; cursor: pointer; }
+.story .imgstack .m1:hover, .story .imgstack .m2:hover { transform: rotate(0deg) scale(1.09); z-index: 3; box-shadow: 0 28px 60px rgba(8,29,51,.35); }
+
+/* --- gallery strip --- */
+.galwrap { position: relative; }
+.gal { display: flex; gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 14px; }
+/* same white arrow vocabulary as the home-page carousel (.hscroll-nav) */
+.galwrap .galnav { position: absolute; top: 122px; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: rgba(253,251,246,.92); color: var(--navy); font-size: 18px; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: var(--shadow-lift); z-index: 3; transition: transform .2s, border-color .2s, color .2s; }
+.galwrap .galnav:hover { transform: scale(1.06); border-color: var(--gold); color: var(--brass-ink); }
+.galwrap .galnav[disabled] { opacity:.35; cursor:default; transform:none; } /* end-of-scroll state, matches .hscroll-nav on 01 */
+.galwrap .galnav.prev { left: -12px; }
+.galwrap .galnav.next { right: -12px; }
+@media (max-width: 900px) { .galwrap .galnav { top: 88px; width: 40px; height: 40px; } }
+.gal::-webkit-scrollbar { height: 8px; }
+.gal::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
+.gal figure { margin: 0; flex: 0 0 clamp(300px, 34vw, 420px); scroll-snap-align: start; transition: transform .3s ease; }
+.gal figure:hover { transform: translateY(-6px); }
+.gal img { width: 100%; height: 280px; object-fit: cover; border-radius: var(--r-md); box-shadow: var(--shadow); transition: transform .35s ease; }
+.gal figure:hover img { transform: scale(1.025); }
+.gal figcaption { font-size: 12.5px; color: var(--ink-soft); margin-top: 10px; display: flex; gap: 8px; align-items: baseline; }
+.gal figcaption b { color: var(--navy); font-weight: 700; }
+.gal figcaption .n { color: var(--brass-ink); font-weight: 800; font-size: 11px; }
+
+/* --- location --- */
+.locband { display: grid; grid-template-columns: 1fr 1.25fr; gap: 64px; align-items: center; }
+.locrows { border-top: 1px solid rgba(255,255,255,.16); }
+.locrows > div { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; padding: 15px 2px; border-bottom: 1px solid rgba(255,255,255,.16); }
+.locrows .name { font-weight: 700; color: #fff; font-size: 15.5px; }
+.locrows .name small { display: block; font-weight: 500; font-size: 12px; color: rgba(255,255,255,.55); margin-top: 2px; }
+.locrows .dist { color: var(--gold-soft); font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.locrows .dist .req { color: var(--gold-soft); }
+
+/* --- verification --- */
+.verify { display: grid; grid-template-columns: .9fr 1.1fr; gap: 64px; align-items: center; }
+.verify .ph { position: relative; }
+.verify .ph img { border-radius: var(--r-md); box-shadow: var(--shadow-lift); }
+.verify .ph .tag { position: absolute; left: 16px; bottom: 16px; background: rgba(8,29,51,.82); color: #fff; font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 8px 14px; border-radius: 999px; backdrop-filter: blur(4px); }
+.vlist { list-style: none; margin: 26px 0 0; padding: 0; display: grid; gap: 16px; }
+.vlist li { display: flex; gap: 16px; font-size: 15px; color: var(--ink-soft); }
+.vlist .ic { flex: 0 0 34px; height: 34px; border-radius: 50%; background: var(--green-bg); color: var(--green); display: grid; place-items: center; font-weight: 800; }
+.vlist b { color: var(--ink); }
+.approval-no { margin-top: 22px; background: var(--paper); border: 1.5px dashed var(--gold); border-radius: var(--r-sm); padding: 16px 20px; font-size: 14px; color: var(--ink-soft); }
+
+@media (max-width: 900px) {
+  .fixedhero { position: absolute; height: 92vh; }
+  .slide { margin-top: 92vh; }
+  .fixedhero .inner { padding-bottom: 90px; }
+  .factsband { border-radius: var(--r-sm) var(--r-sm) 0 0; }
+  .factsband .grid { grid-template-columns: 1fr 1fr; gap: 18px; padding: 28px 22px; }
+  .factsband .cell { border-left: 0; padding: 0; }
+  .factsband .grid { gap: 14px 0; }
+  .availgrid { grid-template-columns: 1fr; }
+  .panel { position: static; }
+  .panel.is-empty { min-height: 545px; }
+  @media (max-width: 640px) {
+    .panel { width: min(420px, calc(100% - 28px)); margin: 0 auto; }
+  }
+  .story { grid-template-columns: 1fr; gap: 36px; }
+  .story .imgstack { padding-bottom: 40px; }
+  .story .imgstack .m2 { right: 8px; bottom: 0; width: 52%; }
+  .locband, .verify { grid-template-columns: 1fr; gap: 36px; }
+  .gal img { height: 210px; }
+}
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+<!-- fixed full-bleed hero -->
+<div class="fixedhero">
+  <div class="bg"></div>
+  <div class="veil" id="heroVeil"></div>
+  <div class="inner container">
+    <p class="loc">Chennai North* · DTCP approved</p>
+    <h1>Landmark City</h1>
+    <p class="sub req">24 plots around a central spine road — extent ~9.8 acres*. A concept render stands in for project photography until client assets are supplied.</p>
+    <div class="scue"><span>Scroll</span><span class="line"></span></div>
+  </div>
+</div>
+
+<header class="site-header site-header--glass" id="siteHeader">
+  <div class="bar">
+    <a class="brand" href="01-home.html"><span class="brand-logo" role="img" aria-label="VSS Associates"></span></a>
+    <nav class="nav">
+      <a href="02-projects.html">Projects</a>
+      <a href="05-about.html">About</a>
+      <a href="06-contact.html">Contact</a>
+    </nav>
+    <a class="btn btn-gold btn-sm nav-visit" href="06-contact.html">Book a Visit</a>
+    <a class="nav-call" href="tel:04442087913" aria-label="Call VSS Associates on 044 4208 7913"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.9 15.9 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.57 3.6 1 1 0 01-.25 1z"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+<!-- R13: restored the .slide wrapper this page's CSS expects (line 29: z-index:2 + margin-top:100vh) —
+     without it content started at y=0 under the fixed hero, colliding with the hero text and losing
+     the stacking that keeps section backgrounds above the fixed photo (client-reported breakage) -->
+<div class="slide">
+
+  <!-- quick facts band -->
+  <section class="factsband" id="top">
+    <div class="grid">
+      <div class="cell"><div class="k">Extent</div><div class="v req">~9.8 acres*</div></div>
+      <div class="cell"><div class="k">Plots</div><div class="v req">24*</div></div>
+      <div class="cell"><div class="k">Plot size</div><div class="v req">1,200 – 2,400 sq.ft*</div></div>
+      <div class="cell"><div class="k">Price</div><div class="v req">₹1,850/sq.ft*</div></div>
+      <div class="cell"><div class="k">Status</div><div class="v" style="font-size:16px"><span class="badge badge-available">15 of 24 plots available*</span></div></div>
+    </div>
+  </section>
+
+  <!-- availability -->
+  <section class="section section--white" id="availability">
+    <div class="container">
+      <div class="sechead rv">
+        <p class="eyebrow">Availability</p>
+        <h2 class="h-section">Choose your plot<br>before you visit.</h2>
+        <p class="lead">Live plot states from the site plan. Select any plot to see its number, area, facing and price — then book a site visit and walk it in person.</p>
+      </div>
+
+      <div class="availgrid">
+        <div class="mapcard rv">
+          <div class="mapbar">
+            <span class="title">Site plan — Landmark City*</span>
+            <span class="legend" role="group" aria-label="Filter plots by status">
+              <button class="lg lg--on" type="button" data-filter="all">All · 24</button>
+              <button class="lg" type="button" data-filter="available"><i class="l-av"></i>Available · 15</button>
+              <button class="lg" type="button" data-filter="reserved"><i class="l-rs"></i>Reserved · 3</button>
+              <button class="lg" type="button" data-filter="sold"><i class="l-so"></i>Sold · 6</button>
+            </span>
+          </div>
+          <div class="mapwrap">
+            <svg id="plotmap" viewBox="0 0 1060 430" role="group" aria-label="Interactive plot layout of Landmark City"></svg>
+            <noscript><p style="padding:10px 14px; font-size:13.5px; color:var(--ink-soft)">The interactive site plan needs JavaScript — for plot availability without it, call <a href="tel:04442087913" style="color:var(--navy); font-weight:700">044 4208 7913</a>.</p></noscript>
+            <span class="zoomctl">
+              <button class="zbtn" id="zin" type="button" aria-label="Zoom in">+</button>
+              <button class="zbtn" id="zout" type="button" aria-label="Zoom out">−</button>
+              <button class="zbtn zbtn--fit" id="zfit" type="button">Fit</button>
+            </span>
+          </div>
+          <div class="mapfoot">
+            <span class="req">Site plan geometry is illustrative — dimensions &amp; orientation await client supply*</span>
+            <span>Scroll to zoom · drag to pan · tap a plot for details</span>
+          </div>
+        </div>
+
+        <!-- plot panel -->
+        <aside class="panel is-empty rv rv-d1" id="plotPanel">
+          <div class="empty" id="panelEmpty">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#c9a24b" stroke-width="1.4"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 3v18"/></svg>
+            <p style="margin:0"><b style="color:#fff">Select a plot</b> on the site plan to see its number, dimensions, area, facing and price.</p>
+            <p style="margin:12px 0 0; font-size:13.5px" class="req">All plot figures are sample data awaiting client supply.*</p>
+          </div>
+          <div id="panelBody" hidden>
+            <div class="p-k">Plot details</div>
+            <h3 id="plNo">A1</h3>
+            <div class="rows">
+              <div><span class="k">Status</span><span class="v" id="plStatus">Available</span></div>
+              <div><span class="k">Dimensions</span><span class="v" id="plDims">30 × 40 ft*</span></div>
+              <div><span class="k">Area</span><span class="v" id="plArea">1,200 sq.ft</span></div>
+              <div><span class="k">Facing</span><span class="v" id="plFacing">West road</span></div>
+              <div><span class="k">Corner plot</span><span class="v" id="plCorner">No</span></div>
+              <div><span class="k">Price</span><span class="v" id="plPrice">₹22.2 lakh</span></div>
+            </div>
+            <a class="btn btn-gold" id="plCta" href="06-contact.html">Reserve for a site visit</a>
+            <p class="fine" id="plNote">Prices exclude registration &amp; statutory charges.*</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- story -->
+  <section class="section" style="background:var(--paper)">
+    <div class="container story">
+      <div class="txt rv">
+        <p class="eyebrow">The layout</p>
+        <h2 class="h-section">Planned around the way the ground actually works.</h2>
+        <p class="lead">Landmark City was laid out with a single central spine road, plots on either side, and internal roads wide enough for two vehicles to pass. Boundaries are staked and fenced — the plan you see here is the ground you walk.</p>
+        <blockquote>Approved before it was offered — the DTCP number is published on the signboard at the gate.</blockquote>
+        <p class="muted req" style="margin-top:18px; font-size:13.5px">Narrative copy pending client confirmation — supplied facts will replace this text.*</p>
+      </div>
+      <div class="imgstack rv rv-d1">
+        <img class="m1" src="assets/aerial-rows.jpg" alt="Aerial concept render — plot rows and internal roads">
+        <img class="m2" src="assets/proof-stakes.jpg" alt="Real photo — staked plot boundaries at a VSS layout">
+      </div>
+    </div>
+  </section>
+
+  <!-- gallery -->
+  <section class="section section--white">
+    <div class="container">
+      <div class="sechead rv">
+        <p class="eyebrow">From the ground</p>
+        <h2 class="h-section">Real photographs,<br>not renderings.</h2>
+      </div>
+      <div class="galwrap">
+      <button class="galnav prev" type="button" aria-label="Previous photos">‹</button>
+      <div class="gal rv">
+        <figure><img src="assets/card-landmark.jpg" alt="Entrance signboard of Landmark City"><figcaption><span class="n">01</span> <b>Entrance signboard</b> — approval number displayed at the gate</figcaption></figure>
+        <figure><img src="assets/proof-roads.jpg" alt="Internal roads laid between plots"><figcaption><span class="n">02</span> <b>Site progress</b> — internal roads &amp; plot kerbs</figcaption></figure>
+        <figure><img src="assets/proof-stakes.jpg" alt="Plot edges and road kerbs marked out"><figcaption><span class="n">03</span> <b>Plot edges</b> — marked out for site visits</figcaption></figure>
+        <figure><img src="assets/proof-visit.jpg" alt="Site visit group walking the layout"><figcaption><span class="n">04</span> <b>Site visits</b> — walk the ground before you buy</figcaption></figure>
+        <figure><img src="assets/proof-launch.jpg" alt="Launch event canopy"><figcaption><span class="n">05</span> <b>Launch day</b> — booking event under canopy</figcaption></figure>
+        <figure><img src="assets/proof-build.jpg" alt="Boundary construction work"><figcaption><span class="n">06</span> <b>Work in progress</b> — boundary development</figcaption></figure>
+      </div>
+      <button class="galnav next" type="button" aria-label="More photos">›</button>
+      </div>
+      <p class="muted" style="margin-top:14px; font-size:13px">Photographs from VSS site records — captions to be confirmed with the client.*</p>
+    </div>
+  </section>
+
+  <!-- location -->
+  <section class="section section--navy">
+    <div class="container locband">
+      <div class="rv">
+        <p class="eyebrow eyebrow--light">Location</p>
+        <h2 class="h-section">North Chennai,<br>on the growth side of town.</h2>
+        <p class="lead" style="color:rgba(255,255,255,.78)">Reachable from the city via the northern corridor. Distances below are indicative — confirmed figures will be published after verification.</p>
+      </div>
+      <div class="locrows rv rv-d1">
+        <div><span class="name">Nearest bus stop<small class="req">Minjur bus stand*</small></span><span class="dist req">~2 km*</span></div>
+        <div><span class="name">Schools &amp; colleges<small class="req">Ponneri school cluster*</small></span><span class="dist req">~4 km*</span></div>
+        <div><span class="name">Hospital<small class="req">Govt. hospital, Ponneri*</small></span><span class="dist req">~6 km*</span></div>
+        <div><span class="name">Railway / metro station<small class="req">Ponneri railway station*</small></span><span class="dist req">~5 km*</span></div>
+        <div><span class="name">Market &amp; daily needs<small class="req">Minjur market*</small></span><span class="dist req">~2 km*</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- verification -->
+  <section class="section section--white">
+    <div class="container verify">
+      <div class="ph rv">
+        <img src="assets/card-landmark.jpg" alt="Landmark City entrance signboard showing DTCP approval">
+        <span class="tag">Signboard at the gate</span>
+      </div>
+      <div class="rv rv-d1">
+        <p class="eyebrow">Verification</p>
+        <h2 class="h-section">Approved before it's offered.</h2>
+        <ul class="vlist">
+          <li><span class="ic">✓</span><span><b>DTCP approval</b> — the layout is approved by the Directorate of Town &amp; Country Planning before release.</span></li>
+          <li><span class="ic">✓</span><span><b>Clear title</b> — paperwork verified by the same office that sells you the plot.</span></li>
+          <li><span class="ic">✓</span><span><b>Patta support</b> — registration and patta transfer handled end to end.</span></li>
+        </ul>
+        <div class="approval-no req">Approval number: to be published — the number visible on the signboard photograph is awaiting client confirmation.*</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-band">
+    <div class="bg" style="background-image:url('assets/aerial-close.jpg')"></div>
+    <div class="veil"></div>
+    <div class="container inner">
+      <div>
+        <p class="eyebrow eyebrow--light">Final step</p>
+        <h2 class="h-section" style="margin:0; color:#fff">Walk your plot<br>before you pay a rupee.</h2>
+      </div>
+      <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap">
+        <a class="btn btn-gold" href="06-contact.html">Book a Visit</a>
+        <a class="btn btn-ghost-dark tnum" href="tel:04442087913">Call 044-4208 7913</a>
+      </div>
+    </div>
+  </section>
+</div><!-- /.slide -->
+</main>
+
+<footer class="site-footer">
+  <div class="container cols">
+    <div>
+      <div class="brandline"><a class="brand" href="01-home.html" aria-label="VSS Associates"><span class="brand-logo" role="img" aria-label="VSS Associates"></span></a></div>
+      <p style="font-size:14.5px; max-width:38ch; opacity:.75">DTCP-approved plotted developments in Chennai. Approved before it's offered — visit the ground before you decide.</p>
+    </div>
+    <div>
+      <h3>Projects</h3>
+      <ul>
+        <li><a href="03-project-detail.html">Landmark City</a></li>
+        <li><a href="03-project-detail.html">Srivelan Nagar</a></li>
+        <li><a href="03-project-detail.html">Chandrayan Nagar</a></li>
+        <li><a href="02-projects.html">All projects</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Company</h3>
+      <ul>
+        <li><a href="05-about.html">About</a></li>
+        <li><a href="06-contact.html">Contact</a></li>
+        <li><a class="staff" href="07-admin-login.html">Staff login</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Visit us</h3>
+      <p class="addr">No. 11, West Karikalan Street, 1st Floor,<br>(Opp. to SBI Bank), Adambakkam,<br>Chennai – 600 088</p>
+      <p class="addr">044-4208 7913<br>contact@vssassociates.com</p>
+      <p class="addr" style="opacity:.7">Mon – Sat · 8.00 – 18.00<br>Sunday closed</p>
+    </div>
+  </div>
+  <div class="container legal">
+    <span>© VSS Associates, Chennai</span>
+    <span class="dtcp">All layouts DTCP approved — approval numbers published per project</span>
+  </div>
+</footer>
+
+<div class="sample-flag" id="sampleFlag"><b>Sample data</b> — plot facts, prices &amp; stats marked * await client supply <button type="button" aria-label="Dismiss sample-data note" style="margin-left:10px; border:0; background:rgba(255,255,255,.12); color:#fff; width:20px; height:20px; border-radius:999px; font-size:12px; line-height:1; cursor:pointer; vertical-align:middle" onclick="this.closest('.sample-flag').remove()">✕</button></div>
+
+<script>
+/* ---------- canonical sample plot data (shared with 01 & 04) ---------- */
+const PLOTS = [
+  // A row (top, faces west road)
+  ...['A1','A2','A3','A4'].map(n => ({ n, st:'available', area:1200 })),
+  ...['A5','A6','A7','A8'].map(n => ({ n, st:'available', area:1500 })),
+  { n:'A9',  st:'sold',      area:1800 },
+  { n:'A10', st:'reserved',  area:1800 },
+  { n:'A11', st:'available', area:1800 },
+  { n:'A12', st:'sold',      area:1800 },
+  // B row (bottom, faces east road)
+  { n:'B1',  st:'sold',      area:2400 },
+  { n:'B2',  st:'available', area:2400 },
+  { n:'B3',  st:'reserved',  area:1500 },
+  { n:'B4',  st:'sold',      area:1500 },
+  ...['B5','B6','B7','B8','B9'].map(n => ({ n, st:'available', area: n==='B6'?1800:1500 })),
+  { n:'B10', st:'reserved',  area:1500 },
+  { n:'B11', st:'sold',      area:1500 },
+  { n:'B12', st:'sold',      area:1500 },
+];
+const PRICE = 1850; // ₹/sq.ft*
+const FACING = n => n.startsWith('A') ? 'West road' : 'East road';
+
+/* ---------- build the SVG site plan ---------- */
+const svg = document.getElementById('plotmap');
+const NS = 'http://www.w3.org/2000/svg';
+const el = (t, attrs) => { const e = document.createElementNS(NS, t); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+
+// roads
+[ {x:52,  y:30, w:44, h:370, lbl:'WEST ROAD*',  rot:1},
+  {x:964, y:30, w:44, h:370, lbl:'EAST ROAD*',  rot:1},
+  {x:96,  y:185, w:868, h:60, lbl:'SPINE ROAD*', rot:0},
+].forEach(r => {
+  svg.appendChild(el('rect', { x:r.x, y:r.y, width:r.w, height:r.h, fill:'#eceadf' }));
+  const t = el('text', { x:r.x + r.w/2, y:r.y + r.h/2 + 4, 'text-anchor':'middle',
+    fill:'#a9a99a', 'font-size': r.rot ? 10 : 13, 'font-weight':700, 'letter-spacing':'.14em',
+    'font-family':'Manrope, sans-serif',
+    transform: r.rot ? `rotate(-90 ${r.x + r.w/2} ${r.y + r.h/2})` : '' });
+  t.textContent = r.lbl; svg.appendChild(t);
+});
+
+const X0 = 100, PW = 68, GAP = 5, AY = 62, BY = 258, PH = 112;
+PLOTS.forEach((p, i) => {
+  const col = i % 12;
+  const x = X0 + col * (PW + GAP), y = p.n.startsWith('A') ? AY : BY;
+  const g = el('g', { class:`plot plot--${p.st}`, 'data-n':p.n, tabindex:0, role:'button',
+    'aria-label':`Plot ${p.n}, ${p.st}` });
+  g.appendChild(el('rect', { x, y, width:PW, height:PH, rx:4 }));
+  const t1 = el('text', { x:x+PW/2, y:y+PH/2-4, 'text-anchor':'middle', class:'plot-label' + (p.st==='sold' ? ' plot-label--sold':'') });
+  t1.textContent = p.n;
+  const t2 = el('text', { x:x+PW/2, y:y+PH/2+12, 'text-anchor':'middle', class:'plot-label' + (p.st==='sold' ? ' plot-label--sold':''),
+    opacity:.65, 'font-size':8 });
+  t2.textContent = p.area.toLocaleString('en-IN') + ' sft';
+  g.append(t1, t2);
+  svg.appendChild(g);
+});
+
+/* ---------- interactions ---------- */
+const panelBody = document.getElementById('panelBody');
+const panelEmpty = document.getElementById('panelEmpty');
+const fmt = n => n.toLocaleString('en-IN');
+const STLBL = { available:'Available', reserved:'Reserved', sold:'Sold' };
+
+const dims = a => { const w = Math.round(Math.sqrt(a / 1.5) / 5) * 5, d = Math.round(a / w / 5) * 5; return w + ' × ' + d + ' ft*'; };
+const isCorner = n => n === 'A1' || n === 'A12' || n === 'B1' || n === 'B12';
+
+function selectPlot(g) {
+  document.querySelectorAll('.plot--selected').forEach(x => x.classList.remove('plot--selected'));
+  g.classList.add('plot--selected');
+  const p = PLOTS.find(q => q.n === g.dataset.n);
+  panelEmpty.hidden = true; panelBody.hidden = false;
+  document.getElementById('plNo').textContent = p.n;
+  document.getElementById('plStatus').textContent = STLBL[p.st] + (p.st==='available' ? '' : ' — not bookable');
+  document.getElementById('plDims').textContent = dims(p.area);
+  document.getElementById('plArea').textContent = fmt(p.area) + ' sq.ft';
+  document.getElementById('plFacing').textContent = FACING(p.n);
+  document.getElementById('plCorner').textContent = isCorner(p.n) ? 'Yes' : 'No';
+  document.getElementById('plotPanel').classList.remove('is-empty');
+  const cta = document.getElementById('plCta'), note = document.getElementById('plNote');
+  if (p.st === 'available') {
+    document.getElementById('plPrice').textContent = '₹' + (p.area*PRICE/100000).toFixed(1) + ' lakh*';
+    cta.textContent = 'Reserve for a site visit'; cta.href = '06-contact.html';
+    note.textContent = 'Prices exclude registration & statutory charges.*';
+  } else {
+    document.getElementById('plPrice').textContent = '—';
+    cta.textContent = 'Ask about remaining plots'; cta.href = '06-contact.html';
+    note.textContent = p.st === 'sold' ? 'Sold — shown for orientation only.' : 'Reserved — under advance, not bookable.';
+  }
+}
+
+function deselectPlot() {
+  document.querySelectorAll('.plot--selected').forEach(x => x.classList.remove('plot--selected'));
+  panelEmpty.hidden = false; panelBody.hidden = true;
+  document.getElementById('plotPanel').classList.add('is-empty');
+}
+document.addEventListener('click', e => {
+  if (!e.target || typeof e.target.closest !== 'function') return;
+  if (e.target.closest('.plot') || e.target.closest('#plotPanel') || e.target.closest('.zoomctl') || e.target.closest('#plotmap')) return;
+  deselectPlot();
+});
+
+/* ---------- zoom / pan / fit (folded in from 04-plot-layout) ---------- */
+const zoomctl = document.querySelector('.mapwrap .zoomctl');
+let ztHide;
+function zoomLive() {
+  zoomctl.classList.add('zoomctl--live');
+  clearTimeout(ztHide);
+  ztHide = setTimeout(() => zoomctl.classList.remove('zoomctl--live'), 2500);
+}
+let vb = { x:0, y:0, w:1060, h:430 };
+const VB0 = { ...vb };
+const setVB = () => svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+document.getElementById('zin').onclick = () => { vb.w = Math.max(vb.w * .8, 300); vb.h = Math.max(vb.h * .8, 300 * 430/1060); clampVB(); setVB(); zoomLive(); };
+document.getElementById('zout').onclick = () => { vb.w = Math.min(vb.w/.8, 1060); vb.h = Math.min(vb.h/.8, 430); clampVB(); setVB(); zoomLive(); };
+document.getElementById('zfit').onclick = () => { vb = { ...VB0 }; setVB(); zoomLive(); };
+['wheel','pointerdown','pointermove'].forEach(ev => svg.addEventListener(ev, zoomLive, { passive:true }));
+zoomctl.addEventListener('pointerenter', () => { clearTimeout(ztHide); zoomctl.classList.add('zoomctl--live'); });
+zoomctl.addEventListener('pointerleave', zoomLive);
+function clampVB() { vb.x = Math.min(Math.max(vb.x, 0), 1060 - vb.w); vb.y = Math.min(Math.max(vb.y, 0), 430 - vb.h); }
+svg.addEventListener('wheel', e => {
+  e.preventDefault();
+  const f = e.deltaY > 0 ? 1.12 : .9;
+  const nw = Math.min(Math.max(vb.w * f, 300), 1060), nh = nw * 430/1060;
+  const rect = svg.getBoundingClientRect();
+  const mx = vb.x + (e.clientX - rect.left)/rect.width * vb.w;
+  const my = vb.y + (e.clientY - rect.top)/rect.height * vb.h;
+  vb.x = Math.min(Math.max(mx - (mx - vb.x) * nw/vb.w, 0), 1060-nw);
+  vb.y = Math.min(Math.max(my - (my - vb.y) * nh/vb.h, 0), 430-nh);
+  vb.w = nw; vb.h = nh; setVB();
+}, { passive:false });
+let drag = null, downPlot = null, downPt = null;
+svg.addEventListener('pointerdown', e => {
+  drag = { x:e.clientX, y:e.clientY, vb:{...vb} };
+  downPlot = e.target.closest('.plot');
+  downPt = { x:e.clientX, y:e.clientY };
+  svg.setPointerCapture(e.pointerId);
+});
+svg.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const rect = svg.getBoundingClientRect();
+  const k = vb.w / rect.width;
+  vb.x = Math.min(Math.max(drag.vb.x - (e.clientX - drag.x)*k, 0), 1060-vb.w);
+  vb.y = Math.min(Math.max(drag.vb.y - (e.clientY - drag.y)*k, 0), 430-vb.h);
+  setVB();
+});
+svg.addEventListener('pointerup', e => {
+  if (downPt && Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) < 6) {
+    if (downPlot) selectPlot(downPlot); else deselectPlot();
+  }
+  downPlot = null; downPt = null; drag = null;
+});
+svg.addEventListener('pointercancel', () => { downPlot = null; downPt = null; drag = null; });
+
+// scroll a zoomed plot into view when selected
+function scrollToPlot(g) {
+  if (vb.w >= 1060) return;
+  const r = g.querySelector('rect'), cx = +r.getAttribute('x') + +r.getAttribute('width')/2, cy = +r.getAttribute('y') + +r.getAttribute('height')/2;
+  vb.x = Math.min(Math.max(cx - vb.w/2, 0), 1060 - vb.w);
+  vb.y = Math.min(Math.max(cy - vb.h/2, 0), 430 - vb.h);
+  setVB();
+}
+const _selectPlot = selectPlot;
+selectPlot = g => { _selectPlot(g); scrollToPlot(g); };
+
+/* ---------- status filters — legend doubles as the filter row ---------- */
+let filter = 'all';
+document.querySelectorAll('.legend .lg').forEach(b => b.addEventListener('click', () => {
+  filter = b.dataset.filter;
+  document.querySelectorAll('.legend .lg').forEach(x => x.classList.toggle('lg--on', x === b));
+  document.querySelectorAll('.plot').forEach(g => {
+    const on = filter === 'all' || g.classList.contains('plot--' + filter);
+    g.classList.toggle('plot--dimmed', !on);
+    if (on) { g.removeAttribute('aria-disabled'); g.tabIndex = 0; }
+    else { g.setAttribute('aria-disabled', 'true'); g.tabIndex = -1; }
+  });
+}));
+
+svg.addEventListener('click', e => { const g = e.target.closest('.plot'); if (g) selectPlot(g); });
+svg.addEventListener('mouseover', e => { const g = e.target.closest('.plot'); if (g) g.classList.add('plot--hover'); });
+svg.addEventListener('mouseout', e => { const g = e.target.closest('.plot'); if (g) g.classList.remove('plot--hover'); });
+svg.addEventListener('keydown', e => {
+  const g = e.target.closest('.plot');
+  if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); if (!g.classList.contains('plot--dimmed')) selectPlot(g); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') deselectPlot(); });
+
+/* ---------- scroll: veil darkening, header solid, reveal ---------- */
+const veil = document.getElementById('heroVeil');
+const header = document.getElementById('siteHeader');
+const heroInner = document.querySelector('.fixedhero .inner');
+addEventListener('scroll', () => {
+  const y = scrollY, h = innerHeight;
+  veil.style.filter = `brightness(${Math.max(.55, 1 - y/(h*1.4))})`;
+  // hero text fades away as content slides over (Kendrick-style)
+  heroInner.style.opacity = Math.max(0, 1 - y/(h*.5));
+  header.classList.toggle('site-header--solid', y > h * .82);
+  header.classList.toggle('site-header--glass', y <= h * .82);
+}, { passive:true });
+
+const io = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }), { threshold:.18 });
+document.querySelectorAll('.rv').forEach(x => io.observe(x));
+
+/* ---------- gallery nav: scroll one card per click, disabled at either end ---------- */
+const gal = document.querySelector('.gal');
+const galPrev = document.querySelector('.galnav.prev');
+const galNext = document.querySelector('.galnav.next');
+function galScroll(dir) {
+  if (gal) {
+    const step = gal.querySelector('figure').getBoundingClientRect().width + 18;
+    gal.scrollBy({ left: dir * step, behavior: 'smooth' });
+  }
+}
+if (gal && galPrev && galNext) {
+  const galSync = () => {
+    galPrev.disabled = gal.scrollLeft <= 4;
+    galNext.disabled = gal.scrollLeft >= gal.scrollWidth - gal.clientWidth - 4;
+  };
+  galPrev.addEventListener('click', () => galScroll(-1));
+  galNext.addEventListener('click', () => galScroll(1));
+  gal.addEventListener('scroll', galSync, { passive: true });
+  addEventListener('resize', galSync);
+  galSync();
+}
+</script>
+
+<section class="rationale">
+  <div class="container">
+    <h2><span>03</span> · Project detail — design rationale</h2>
+    <ol>
+      <li><b>Borrowed:</b> Kendrick Guehr's persistent background — the hero image stays fixed while opaque content bands slide over it, with one transparent "reveal" gap mid-page; Hosachiguru's project page rhythm — full-width hero with the property name layered over it, then relaxed editorial sections; Anehana's interactive availability idea.</li>
+      <li><b>Adapted for VSS:</b> the hero is a flagged concept render (no real project photography is hero-grade yet); the interactive 24-plot site plan is the page's product moment, feeding a sticky navy detail panel (plot no, status, area, price, facing, "Reserve for a site visit"); the gallery uses only real VSS site photographs with caption chips; the verification section anchors on the actual signboard photo; the fixed image is the shared brand render — it is never captioned as the project.</li>
+      <li><b>Improves on the previous proposal:</b> replaces the stacked info-blocks page with a single continuous "walk-through" scroll; the plot map is now a first-class interactive product feature instead of a static image; facts band, ghost typography and full-bleed moments create dense↔sparse rhythm; every unverifiable figure is visibly flagged instead of silently invented.</li>
+      <li><b>Client to supply:</b> real hero-grade project photography; confirmed site plan geometry/dimensions/orientation; per-plot areas, prices &amp; statuses; DTCP approval number; landmark names &amp; distances; gallery captions; story copy.</li>
+    </ol>
+    <h2><span>R</span> · Review revisions</h2>
+    <ol>
+      <li><b>R1:</b> fixed the footer/rationale rendering — the fixed hero (z-index 0) was painting over them at the bottom of the page; both now carry z-index 2 and the page ends cleanly. Removed the mid-page “This ground is staked, fenced and waiting for a walk” reveal band per client request. The “From the ground” gallery gained floating ‹ › nav buttons (scroll one card per click, verified working). The small overlapping site-progress photo in “The layout” section enlarged 46%→58% of the stack width.</li>
+      <li><b>R2:</b> gallery nav buttons restyled to the home-page carousel vocabulary: white paper circles with navy arrows and a hairline border, gold border + scale on hover (previously dark navy discs).</li>
+      <li><b>R3:</b> “The layout” image pair rebuilt as a stacked polaroid effect: back card (concept render) rotated −2.2°, front card (real photo, 50% of the stack width, thick white mat) rotated +2.4°; hovering either card straightens and enlarges it (scale 1.09 + deeper shadow). Mobile keeps the stack with reduced offsets.</li>
+      <li><b>R4:</b> gallery cards got a subtle hover animation (lift −6px with soft 0.3s ease, image zoom 1.025) and the location rows now carry dummy landmark names + approximate distances (Minjur bus stand ~2 km*, Ponneri schools ~4 km*, Govt. hospital Ponneri ~6 km*, Ponneri railway station ~5 km*, Minjur market ~2 km*) — all asterisked as sample data pending client confirmation.</li>
+      <li><b>R5:</b> 04-plot-layout capabilities folded into this page at the client's request (04 deemed redundant): zoom +/−/Fit buttons in the mapbar, scroll-to-zoom &amp; drag-to-pan on the SVG, selecting a plot auto-centres the zoomed view, and the plot-details card now shows dimensions (35 × 50 ft*), corner-plot flag, price “—” for sold/reserved, and a context CTA (Reserve for a site visit / Ask about remaining plots). The “Open full plot layout →” link was removed — the full layout now lives here.</li>
+      <li><b>R6:</b> 04-plot-layout.html deleted at the client's confirmation; status-filter chips (All plots / Available · 15* / Reserved · 3* / Sold · 6*) added as a slim row between the map bar and the plan — light-theme restyle of 04's navy chips (.wchip); non-matching plots dim to opacity .22. Home-page card link repointed to 03-project-detail.html#availability.</li>
+      <li><b>R7:</b> the redundant filter row was removed per client feedback — the map-bar legend itself now does the filtering: clickable legend pills (All · 24 / Available · 15 / Reserved · 3 / Sold · 6, .lg buttons) with a gold active ring; non-matching plots dim. The map column was widened (availgrid 1.7fr/1fr → 2.2fr/1fr) for headroom on larger layouts; zoom/pan/fit already covers 2–4× the plot count, and a full-width map with a floating detail card is the agreed next step if layouts grow much bigger.</li>
+      <li><b>R8:</b> after widening, the +/−/Fit buttons wrapped onto a second bar row, crowding the legend — they moved into the map itself as a floating overlay (bottom-right of the plan) that appears only while you interact with the map (scroll inside it) and fades away after ~2.5s, Google-Maps style. The legend sits closer to the “Site plan” title (mapbar is flex-start, gap 12px) instead of being pushed to the far right.</li>
+      <li><b>R9:</b> the too-compact title↔legend spacing was re-balanced: bar gap widened to 30px and the legend is again pushed to the right edge (margin-left auto), title stays left — the original right-aligned balance with breathing room. Accepted by the client (session closed).</li>
+      <li><b>R10:</b> plot selection moved to pointerup (pointer capture on the pannable map retargeted the click event away from the plots in some browsers, so clicking a plot did nothing) — tap a plot to select, tap the map or anywhere outside it to revert the panel to the empty state; the empty “Select a plot” card is now centred in the panel column; duplicated fine-print line under the CTA removed.</li>
+      <li><b>R11:</b> the empty panel now spans the full height of the availability section (heading included) and the “Select a plot” card is vertically centred against that whole block, instead of just the map column.</li>
+      <li><b>R12:</b> the selected-state panel follows the same geometry — the navy panel spans the full availability section with the plot-details card vertically centred, and extra inner padding keeps card content from hugging the panel edges.</li>
+      <li><b>R13:</b> the right panel was reduced to its natural height (no longer stretching the full section) and is vertically centred against the availability section in both states; the empty panel takes the same height as the selected one (~545px), keeping both states visually identical in size while staying smaller than the section.</li>
+      <li><b>R14 (impeccable critique):</b> no-JS fallback added — reveal sections no longer depend on JavaScript (html.js gate), the header renders solid paper without JS, and the map carries a “needs JavaScript / call us” notice (progressive enhancement per PRODUCT.md); facts band sample data now agrees with the map/legend (15 of 24 available*, 1,200 – 2,400 sq.ft* — was “3 plots remaining*” and “600–2,400 sq.ft*”); gold “Book a Visit” pill now shows on desktop headers too (was mobile-only); map accessibility — svg role="group", zoom controls visible on keyboard focus, Esc deselects, dimmed plots become aria-disabled + untabbable; mobile scroll trap removed (touch-action: pan-y); zoom-in button clamped like wheel zoom; sample-data pill gained a dismiss ✕; footer headings h4→h3 (fixes heading skip); duplicate </ol> and “R31” comment label corrected; mapbar title 15→17px; mobile factsband cells given vertical breathing room. Verified in browser at 1440px, 390px and with scripts disabled.</li>
+    </ol>
+  </div>
+</section>
+</body>
+</html>

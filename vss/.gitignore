@@ -8,3 +8,15 @@ tmp/
 /fullPage
 /element
 /--viewport
+
+# Lavish artifacts: images/screenshots stay out of version control (duplicates
+# of assets/img). The approved spec HTML screens remain tracked until all
+# pages are implemented natively.
+.lavish/*
+!.lavish/screens/
+.lavish/screens/*
+!.lavish/screens/*.html
+!.lavish/screens/meridian.css
+
+# VSS source-material originals (web-optimized copies live in assets/img)
+site_content/

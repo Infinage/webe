@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07 · Admin Login — VSS Associates</title>
+<link rel="stylesheet" href="meridian.css?v=13">
+<style>
+/* ============ 07 · admin login — deliberately minimal ============ */
+body { background: var(--navy-deep); min-height: 100vh; display: grid; place-items: center; position: relative; }
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background: url('assets/aerial-close.jpg') center/cover no-repeat;
+  opacity: .16;
+}
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 30% 20%, rgba(14,42,71,.4), rgba(8,29,51,.9) 75%);
+}
+.login { position: relative; z-index: 2; width: min(400px, calc(100vw - 40px)); }
+.login-brand { display: flex; justify-content: center; margin-bottom: 30px; }
+.login-brand .brand-logo { height: 48px; width: 194px; background-image: url('assets/brand-white.png'); }
+.card {
+  background: #fff; border-radius: var(--r-lg); padding: 40px 36px 34px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.45);
+}
+.card h1 { font: 800 22px/1.2 'Manrope', sans-serif; color: var(--navy); margin: 0; letter-spacing: -.01em; }
+.card .sub { font: 500 13.5px/1.5 'Manrope', sans-serif; color: var(--ink-soft); margin: 6px 0 26px; }
+.fld { margin-bottom: 16px; }
+.fld label { display: block; font: 700 11.5px/1 'Manrope', sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 7px; }
+.fld input {
+  width: 100%; font: 500 15px/1.4 'Manrope', sans-serif; color: var(--ink);
+  background: var(--warm); border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 13px 15px; outline: none; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.fld input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,75,.18); background: #fff; }
+.btn { width: 100%; justify-content: center; margin-top: 8px; }
+.btn[disabled] { opacity: .65; cursor: default; }
+.foot { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+.foot a, .foot button { font: 600 12.5px/1 'Manrope', sans-serif; color: var(--ink-soft); text-decoration: none; background: none; border: 0; padding: 0; cursor: pointer; }
+.foot a:hover, .foot button:hover { color: var(--navy); }
+.ferr { display: none; font: 600 12px/1.4 'Manrope', sans-serif; color: #b3372c; margin: 6px 0 0; }
+.ferr--on { display: block; }
+.fld input.fld--err { border-color: #b3372c; }
+/* show-password toggle */
+.pwrap { position: relative; }
+.pwrap input { padding-right: 46px; }
+.peye {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: none; border: 0; border-radius: var(--r-sm); cursor: pointer; color: var(--ink-soft);
+}
+.peye:hover { color: var(--navy); background: rgba(20,49,79,.06); }
+.peye svg { width: 18px; height: 18px; }
+/* demo notice (forgot password) */
+.demo-note {
+  display: none; margin-top: 14px; padding: 10px 12px;
+  font: 600 12px/1.5 'Manrope', sans-serif; color: var(--brass-ink);
+  background: var(--warm); border: 1px dashed var(--gold-deep); border-radius: var(--r-sm);
+}
+.demo-note--on { display: block; }
+.tagline { text-align: center; margin-top: 26px; font: 500 11.5px/1.6 'Manrope', sans-serif; color: rgba(255,255,255,.66); letter-spacing: .04em; }
+/* admin footer link back to site */
+.backsite {
+  position: fixed; bottom: 22px; left: 0; right: 0; text-align: center; z-index: 2;
+  font: 600 12px/1 'Manrope', sans-serif; color: rgba(255,255,255,.66); text-decoration: none;
+}
+.backsite:hover { color: #fff; }
+</style>
+</head>
+<body>
+
+<main class="login">
+  <div class="login-brand"><span class="brand-logo" role="img" aria-label="VSS Associates"></span></div>
+
+  <div class="card">
+    <h1>Admin sign in</h1>
+    <p class="sub">Manage projects, plots and enquiries. Authorised staff only.</p>
+
+    <form id="loginform" novalidate>
+      <div class="fld">
+        <label for="a-user">Username or email</label>
+        <input id="a-user" type="text" placeholder="e.g. office@vss" autocomplete="username" required>
+        <p class="ferr" id="err-user">Enter your username or email.</p>
+      </div>
+      <div class="fld">
+        <label for="a-pass">Password</label>
+        <div class="pwrap">
+          <input id="a-pass" type="password" placeholder="••••••••" autocomplete="current-password" required>
+          <button type="button" class="peye" id="peye" aria-label="Show password" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <p class="ferr" id="err-pass">Enter your password.</p>
+      </div>
+      <button class="btn btn-gold" type="submit" id="signin">Sign in</button>
+      <div class="foot">
+        <button type="button" id="forgot">Forgot password?</button>
+      </div>
+      <p class="demo-note" id="demo-note" role="status">Demo mockup — password reset isn’t wired here. In the real system this emails a reset link to staff addresses.</p>
+    </form>
+  </div>
+
+  <p class="tagline">VSS Associates — internal administration</p>
+</main>
+
+<a class="backsite" href="01-home.html">← Back to website</a>
+
+<script>
+(() => {
+  const form = document.getElementById('loginform');
+  const user = document.getElementById('a-user');
+  const pass = document.getElementById('a-pass');
+  const btn = document.getElementById('signin');
+  const errs = { user: document.getElementById('err-user'), pass: document.getElementById('err-pass') };
+
+  const mark = (input, key, on) => {
+    errs[key].classList.toggle('ferr--on', on);
+    input.classList.toggle('fld--err', on);
+    input.setAttribute('aria-invalid', on ? 'true' : 'false');
+  };
+
+  // show-password toggle
+  const eye = document.getElementById('peye');
+  eye.addEventListener('click', () => {
+    const show = pass.type === 'password';
+    pass.type = show ? 'text' : 'password';
+    eye.setAttribute('aria-pressed', String(show));
+    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    pass.focus();
+  });
+
+  // demo notice for forgot password (no silent dead link)
+  document.getElementById('forgot').addEventListener('click', () => {
+    document.getElementById('demo-note').classList.toggle('demo-note--on');
+  });
+
+  // validation → loading → continue to the projects screen (demo flow)
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let firstBad = null;
+    const badUser = !user.value.trim();
+    const badPass = !pass.value.trim();
+    mark(user, 'user', badUser); if (badUser) firstBad = user;
+    mark(pass, 'pass', badPass); if (badPass && !firstBad) firstBad = pass;
+    if (firstBad) { firstBad.focus(); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+    setTimeout(() => { location.href = '08-admin-projects.html'; }, 700);
+  });
+
+  [user, pass].forEach((el) => el.addEventListener('input', () => {
+    mark(el, el === user ? 'user' : 'pass', false);
+  }));
+})();
+</script>
+
+</body>
+</html>

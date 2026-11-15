@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05 · About — VSS Associates</title>
+<link rel="stylesheet" href="meridian.css?v=13">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,560..640&display=swap');
+/* ============ 05 · about — editorial storytelling ============ */
+
+/* ---- hero: editorial over a land photograph ---- */
+.ab-hero { padding: 180px 0 110px; position: relative; overflow: hidden; color: var(--navy); }
+/* hero photo: client-supplied concept render — family + team member standing on a laid-out plot
+   (crop starts at 12% up from bottom to drop the render-tool watermark) */
+.ab-hero .bg { position: absolute; inset: 0; background: url('assets/about-hero.jpg') center / cover no-repeat; }
+/* ≥1280px: zoom the photo ~30% and bias the crop right so the group always clears
+   the headline (center crop put the seller's head under "bought right"; head sits
+   ~46-190px right of the text column from 1280px to ultrawide) */
+@media (min-width: 1280px) {
+  .ab-hero .bg { background-size: auto 130%; background-position: 30% 50%; }
+}
+/* ultrawide: once the zoomed image is narrower than the viewport (~2352px+),
+   re-fit with cover at the same right-biased position to avoid side bands */
+@media (min-width: 2352px) {
+  .ab-hero .bg { background-size: cover; background-position: 30% 50%; }
+}
+/* dark editorial veil: left column darkened so the white/gold headline reads; photo stays
+   bright on the right where the group stands */
+.ab-hero .veil { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(8,29,51,.82) 0%, rgba(8,29,51,.62) 40%, rgba(8,29,51,.18) 66%, rgba(8,29,51,.08) 100%), linear-gradient(180deg, rgba(8,29,51,.30), rgba(8,29,51,0) 38%, rgba(8,29,51,.55)); }
+.ab-hero .wrap { max-width: 1100px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 2; }
+.ab-hero .eyebrow { margin-bottom: 26px; color: var(--gold-soft); font-weight: 800; font-size: 13px; letter-spacing: .18em; }
+.ab-hero .ab-hero-sub { color: #1d2733; text-shadow: 0 1px 0 rgba(247,243,236,.85), 0 0 12px rgba(247,243,236,.7); }
+.ab-hero h1 {
+  font: 800 clamp(40px, 5.4vw, 68px)/1.05 'Manrope', sans-serif;
+  color: #fff; letter-spacing: -.03em; margin: 0;
+  max-width: 16ch;
+}
+/* em accent: italic serif (Fraunces) in theme gold — editorial counter-voice to the sans headline */
+.ab-hero h1 em {
+  font: italic 600 .98em/1 'Fraunces', Georgia, serif;
+  color: var(--gold); letter-spacing: -.01em;
+}
+.ab-lede {
+  max-width: 62ch; margin: 28px 0 0;
+  font: 400 clamp(17px, 1.6vw, 20px)/1.65 'Manrope', sans-serif; color: rgba(255,255,255,.85);
+}
+.ab-lede .req { color: var(--gold-soft); }
+
+/* ---- split story: image left / text right ---- */
+.split {
+  display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(32px, 5vw, 88px);
+  align-items: center; max-width: 1280px; margin: 0 auto; padding: 80px 28px;
+}
+.split .imgwrap { position: relative; }
+.split .imgwrap img { width: 100%; display: block; border-radius: var(--r-lg); box-shadow: var(--shadow-lift); }
+.split .imgwrap::after {
+  content: ''; position: absolute; inset: 18px -18px -18px 18px;
+  border: 1px solid var(--line-strong); border-radius: var(--r-lg); z-index: -1;
+}
+.split .kicker { margin-bottom: 18px; }
+.split h2 { font: 800 clamp(28px, 3.2vw, 42px)/1.12 'Manrope', sans-serif; color: var(--navy); letter-spacing: -.02em; margin: 0; }
+.split p { font: 400 16.5px/1.7 'Manrope', sans-serif; color: var(--ink-soft); margin: 20px 0 0; }
+.split p .req { color: var(--gold-deep); }
+.split .pull {
+  margin: 26px 0 0; padding-left: 20px; border-left: 3px solid var(--gold);
+  font: 700 17px/1.5 'Manrope', sans-serif; color: var(--navy);
+}
+
+/* ---- values band ---- */
+.vals { background: var(--navy); color: #fff; padding: 100px 0; position: relative; overflow: hidden; }
+.vals::before {
+  content: ''; position: absolute; top: -220px; right: -180px; width: 560px; height: 560px;
+  background: radial-gradient(circle, rgba(201,162,75,.14), transparent 65%); pointer-events: none;
+}
+.vals .wrap { max-width: 1100px; margin: 0 auto; padding: 0 28px; position: relative; }
+.vals h2 { font: 800 clamp(30px, 3.6vw, 46px)/1.1 'Manrope', sans-serif; letter-spacing: -.02em; margin: 0 0 10px; }
+.vals .sub { color: rgba(255,255,255,.6); font-size: 16.5px; max-width: 58ch; margin: 0; }
+.vlist { display: grid; grid-template-columns: 1fr 1fr; gap: 0 64px; margin-top: 54px; border-top: 1px solid rgba(255,255,255,.14); }
+.vitem { padding: 30px 0 26px; border-bottom: 1px solid rgba(255,255,255,.14); display: flex; gap: 20px; }
+.vitem .no { font: 800 13px/1.4 'Manrope', sans-serif; color: var(--gold-soft); letter-spacing: .06em; min-width: 34px; }
+.vitem h3 { font: 800 19px/1.25 'Manrope', sans-serif; margin: 0 0 8px; letter-spacing: -.01em; }
+.vitem p { font-size: 14.5px; line-height: 1.6; color: rgba(255,255,255,.65); margin: 0; }
+
+/* ---- growth timeline: horizontal track ---- */
+.growth { padding: 64px 0; }
+.growth .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+.growth .kicker { margin-bottom: 18px; }
+.growth h2 { font: 800 clamp(30px, 3.6vw, 46px)/1.1 'Manrope', sans-serif; color: var(--navy); letter-spacing: -.02em; margin: 0; max-width: 22ch; }
+.growth .sub { color: var(--ink-soft); font-size: 16px; margin: 14px 0 0; max-width: 60ch; }
+.tl { position: relative; margin-top: 70px; }
+.tl-track { position: absolute; top: 9px; left: 0; right: 0; height: 2px; background: var(--line-strong); }
+/* fill ends at the Today dot — measured 52% of track width (1280px grid) */
+.tl-track i { position: absolute; inset: 0; background: var(--gold); transform-origin: left; transform: scaleX(.52); }
+.tl-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; position: relative; }
+.tl-item .dot { width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 5px solid var(--gold); margin-bottom: 22px; }
+.tl-item .yr { font: 700 clamp(18px, 1.7vw, 22px)/1 'Manrope', sans-serif; color: var(--navy); letter-spacing: -.01em; }
+.tl-item h3 { font: 700 15.5px/1.35 'Manrope', sans-serif; color: var(--navy); margin: 10px 0 8px; }
+.tl-item p { font: 500 13.5px/1.55 'Manrope', sans-serif; color: var(--ink-soft); margin: 0; }
+.tl-item p .req { color: var(--gold-deep); }
+.tl-item--pending .dot { border: 5px solid color-mix(in srgb, var(--gold) 40%, transparent); background: var(--paper); }
+
+/* ---- wide proof band: two photos + stat strip ---- */
+.proof { background: var(--warm); padding: 64px 0; }
+.proof .wrap { max-width: 1280px; margin: 0 auto; padding: 0 28px; }
+.pf-photos { display: grid; grid-template-columns: 1.35fr 1fr 1fr; grid-auto-rows: 240px; gap: 22px; position: relative; }
+.pf-photos figure { height: 100%; }
+.pf-photos figure:first-child { grid-row: span 2; }
+.pf-lead { grid-column: 3; grid-row: 2; }
+.pf-arrows { position: absolute; right: -8px; bottom: -20px; display: flex; gap: 10px; z-index: 3; }
+.pf-arrow { width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); color: var(--navy); font-size: 20px; cursor: pointer; box-shadow: 0 6px 18px rgba(8,29,51,.28); transition: transform .2s ease, background .2s ease; }
+.pf-arrow:hover { background: #fff; transform: translateY(-2px); }
+.pf-tile { will-change: transform, opacity; }
+.pf-photos figure { margin: 0; position: relative; border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow); }
+.pf-photos img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pf-photos .cap {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 18px 14px;
+  background: linear-gradient(transparent, rgba(8,29,51,.78));
+  color: #fff; font: 600 12.5px/1.4 'Manrope', sans-serif; letter-spacing: .02em;
+}
+.pf-photos .cap .req { color: var(--gold-soft); }
+.pf-strip {
+  margin-top: 46px; background: var(--navy); border-radius: var(--r-lg); color: #fff;
+  padding: 44px clamp(28px, 4vw, 60px); display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;
+}
+.pf-strip .n { font: 800 clamp(34px, 4vw, 50px)/1 'Manrope', sans-serif; color: var(--gold-soft); font-variant-numeric: tabular-nums; }
+.pf-strip .l { font: 600 12.5px/1.4 'Manrope', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.6); margin-top: 10px; }
+.pf-strip .req { color: var(--gold-soft); }
+
+/* ---- CTA: shared cta-band vocabulary (aerial photo + navy veil, like 02/03) ---- */
+.ab-cta { padding: 48px 0 0; }
+
+/* gallery hover: same lift vocabulary as 03's gallery (R4) */
+.pf-photos figure { transition: transform .3s ease, box-shadow .3s ease; }
+.pf-photos figure:hover { transform: translateY(-6px); box-shadow: var(--shadow-lift); }
+.pf-photos figure:hover img { transform: scale(1.025); }
+.pf-photos img { transition: transform .45s ease; }
+
+/* ---- responsive ---- */
+@media (max-width: 900px) {
+  .split { grid-template-columns: 1fr; }
+  .split .imgwrap::after { display: none; }
+  .vlist { grid-template-columns: 1fr; gap: 0; }
+  .tl-items { grid-template-columns: 1fr 1fr; row-gap: 44px; }
+  .tl-track { display: none; }
+  .pf-photos { grid-template-columns: 1fr; grid-auto-rows: 260px; }
+  .pf-photos figure { height: 260px; }
+  .pf-photos figure:first-child { grid-row: auto; }
+  .pf-lead { grid-column: auto; grid-row: auto; }
+  .pf-strip { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .tl-items { grid-template-columns: 1fr; }
+  .pf-strip { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+}
+/* reveal-on-scroll — same grammar as 03 */
+.rv { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
+.rv.in { opacity: 1; transform: none; }
+.rv-d1 { transition-delay: .12s; } .rv-d2 { transition-delay: .24s; } .rv-d3 { transition-delay: .36s; }
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header site-header--glass" id="siteHeader">
+  <div class="bar">
+    <a class="brand" href="01-home.html"><span class="brand-logo" role="img" aria-label="VSS Associates"></span></a>
+    <nav class="nav">
+      <a href="02-projects.html">Projects</a>
+      <a href="05-about.html">About</a>
+      <a href="06-contact.html">Contact</a>
+    </nav>
+    <a class="btn btn-gold btn-sm nav-visit" href="06-contact.html">Book a Visit</a>
+    <a class="nav-call" href="tel:04442087913" aria-label="Call VSS Associates on 044 4208 7913"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.9 15.9 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.57 3.6 1 1 0 01-.25 1z"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ hero ============ -->
+<section class="ab-hero">
+  <div class="bg" role="img" aria-label="A family and a VSS team member standing on a laid-out plot"></div>
+  <div class="veil"></div>
+  <div class="wrap">
+    <p class="eyebrow">About VSS Associates</p>
+    <h1>Real land, bought right and <em>handed over honestly.</em></h1>
+    <p class="ab-lede">We source, approve and develop land in and around Chennai — and we keep a simple promise on every layout: what is promised on paper is what you walk on.</p>
+  </div>
+</section>
+
+<!-- ============ split story ============ -->
+<section class="split">
+  <div class="imgwrap rv">
+    <img src="assets/proof-event.jpg" alt="Founder at an on-site registration event — stand-in photograph until client supplies a founder portrait*" loading="lazy">
+  </div>
+  <div class="rv rv-d1">
+    <p class="eyebrow kicker">The VSS way</p>
+    <h2>Every plot we sell, we could stand on and defend.</h2>
+    <p>VSS began with a frustration. Our founder spent his early career inside another real estate firm and kept seeing the same problem: paperwork that wasn't clear, and buyers left worried and confused by the very documents that were meant to protect them. He found that hard to watch — and eventually hard to work for.</p>
+    <p>So he left to build the firm he wished he'd worked at, and grew it from the bottom up, plot by plot. The way he runs it is what people mention first: he treats everyone with the same respect, has stayed modest and accessible despite the firm's success, and the office is said to feel like a family — with a freedom and flexibility rare in this business. We try to sell plots the same way: clearly, and without pressure.</p>
+    <p class="pull">"Approval first, marketing second" — <span class="req">placeholder quote awaiting client wording.*</span></p>
+  </div>
+</section>
+
+<!-- ============ values ============ -->
+<section class="vals">
+  <div class="wrap">
+    <div class="rv">
+    <p class="eyebrow">What we hold to</p>
+    <h2>Four commitments, kept on every layout.</h2>
+    <p class="sub">These are operating principles, not slogans — each one is checkable on a VSS site.</p>
+    </div>
+    <div class="vlist">
+      <div class="vitem rv">
+        <span class="no">01</span>
+        <div>
+          <h3>Approvals before sales</h3>
+          <p>Nothing is offered until the layout papers are in order. Approval documents are shared openly with every buyer.</p>
+        </div>
+      </div>
+      <div class="vitem rv rv-d1">
+        <span class="no">02</span>
+        <div>
+          <h3>The plan is the ground truth</h3>
+          <p>Plot sizes, road widths and boundaries on the plan match the ground. If a survey disagrees, we fix the ground.</p>
+        </div>
+      </div>
+      <div class="vitem rv rv-d2">
+        <span class="no">03</span>
+        <div>
+          <h3>Honest pricing</h3>
+          <p>One clear price per plot, stated upfront. No pressure escalation, no hidden charges introduced after booking.</p>
+        </div>
+      </div>
+      <div class="vitem rv rv-d3">
+        <span class="no">04</span>
+        <div>
+          <h3>Handover with papers</h3>
+          <p>Registration support, patta transfer guidance and a defined handover checklist — the plot is yours in fact, not just in promise.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ growth timeline ============ -->
+<section class="growth">
+  <div class="wrap">
+    <div class="rv">
+    <p class="eyebrow kicker">Growth, verified</p>
+    <h2>A history written in approved layouts.</h2>
+    <p class="sub">Each milestone below corresponds to a real project or company event. Items marked <span class="req" style="color:var(--gold-deep)">*</span> are <span class="req" style="color:var(--gold-deep)">'CLIENT INPUT REQUIRED'</span> placeholders — the story is the structure; the years and names are not final.</p>
+    </div>
+
+    <div class="tl rv rv-d1">
+      <div class="tl-track"><i></i></div>
+      <div class="tl-items">
+        <div class="tl-item tl-item--pending">
+          <div class="dot"></div>
+          <div class="yr">Origins*</div>
+          <h3>The lesson</h3>
+          <p>Working inside another real estate firm, our founder saw documentation that left buyers worried and confused. <span class="req">Founding year awaited from client.*</span></p>
+        </div>
+        <div class="tl-item tl-item--pending">
+          <div class="dot"></div>
+          <div class="yr">Founded*</div>
+          <h3>VSS Associates</h3>
+          <p>He left to build a firm where the papers are clear and the ground is honest — and grew it from the bottom up, plot by plot. <span class="req">Year and founder's name awaited from client.*</span></p>
+        </div>
+        <div class="tl-item">
+          <div class="dot"></div>
+          <div class="yr">Today</div>
+          <h3>4 layouts delivered</h3>
+          <p>Chandrayan and Srivelan are live on this site with a further <span class="req">4 layouts to be listed — client input required.*</span></p>
+        </div>
+        <div class="tl-item tl-item--pending">
+          <div class="dot"></div>
+          <div class="yr">Next</div>
+          <h3>Upcoming layouts*</h3>
+          <p class="req">Pipeline projects and target years awaited from client.*</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ proof band ============ -->
+<section class="proof">
+  <div class="wrap">
+    <div class="pf-photos rv">
+      <figure class="pf-tile" data-tile="0">
+        <img src="assets/proof-build.jpg" alt="Completed compound wall at a VSS layout" loading="lazy">
+        <figcaption class="cap"><span class="cap-t">Compound wall at handover · project name to be confirmed*</span></figcaption>
+      </figure>
+      <figure class="pf-tile" data-tile="1">
+        <img src="assets/proof-stakes.jpg" alt="Plot number board at a VSS layout" loading="lazy">
+        <figcaption class="cap"><span class="cap-t">Plot stakes and numbering on the ground</span></figcaption>
+      </figure>
+      <figure class="pf-tile" data-tile="2">
+        <img src="assets/proof-visit.jpg" alt="Site visit walkthrough at a VSS layout" loading="lazy">
+        <figcaption class="cap"><span class="cap-t">Site visit walkthrough</span></figcaption>
+      </figure>
+      <figure class="pf-tile" data-tile="3">
+        <img src="assets/proof-roads.jpg" alt="Finished internal roads at a VSS layout" loading="lazy">
+        <figcaption class="cap"><span class="cap-t">Finished internal roads</span></figcaption>
+      </figure>
+      <figure class="pf-tile pf-lead" data-tile="4">
+        <img src="assets/proof-site-1.jpg" alt="Overview of a completed VSS layout" loading="lazy">
+        <figcaption class="cap"><span class="cap-t">Layout overview on handover day</span></figcaption>
+      </figure>
+      <div class="pf-arrows">
+        <button type="button" class="pf-arrow pf-prev" aria-label="Previous photos">‹</button>
+        <button type="button" class="pf-arrow pf-next" aria-label="Next photos">›</button>
+      </div>
+    </div>
+
+    <div class="pf-strip rv rv-d1">
+      <div><div class="n"><span class="count" data-target="4">0</span></div><div class="l">Layouts delivered</div></div>
+      <div><div class="n"><span class="count" data-target="600">0</span><span class="req">*</span></div><div class="l">Plots delivered<span class="req">*</span></div></div>
+      <div><div class="n"><span class="count" data-target="120">0</span><span class="req">*</span></div><div class="l">Acres developed<span class="req">*</span></div></div>
+      <div><div class="n"><span class="count" data-target="100">0</span><span class="req">*</span></div><div class="l">% DTCP approved<span class="req">*</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="ab-cta">
+  <div class="cta-band">
+    <div class="bg" style="background-image:url('assets/aerial-rows.jpg')"></div>
+    <div class="veil"></div>
+    <div class="container inner rv">
+      <div>
+        <p class="eyebrow eyebrow--light">Final step</p>
+        <h2 class="h-section" style="margin:0; color:#fff">Stand on the land<br>before you buy it.</h2>
+      </div>
+      <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap">
+        <a class="btn btn-gold" href="06-contact.html">Book a Visit</a>
+        <a class="btn btn-ghost-dark" href="tel:04442087913">Call 044-4208 7913</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container cols">
+    <div>
+      <div class="brandline"><a class="brand" href="01-home.html" aria-label="VSS Associates"><span class="brand-logo" role="img" aria-label="VSS Associates"></span></a></div>
+      <p style="font-size:14.5px; max-width:38ch; opacity:.75">DTCP-approved plotted developments in and around Chennai, Tamil Nadu.</p>
+    </div>
+    <div>
+      <h4>Projects</h4>
+      <ul>
+        <li><a href="03-project-detail.html">Landmark City</a></li>
+        <li><a href="03-project-detail.html">Srivelan Nagar</a></li>
+        <li><a href="03-project-detail.html">Chandrayan Nagar</a></li>
+        <li><a href="02-projects.html">All projects</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Company</h4>
+      <ul>
+        <li><a href="05-about.html">About</a></li>
+        <li><a href="06-contact.html">Contact</a></li>
+        <li><a class="staff" href="07-admin-login.html">Staff login</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Visit us</h4>
+      <p class="addr">VSS Associates office<br>No. 11, West Karikalan Street, 1st Floor,<br>(Opp. to SBI Bank), Adambakkam,<br>Chennai – 600 088</p>
+      <p class="addr">044-4208 7913<br>contact@vssassociates.com</p>
+      <p class="addr" style="opacity:.7">Mon – Sat · 8.00 – 18.00<br>Sunday closed</p>
+    </div>
+  </div>
+  <div class="container legal">
+    <span>© VSS Associates, Chennai</span>
+    <span class="dtcp">All layouts marketed are subject to DTCP approval — approval numbers published per project</span>
+  </div>
+</footer>
+
+<!-- ================= RATIONALE ================= -->
+<section class="rationale">
+  <div class="container">
+    <h2>Design rationale — <span>Screen 05 · About</span></h2>
+    <ol>
+      <li><b>What is borrowed.</b> <span class="k">Hosachiguru</span>: the founder-story split (narrative beside a ground photo) and the “growth, verified” timeline that sells history instead of claiming it. <span class="k">G Square</span>: the numbered commitments strip — four checkable operating principles rather than slogans.</li>
+      <li><b>How it is adapted.</b> The founder story is client-supplied (early career inside another real estate firm, unclear documentation, bottom-up growth, office-as-family culture) and is written in the firm's own voice; the pull-quote awaits the client's exact wording. The timeline is structured as Origins* / Founded* / Today / Next* — eras until real years and the founder's name arrive. Location is canon: Chennai (user-confirmed 2026-11-14). Proof band uses only real VSS site photographs; placeholder tiles stay in the carousel until real photos replace them.</li>
+      <li><b>Why it improves on the previous proposal.</b> The page sells honesty as the brand: every unconfirmed fact is asterisked, the strip counter (“4 layouts delivered”) matches the homepage, and the gallery keeps unverified shots out rather than inventing them.</li>
+      <li><b>Client input still required.</b> Founding year, founder's name, pull-quote wording, pipeline projects &amp; target years, proof-band numbers (600 plots*, 120 acres*, 100 DTCP-approved*), and photos for the empty gallery tiles.</li>
+    </ol>
+    <h2>Review revisions</h2>
+    <ol>
+      <li><b>R1:</b> hero photo replaced with client-supplied concept render (mirrored, bottom watermark crop); verified headline clearance at 1440/390.</li>
+      <li><b>R2:</b> Madurai → Chennai canon fix (hero lede + footer) after user confirmed the founder's Chennai base and Chennai-area layouts.</li>
+      <li><b>R3:</b> founder story written into the split narrative and restructured the timeline from three dashed “awaited” placeholders into story beats; strip counter 6 → 4 to match the homepage stat.</li>
+      <li><b>R4:</b> pending timeline dots redrawn — 5px dashed borders fragmented into broken arcs at 20px, now solid gold rings at 40% opacity; Today's solid ring is the only one. Track fill ends exactly at the Today dot (measured 52%).</li>
+      <li><b>R5:</b> undefined tokens (--gold-deep, --line-strong, --warm) defined in meridian.css :root — split-photo frame, proof band background and asterisk contrast were silently falling back to defaults.</li>
+    </ol>
+  </div>
+</section>
+
+<div class="sample-flag"><b>Sample data</b> — story beats, years &amp; proof numbers marked * await client supply</div>
+
+<script>
+/* animated counters — same pattern as 01-home (.count[data-target]);
+   run ONCE, the first time the stat strip scrolls into view */
+(() => {
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  const run = el => {
+    const target = +el.dataset.target, t0 = performance.now(), dur = 1400;
+    const tick = now => {
+      if (!el.isConnected) return;
+      const p = Math.min(1, (now - t0) / dur);
+      el.textContent = Math.round(target * ease(p)).toLocaleString('en-IN');
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+  const strip = document.querySelector('.pf-strip');
+  const io = new IntersectionObserver(entries => {
+    if (entries.some(e => e.isIntersecting)) {
+      document.querySelectorAll('.count').forEach(run);
+      io.disconnect();
+    }
+  }, { threshold: .3 });
+  if (strip) io.observe(strip);
+})();
+</script>
+<script>
+/* reveal-on-scroll — same grammar as 03: elements fade/rise once, first time in view */
+(function () {
+  const io = new IntersectionObserver(es => es.forEach(x => {
+    if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); }
+  }), { threshold: .18 });
+  document.querySelectorAll('.rv').forEach(x => io.observe(x));
+})();
+</script>
+<script>
+/* proof gallery — arrows rotate the 4 small tiles through a pool of 6 site photos.
+   ‹ moves the window back one photo, › forward; the lead photo (left) stays fixed. */
+(function () {
+  const pool = [
+    { src: 'assets/proof-stakes.jpg',  cap: 'Plot stakes and numbering on the ground' },
+    { src: 'assets/proof-visit.jpg',   cap: 'Site visit walkthrough' },
+    { src: 'assets/proof-roads.jpg',   cap: 'Finished internal roads' },
+    { src: 'assets/proof-site-1.jpg',  cap: 'Layout overview on handover day' },
+    { src: 'assets/proof-launch.jpg',  cap: 'Launch day — project name to be confirmed*' },
+    { src: 'assets/proof-event.jpg',   cap: 'Customer meet — details awaited from client*' },
+  ];
+  const tiles = [...document.querySelectorAll('.pf-tile')].sort((a, b) => +a.dataset.tile - +b.dataset.tile);
+  let off = 0;
+  let busy = false;
+  /* dir = -1 for › (cards exit left, enter from right), +1 for ‹ (reverse) */
+  function slide(dir) {
+    if (busy) return;
+    busy = true;
+    tiles.forEach((t, i) => {
+      const it = pool[(i + off + pool.length) % pool.length];
+      setTimeout(() => {
+        t.style.transition = 'transform .18s ease, opacity .18s ease';
+        t.style.transform = 'translateX(' + (dir * -30) + 'px)';
+        t.style.opacity = '0';
+        setTimeout(() => {
+          t.querySelector('img').src = it.src;
+          t.querySelector('.cap-t').textContent = it.cap;
+          t.style.transition = 'none';
+          t.style.transform = 'translateX(' + (dir * 30) + 'px)';
+          requestAnimationFrame(() => {
+            t.style.transition = 'transform .3s cubic-bezier(.22,.61,.36,1), opacity .3s ease';
+            t.style.transform = 'translateX(0)';
+            t.style.opacity = '1';
+          });
+        }, 190);
+      }, i * 55);
+    });
+    setTimeout(() => { busy = false; }, 700);
+  }
+  document.querySelector('.pf-prev').addEventListener('click', () => { off = (off + pool.length - 1) % pool.length; slide(1); });
+  document.querySelector('.pf-next').addEventListener('click', () => { off = (off + 1) % pool.length; slide(-1); });
+})();
+</script>
+<script>
+/* header: transparent over hero, solid after scroll — same as 01-home */
+(() => {
+  const header = document.getElementById('siteHeader');
+  const onScroll = () => header.classList.toggle('site-header--solid', window.scrollY > 60);
+  onScroll(); addEventListener('scroll', onScroll, { passive: true });
+})();
+</script>
+</body>
+</html>
