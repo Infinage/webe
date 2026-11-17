@@ -1,0 +1,54 @@
+<!-- https://cssbattle.dev/play/v4vfHaiNnku33Bu4ZxoO -->
+<div class="row">
+  <div class="semi-circle"></div>
+  <div class="semi-circle"></div>
+</div>
+
+<div class="row">
+  <div class="semi-circle"></div>
+</div>
+<style>
+:root {
+    --width: 30px;
+    --border: 30px;
+}
+
+* {
+    margin: 0;
+}
+
+body {
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #1A4341;
+}
+
+.row {
+    display: flex;
+
+    &:nth-child(1) {
+        gap: var(--width);
+    }
+}
+
+.semi-circle {
+    width: var(--width);
+    aspect-ratio: 2/1;
+    border: var(--border) solid #998235;
+    border-radius: 999px 999px 0 0;
+}
+
+.row:nth-child(1) .semi-circle {
+    border-bottom: 0;
+}
+
+.row:nth-child(2) .semi-circle {
+    border-radius: 0 0 999px 999px;
+    border-top: 0;
+}
+</style>
