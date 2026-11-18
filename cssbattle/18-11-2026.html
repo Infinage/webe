@@ -1,0 +1,60 @@
+<!-- https://cssbattle.dev/play/OuZGRWZ169z3th35sN48 -->
+<div class="container">
+  <div class="rect"></div>
+  <div class="diamond"></div>
+  <div class="rect"></div>
+
+  <div class="rect"></div>
+  <div class="square"></div>
+  <div class="rect"></div>
+
+  <div class="rect"></div>
+  <div class="diamond"></div>
+  <div class="rect"></div>
+</div> 
+<style>
+  * {
+    margin: 0;
+  }
+  
+  body {
+    background-color: #F2EAA8;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    height: 150px;
+    width: 230px; 
+
+    display: grid;
+    grid-template-columns: 3fr 1fr 3fr;
+    grid-template-rows: repeat(3 1fr);
+    gap: 30px 20px;
+
+    align-items: center;
+    justify-content: center;
+
+    div {
+        background-color: #4760B6;
+        height: 100%;
+    }
+
+    .rect {
+        border-radius: 20px;
+        width: 100%;
+    }
+
+    .square, .diamond {
+        aspect-ratio: 1/1;
+        border-radius: 10px;
+    }
+
+    .diamond {
+        rotate: 45deg;
+    }
+}
+</style>
