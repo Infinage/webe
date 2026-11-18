@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="index.css">
+    <script src="index.js" type="module" defer></script>
+  </head>
+  <body>
+    <h1>Update CSS Variable with <span>JS</span></h1>
+
+    <div class="controls">
+      <div class="spacing-ctrl">
+        <label for="spacing">Spacing: </label>
+        <input data-unit="px" min="10" max="200" value="10" type="range" id="spacing" />
+      </div>
+
+      <div class="blur-ctrl">
+        <label for="blur">Blur: </label>
+        <input data-unit="px" min="0" max="25" value="10" type="range" id="blur" />
+      </div>
+
+      <div class="color-ctrl">
+        <label for="color">Base Color:</label>
+        <input value="#ffc600" type="color" id="color" />
+      </div>
+    </div>
+
+    <img src="image.jpg">
+  </body>
+</html>
