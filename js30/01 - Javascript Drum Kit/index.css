@@ -54,5 +54,6 @@ body {
     &.active {
         border: 3px solid #ffc600;
         transform: scale(1.1);
+        box-shadow: #ffc600 0 0 1rem;
     }
 }
