@@ -1,0 +1,68 @@
+<!-- https://cssbattle.dev/play/NKPquzPInXKuDaB3FR9K -->
+<div class="white"></div>
+<div class="black"></div>
+<div class="blue"></div>
+
+<style>
+:root {
+  --lsize: 70px;
+  --msize: 70px;
+  --ssize: 60px;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  background-color: #6C6C6C;
+  position: relative;
+}
+
+.white {
+  background-color: #FFFFFF;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% 7%;
+
+  height: var(--lsize);
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+}
+
+.black {
+  background-color: #4B4D88;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+
+  height: var(--msize);
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+}
+
+.blue {
+  background-color: #B0E1FB;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -115%;
+
+  height: var(--ssize);
+  aspect-ratio: 1/1;
+  border-radius: 50% 50% 0 50%;
+
+  rotate: 45deg;
+}
+</style>
