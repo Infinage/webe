@@ -20,10 +20,7 @@ export {};
 const cities = Array.from(await (await fetch('cities.json')).json());
 
 const resultList = document.getElementById("search-result");
-if (!resultList) throw "Search result not initialized";
-
 const cityTemplate = document.getElementById("city-template");
-if (!cityTemplate) throw "City template not initialized"; 
 
 /** 
   * Utility function that wraps highlighted sections with span.highlight
@@ -64,23 +61,43 @@ function li(c, search) {
   return template;
 }
 
-document.getElementById("search-input")?.addEventListener("keyup", evt => {
-  if (!evt.target || !(evt.target instanceof HTMLInputElement)) return;
-  const search = evt.target.value.toLowerCase();
-  resultList.innerHTML = "";
+/**
+  * Returns a function to filter cities with specified debounce
+  * @param {number} delay
+  * @returns {(evt: Event) => void}
+*/
+function filterCitiesFn(delay) {
+  /** @type {Number} */ let timeout; 
 
-  if (!search) {
-    const li1 = document.createElement("li");
-    const li2 = document.createElement("li");
-    li1.innerText = "Fiter For A City";
-    li2.innerText = "Or A State";
-    resultList.append(li1, li2);
-    return;
+  return (evt) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      if (!evt.target || !(evt.target instanceof HTMLInputElement) || !resultList) 
+        return;
+
+      const search = evt.target.value.toLowerCase();
+
+      // Clear current list
+      resultList.innerHTML = "";
+
+      // Default if no input
+      if (!search) {
+        const li1 = document.createElement("li");
+        const li2 = document.createElement("li");
+        li1.innerText = "Fiter For A City";
+        li2.innerText = "Or A State";
+        resultList.append(li1, li2);
+        return;
+      }
+
+      // Filtered list if something is present
+      const filtered = cities.filter(c => {
+        return c.city.toLowerCase().includes(search) || 
+          c.state.toLowerCase().includes(search);
+      });
+      resultList.append(...filtered.map((c) => li(c, search)));
+    }, delay);
   }
+};
 
-  const filtered = cities.filter(c => {
-    return c.city.toLowerCase().includes(search) || 
-      c.state.toLowerCase().includes(search);
-  });
-  resultList.append(...filtered.map((c) => li(c, search)));
-});
+document.getElementById("search-input")?.addEventListener("keyup", filterCitiesFn(200));
