@@ -25,15 +25,42 @@ if (!resultList) throw "Search result not initialized";
 const cityTemplate = document.getElementById("city-template");
 if (!cityTemplate) throw "City template not initialized"; 
 
+/** 
+  * Utility function that wraps highlighted sections with span.highlight
+  * @param {string} text
+  * @param {string} search
+  * @returns {HTMLElement}
+*/
+function highlight(text, search) {
+  const span = document.createElement("span");
+  const searchCleaned = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  text = text.replaceAll(new RegExp(`(${searchCleaned})`, "ig"), 
+    `<span class="highlight">$1</span>`);
+  span.innerHTML = text;
+  return span;
+}
+
 /**
   * Helper to return a list with given city.
   * @param {City} c
-  * @returns {HTMLElement}
+  * @param {string} search
+  * @returns {DocumentFragment}
   */
-function li(c) {
-  const template = /** @type {HTMLElement} */ (cityTemplate).cloneNode();
-  if (!template || !(template instanceof HTMLElement)) throw "Clone fail";
-  template.innerHTML = c.city;
+function li(c, search) {
+  const templateContent = /** @type {HTMLTemplateElement} */ (cityTemplate).content
+  const template = document.importNode(templateContent, true);
+
+  const cityName = template.querySelector(".city-name")
+  const cityState = template.querySelector(".city-state")
+  const cityPopulation = template.querySelector(".city-population")
+
+  if (!cityName || !cityState || !cityPopulation) 
+    throw "Missing required template tags";
+
+  cityName.appendChild(highlight(c.city, search));
+  cityState.appendChild(highlight(c.state, search));
+  cityPopulation.textContent = Number(c.population).toLocaleString();
+
   return template;
 }
 
@@ -55,5 +82,5 @@ document.getElementById("search-input")?.addEventListener("keyup", evt => {
     return c.city.toLowerCase().includes(search) || 
       c.state.toLowerCase().includes(search);
   });
-  resultList.append(...filtered.map(li));
+  resultList.append(...filtered.map((c) => li(c, search)));
 });
