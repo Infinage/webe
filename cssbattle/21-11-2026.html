@@ -1,0 +1,64 @@
+<!-- https://cssbattle.dev/play/uzoOpbBnY8iXVAKpjzxS -->
+<main>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+
+  <div></div>
+  <div></div>
+
+
+  <div></div>
+  <div></div>
+</main>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background-color: #90D3A6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+ 
+main {
+  display: grid;
+  grid-template-columns: repeat(4, min-content);
+  grid-template-rows: repeat(3, min-content);
+  gap: 45px 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+div {w
+  background-color: #024817;
+  height: 25px; 
+  aspect-ratio: 2/1;
+  border-radius: 25px 25px 0 0;
+
+  &:nth-child(6) {
+    grid-row-start: 2;  
+    grid-column-start: 4;  
+  }
+
+  &:nth-child(7) {
+    grid-row-start: 3;  
+    grid-column-start: 2;  
+  }
+
+  &:nth-child(8) {
+    grid-row-start: 3;  
+    grid-column-start: 3;  
+  }
+}
+</style>
