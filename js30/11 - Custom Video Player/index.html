@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <script src="index.js" type="module" defer></script>
+</head>
+<body>
+  <div class="custom-player">
+    <video src="video.mp4"></video> 
+    <div class="interface">
+      <div class="progress-bar"><div class="bar-position"></div></div>
+      <div class="controls">
+        <button name="play-pause" type="button">▶</button>
+        <input name="volume" class="volume" type="range" min="0" 
+          max="1" step="0.05" value="1" />
+        <input name="playback" class="playback" type="range" min="0.25" 
+          max="2" step="0.25" value="1" />
+        <button name="seek-backward" type="button">« 10s</button>
+        <button name="seek-forward" type="button">25s »</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
