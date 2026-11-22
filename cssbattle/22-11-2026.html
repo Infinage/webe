@@ -1,0 +1,60 @@
+<!-- https://cssbattle.dev/play/NeNTagiTiZfRt8dCPIqd -->
+<div class="outer">
+  <div class="inner"></div>
+  <div class="inner"></div>
+</div>
+
+<div class="outer">
+  <div class="inner"></div>
+  <div class="inner"></div>
+</div>
+
+<div class="outer">
+  <div class="inner"></div>
+  <div class="inner"></div>
+</div>
+<style>
+  * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background-color: #1D025E;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.outer {
+    height: 70px; 
+    width: 150px;
+    display: flex;
+    overflow: hidden;
+    gap: 10px;
+
+    .inner {
+      height: 100%;
+      aspect-ratio: 1/1;
+    }
+
+    .inner:first-child {
+      background-color: #F6DF96;
+      border-radius: 0 0 100% 0;
+    }
+
+    .inner:last-child {
+      background-color: #43B6C7;
+      border-radius: 0 0 0 100%;
+    }
+}
+</style>
