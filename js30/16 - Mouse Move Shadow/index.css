@@ -1,0 +1,39 @@
+:root {
+  --pink-offset-x: 0;
+  --pink-offset-y: 0;
+
+  --blue-offset-x: 0;
+  --blue-offset-y: 0;
+
+  --cyan-offset-x: 0;
+  --cyan-offset-y: 0;
+
+  --green-offset-x: 0;
+  --green-offset-y: 0;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero h2 {
+  font-size: 5rem;
+  text-shadow: 
+    var(--pink-offset-x) var(--pink-offset-y) lightpink,
+    var(--blue-offset-x) var(--blue-offset-y) blueviolet,
+    var(--cyan-offset-x) var(--cyan-offset-y)  cyan,
+    var(--green-offset-x) var(--green-offset-y) lightgreen;
+}
