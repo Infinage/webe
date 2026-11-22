@@ -1,0 +1,42 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  background-color: #ffc600;
+  height: 90%;
+
+  main {
+    background-color: white;
+    margin: 20px 10px;
+    position: relative;
+
+    video {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 150px;
+      width: 200px;
+    }
+
+    canvas {
+      width: 100%;
+    }
+
+    .strip {
+      display: flex;
+      flex-wrap: wrap;
+
+      img {
+        height: 75px;
+        width: 100px;
+      }
+    }
+  }
+}
