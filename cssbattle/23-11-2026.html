@@ -1,0 +1,54 @@
+<!-- https://cssbattle.dev/play/d3CuehIATuNu3MvLxn8U -->
+<div class="container">
+  <div class="pill"></div>
+  <div class="pill rotated"></div>
+  <div class="circle"></div>
+</div>
+<style>
+  * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background-color: #F8B140;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .container {
+      aspect-ratio: 1/1;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+
+      .pill {
+        position: absolute;
+        width: 100%;
+        height: 50%;
+        border-radius: 999px;
+        background-color: #CF6939;
+
+        &.rotated {
+          rotate: 90deg;
+        }
+      }
+
+      .circle {
+        position: absolute;
+        height: 30px;
+        aspect-ratio: 1/1;
+        border-radius: 20px;
+        border: 10px solid #2F434E;
+      }
+  }
+}
+</style>
