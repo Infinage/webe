@@ -1,0 +1,54 @@
+:root {
+  --black-15: rgba(0,0,0,0.15);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background-color: #ffc600;
+  display: flex;
+  justify-content: center;
+}
+
+.page {
+  width: 700px;
+  height: fit-content;
+  margin: 2rem;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 10px 10px 0 var(--black-15);
+  padding-top: 15px;
+
+  background: linear-gradient(#fff 96%, #d9eaf3);
+  background-size: 100% 3rem;
+
+  position: relative;
+
+  &:before {
+    content: "";
+    position: absolute;
+    width: 4px;
+    inset: 0 0 0 3rem;
+    border-inline: 1px solid var(--black-15);
+  }
+
+  .para {
+    position: relative;
+    margin-left: 50px;
+    margin-bottom: 3rem;
+    padding-inline: 30px 20px;
+
+    font-weight: 200;
+    font-size: 20px;
+    line-height: 3rem;
+  }
+}
