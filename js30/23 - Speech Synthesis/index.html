@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <script src="index.js" type="module" defer></script>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+</head>
+<body>
+  <form>
+    <div class="form-header">
+      <h2>The Voiceinator 5000</h2>
+    </div>
+
+    <div class="form-inputs">
+      <select name="voice">
+        <option selected disabled>Select A Voice</option>
+      </select>
+
+      <label for="speech-rate">Rate:</label>
+      <input min="0" max="3" step="0.1" name="rate" type="range" id="speech-rate" />
+
+      <label for="speech-pitch">Pitch:</label>
+      <input min="0" max="2" step="0.1" name="pitch" type="range" id="speech-pitch" />
+
+      <textarea name="text" rows="8">Hello! I love JavaScript!</textarea>
+    </div>
+
+    <div class="form-control">
+      <button name="stop" type="button">Stop!</button>
+      <button name="speak" type="button">Speak</button>
+    </div>
+  </form> 
+</body>
+</html>

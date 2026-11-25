@@ -1,0 +1,105 @@
+:root {
+  --bg: rgba(0,0,0,0.05);
+}
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  height: 100vh;
+  background-image:
+  radial-gradient(circle at 100% 150%, #3BC1AC 24%, #42D2BB 25%, #42D2BB 28%, #3BC1AC 29%, #3BC1AC 36%, #42D2BB 36%, #42D2BB 40%, transparent 40%, transparent),
+  radial-gradient(circle at 0    150%, #3BC1AC 24%, #42D2BB 25%, #42D2BB 28%, #3BC1AC 29%, #3BC1AC 36%, #42D2BB 36%, #42D2BB 40%, transparent 40%, transparent),
+  radial-gradient(circle at 50%  100%, #42D2BB 10%, #3BC1AC 11%, #3BC1AC 23%, #42D2BB 24%, #42D2BB 30%, #3BC1AC 31%, #3BC1AC 43%, #42D2BB 44%, #42D2BB 50%, #3BC1AC 51%, #3BC1AC 63%, #42D2BB 64%, #42D2BB 71%, transparent 71%, transparent),
+  radial-gradient(circle at 100% 50%, #42D2BB 5%, #3BC1AC 6%, #3BC1AC 15%, #42D2BB 16%, #42D2BB 20%, #3BC1AC 21%, #3BC1AC 30%, #42D2BB 31%, #42D2BB 35%, #3BC1AC 36%, #3BC1AC 45%, #42D2BB 46%, #42D2BB 49%, transparent 50%, transparent),
+  radial-gradient(circle at 0    50%, #42D2BB 5%, #3BC1AC 6%, #3BC1AC 15%, #42D2BB 16%, #42D2BB 20%, #3BC1AC 21%, #3BC1AC 30%, #42D2BB 31%, #42D2BB 35%, #3BC1AC 36%, #3BC1AC 45%, #42D2BB 46%, #42D2BB 49%, transparent 50%, transparent);
+  background-size:100px 50px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+form {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 2rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 500px;
+
+  .form-header > h2 {
+    background-color: #ffc600;
+    font-family: 'Pacifico', cursive;
+    padding: 10px;
+    text-align: center;
+
+    font-size: 3rem;
+    @media (width < 600px) { font-size: 2rem; }
+    @media (width < 400px) { font-size: 1.75rem; }
+  }
+
+  .form-inputs {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    gap: 10px;
+
+    label {
+      font-size: 0.75rem;
+      line-height: 2rem;
+    }
+
+    select {
+      font-size: 1.25rem;
+      @media(width < 400px) { font-size: 1rem; }
+
+      height: 40px;
+      outline: none;
+      padding: 10px;
+      border: none;
+      background-color: var(--bg);
+
+      > option {
+        background-color: var(--bg);
+      }
+    }
+
+    textarea {
+      background-color: var(--bg);
+      border: none;
+      padding: 10px;
+      font-size: 1.15rem;
+      @media(width < 400px) { font-size: 1rem; }
+    }
+  }
+
+  .form-control {
+    display: flex;
+    flex-direction: row; 
+    @media (width < 600px) { flex-direction: column; }
+
+    padding: 15px;
+    padding-top: 0;
+    gap: 10px;
+
+    button {
+      flex: 1;
+      padding: 10px;
+      font-family: 'Pacifico', cursive;
+      font-size: 1.25rem;
+      background-color: #ffc600;
+      border: none;
+      cursor: pointer;
+
+      &:active {
+        translate: 0 1%; 
+      }
+    }
+  }
+}
