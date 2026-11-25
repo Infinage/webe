@@ -1,0 +1,102 @@
+* {
+  margin: 0; 
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background-color: hsl(0 0 90%);
+}
+
+header {
+  background-image: url(https://picsum.photos/seed/picsum/960/640);
+  background-size: cover;
+  background-position: bottom;
+  background-repeat: no-repeat;
+
+  height: 75%;
+  display: flex; 
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+
+  h1 {
+    color: white;
+    text-shadow: 3px 3px rgba(0,0,0,0.3);
+    font-size: 7vw;
+    text-align: center;
+  }
+}
+
+nav {
+  width: 100%;
+  background-color: black;
+
+  ul {
+    display: flex;
+    width: 100%;
+
+    li {
+      flex: 1;
+      list-style: none;
+      text-transform: uppercase;
+      text-align: center;
+      font-size: 1.5rem;
+
+      a {
+        display: inline-block;
+        padding: 20px 30px;
+        color: hsl(0 0 90%);
+        text-decoration: none;
+      }
+
+      &:first-child {
+        box-sizing: content-box;
+        max-width: 0;
+        background-color: white;
+        transition: max-width ease-in-out 1s;
+
+        a {
+          color: black;
+          font-weight: 500;
+          text-shadow: 1px 0 black;
+        }
+      }
+    }
+  }
+
+  &.sticky {
+    position: fixed;
+    inset: 0 auto auto auto;
+
+    li:first-child {
+      max-width: 300px;
+    }
+  }
+}
+
+main {
+  margin-inline: auto;
+  max-width: 800px;
+  margin-top: 6rem;
+
+  box-shadow: 0 0 10px rgba(0,0,0,0.25);
+  background-color: white;
+  padding: 4rem 2rem;
+
+  p {
+    font-size: 1.25rem;
+    font-weight: 300;
+    text-justify: inter-word;
+    margin: 15px;
+  }
+
+  img {
+    margin: 15px;
+  }
+}
