@@ -1,0 +1,99 @@
+<!-- https://cssbattle.dev/play/TKYsmdfc2XMpMT4qG9mS -->
+<div class="container">
+  <div class="filled-circle"></div>
+  <div class="filled-circle"></div>
+  <div class="filled-circle"></div>
+  <div class="filled-circle"></div>
+
+  <div class="empty-circle"></div>
+
+  <div class="pill pill-top"></div>
+  <div class="pill pill-right"></div>
+  <div class="pill pill-bottom"></div>
+  <div class="pill pill-left"></div>
+</div>
+<style>
+  * {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background-color: #5F133F;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  height: 100px;
+  width: 100px;
+
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  justify-content: center;
+  align-content: center;
+  gap: 30px;
+
+  position: absolute;
+
+  .filled-circle {
+    height: 40px;
+    aspect-ratio: 1/1;
+    background-color: #F075B0;
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  .empty-circle {
+    position: absolute;
+    inset: 50% 50%;
+    translate: -50% -50%;
+
+    background-color: #5F133F;
+    border: solid #F075B0 10px;
+    height: 110px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    z-index: 10;
+  }
+
+  .pill {
+    z-index: 100;
+    position: absolute;
+
+    width: 20px;
+    height: 40px;
+    border-radius: 100% / 50%;
+    background-color: #F7BED9;
+
+    &.pill-left {
+      rotate: 90deg; 
+      left: 0; top: 50%;
+      translate: -50% -50%;
+    }
+
+    &.pill-right {
+      rotate: 90deg; 
+      right: 0; top: 50%;
+      translate: 50% -50%;
+    }
+
+    &.pill-top {
+      left: 50%; top: 0;
+      translate: -50% -50%;
+    }
+
+    &.pill-bottom {
+      left: 50%; bottom: 0;
+      translate: -50% 50%;
+    }
+  }
+}
+</style>
